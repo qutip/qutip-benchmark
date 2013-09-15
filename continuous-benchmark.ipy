@@ -1,0 +1,100 @@
+# Continous benchmarking tool for qutip
+
+import json
+import time
+
+import matplotlib.pyplot as plt
+import pandas as pd
+from git import Repo
+
+# Configuration
+bm_repo_dir = "/home/rob/Desktop/qutip-benchmarking"
+env_dir = "/home/rob/py-envs/py3.3-qutip-benchmarking"
+bm_dir = "/home/rob/Desktop/continuous-benchmark/benchmarks"
+bm_data = "/home/rob/Desktop/continuous-benchmark/benchmark_data.json"
+bm_runs = 5
+
+# load benchmark scripts
+bm_files = !cd {bm_dir} && ls *.py
+bm_names = [bm_file[:-3] for bm_file in bm_files]
+
+# Load previous benchmark results
+prev_data = None
+try:
+    with open(bm_data, "r") as f:
+        prev_data = json.load(f)
+except:
+    pass
+
+if not prev_data:
+    print("No previous data, setting up new data structures")
+    last_commit_timestamp = 1375029892
+
+    results = {}
+    results['timestamp'] = []
+    for bm_name in bm_names:
+        results[bm_name] = []
+else:
+    print("Found previous data, setting up old data structures")
+    last_commit_timestamp = prev_data['last_commit_timestamp']
+    results = prev_data['results']
+    
+    # make sure that all bm files have a list in results record
+    for bm_name in bm_names:
+        if not results.has_key(bm_name):
+            print("Missing data for %s. Padding with NaN" % bm_name)
+            results[bm_name] = [float('nan')] * len(results['timestamp'])
+
+# Setup repository
+repo = Repo(bm_repo_dir)
+repo.git.checkout("master")
+repo.git.pull()
+
+commits = list(repo.iter_commits("master"))
+recent_commits = list(reversed([c for c in commits if c.committed_date > last_commit_timestamp]))
+print("Benchmarking %d new revisions" % len(recent_commits))
+
+def qutip_install():
+    !cd {bm_repo_dir} && {env_dir}/bin/python3 setup.py clean >> /dev/null
+    !cd {bm_repo_dir} && {env_dir}/bin/python3 setup.py install >> /dev/null
+
+for commit in recent_commits:
+    # checkout and install 
+    repo.git.checkout(commit)
+    qutip_install()
+
+    print("Benchmarking: %s: %s: %s" % (commit, commit.committer, commit.committed_date))
+    
+    results['timestamp'].append(commit.committed_date)    
+    for idx, bm_file in enumerate(bm_files):
+        elapsed = !{env_dir}/bin/python {bm_dir}/{bm_file} -r {bm_runs}
+        results[bm_names[idx]].append(float(elapsed[0]))
+        
+    last_commit_timestamp = commit.committed_date
+
+# Save results
+data = {'results': results, 'last_commit_timestamp': last_commit_timestamp}
+with open("benchmark_data.json", "w") as f:
+    json.dump(data, f)
+
+# Generate plots
+df = pd.DataFrame({bm_name: results[bm_name] for bm_name in bm_names},
+                  index=results['timestamp'])
+df.index = pd.to_datetime((df.index.values*1e9).astype(int))
+print(df)
+
+for bm_name in bm_names:
+    fig, ax = plt.subplots(1,1, figsize=(16, 4))
+    
+    try:
+        df[bm_name].plot(ax=ax, x_compat=True)
+        ax.set_title(bm_name)
+        ax.set_ylabel("time (s)")
+        fig.savefig("graphs/" + bm_name + ".png");
+    except:
+        print("skipping %s" % bm_name)
+
+# Versions
+%load_ext version_information
+%version_information git, numpy, pandas, matplotlib
+
