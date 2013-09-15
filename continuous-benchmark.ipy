@@ -3,6 +3,7 @@
 import json
 import time
 
+import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from git import Repo
@@ -87,12 +88,13 @@ for bm_name in bm_names:
     fig, ax = plt.subplots(1,1, figsize=(16, 4))
     
     try:
-        df[bm_name].plot(ax=ax, x_compat=True)
+        #df[bm_name].plot(ax=ax, x_compat=True)
+        ax.step(np.array(df.index.to_pydatetime()), np.array(df[bm_name]))
         ax.set_title(bm_name)
         ax.set_ylabel("time (s)")
         fig.savefig("graphs/" + bm_name + ".png");
-    except:
-        print("skipping %s" % bm_name)
+    except Exception as e:
+        print("skipping %s: %s" % (bm_name, str(e)))
 
 # Versions
 %load_ext version_information
