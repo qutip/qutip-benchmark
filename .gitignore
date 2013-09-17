@@ -1,4 +1,6 @@
 *.py[cod]
+env
+qutip-repo
 
 # C extensions
 *.so
