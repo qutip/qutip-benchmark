@@ -1,6 +1,4 @@
-#
-# qutip benchmark: Qobj.expm
-#
+import time
 
 try:
     from numpy import *

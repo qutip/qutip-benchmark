@@ -1,6 +1,7 @@
 #
 # qutip benchmark: expect
 #
+import time
 
 try:
     from numpy import *

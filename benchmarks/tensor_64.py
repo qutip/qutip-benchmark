@@ -1,3 +1,5 @@
+import time
+
 try:
     from numpy import *
     from qutip import *

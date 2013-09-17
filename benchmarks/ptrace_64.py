@@ -1,6 +1,7 @@
 #
 # qutip benchmark: ptrace 6 spin operators
 #
+import time
 
 try:
     from numpy import *
@@ -14,8 +15,7 @@ def benchmark(runs=1):
     """
     ptrace 6 spin operators.
     """
-    test_name='Qobj ptrace [64]'
-    out=tensor([sigmax(),sigmay(),sigmaz(),sigmay(),sigmaz(),sigmax()])
+    out = tensor([sigmax(),sigmay(),sigmaz(),sigmay(),sigmaz(),sigmax()])
 
     tot_elapsed = 0
     for n in range(runs):

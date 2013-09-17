@@ -1,6 +1,7 @@
 #
 # qutip benchmark: solve for the dynamics of the jaynes-cummings model
 #
+import time
 
 try:
     from numpy import *
@@ -51,8 +52,6 @@ def jc_integrate(N, wc, wa, g, kappa, gamma, tlist):
 
 
 def benchmark(N=1):
-
-    import time
 
     wc = 1.0 * 2 * pi   # cavity frequency
     wa = 1.0 * 2 * pi   # atom frequency

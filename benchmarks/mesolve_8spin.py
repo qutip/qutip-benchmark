@@ -1,6 +1,7 @@
 #
 # qutip benchmark: mesolve 8 spin chain
 #
+import time
 
 try:
     from numpy import *

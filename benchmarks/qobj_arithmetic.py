@@ -1,6 +1,4 @@
-#
-# qutip benchmark: Qobj arithmetic
-#
+import time
 
 try:
     from numpy import *
