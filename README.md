@@ -61,3 +61,9 @@ mesolve_8spin
 
 ![mesolve_8spin](https://raw.github.com/qutip/continuous-benchmark/master/graphs/mesolve_8spin.png)
 
+
+mcsolve_8spin
+-----------------
+
+![mcsolve_8spin](https://raw.github.com/qutip/continuous-benchmark/master/graphs/mcsolve_8spin.png)
+
