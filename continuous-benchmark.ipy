@@ -29,7 +29,7 @@ except:
 
 if not prev_data:
     print("No previous data, setting up new data structures")
-    last_commit_timestamp = 1363029892
+    last_commit_timestamp = 1353029892
 
     results = {}
     results['timestamp'] = []
@@ -58,20 +58,21 @@ print("Benchmarking %d new revisions" % len(recent_commits))
 def qutip_install():
     !cd {bm_repo_dir} && {env_dir}/bin/python setup.py clean >> /dev/null
     !cd {bm_repo_dir} && {env_dir}/bin/python setup.py install >> /dev/null
+    !cd {bm_repo_dir} && rm -rf qutip/_version.py >> /dev/null
 
-for commit in recent_commits:
+for commit_idx, commit in enumerate(recent_commits):
     # checkout and install 
     repo.git.checkout(commit)
     qutip_install()
 
-    print("Benchmarking: %s: %s: %s" % (commit, commit.committer, time.ctime(commit.committed_date)))
+    print("Benchmarking: %s: %s: %s [%.2f%%]" % (commit, commit.committer, time.ctime(commit.committed_date), (100.0 * commit_idx)/len(recent_commits)))
     
     results['timestamp'].append(commit.committed_date)    
     for idx, bm_file in enumerate(bm_files):
         elapsed = None
         try:
             elapsed = !{env_dir}/bin/python {bm_dir}/{bm_file} -r {bm_runs}
-            results[bm_names[idx]].append(float(elapsed[0]))
+            results[bm_names[idx]].append(float(elapsed[-1]))
         except Exception as e:
             print("Failed to store results for %s [%s]:%s" % (bm_file, str(elapsed), str(e)))
             results[bm_names[idx]].append(float('nan'))
