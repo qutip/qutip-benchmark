@@ -6,7 +6,7 @@ import time
 try:
     from numpy import *
     from qutip import *
-except:
+except Exception as e:
     print("nan")
     import sys
     sys.exit(1)
