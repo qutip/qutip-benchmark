@@ -29,10 +29,11 @@ except:
 
 if not prev_data:
     print("No previous data, setting up new data structures")
-    last_commit_timestamp = 1353029892
+    last_commit_timestamp = 1376258051 # 1363050005  #1363047005 #1353029892
 
     results = {}
     results['timestamp'] = []
+    results['commit'] = []
     for bm_name in bm_names:
         results[bm_name] = []
 else:
@@ -46,6 +47,8 @@ else:
             print("Missing data for %s. Padding with NaN" % bm_name)
             results[bm_name] = [float('nan')] * len(results['timestamp'])
 
+if not 'commit' in results:
+    results['commit'] = ['' for _ in results['timestamp']]
 # Setup repository
 repo = Repo(bm_repo_dir)
 repo.git.checkout("master")
@@ -68,6 +71,7 @@ for commit_idx, commit in enumerate(recent_commits):
     print("Benchmarking: %s: %s: %s [%.2f%%]" % (commit, commit.committer, time.ctime(commit.committed_date), (100.0 * commit_idx)/len(recent_commits)))
     
     results['timestamp'].append(commit.committed_date)    
+    results['commit'].append(str(commit))    
     for idx, bm_file in enumerate(bm_files):
         elapsed = None
         try:
@@ -79,10 +83,10 @@ for commit_idx, commit in enumerate(recent_commits):
         
     last_commit_timestamp = commit.committed_date
 
-# Save results
-data = {'results': results, 'last_commit_timestamp': last_commit_timestamp}
-with open("benchmark_data.json", "w") as f:
-    json.dump(data, f)
+    # Save results
+    data = {'results': results, 'last_commit_timestamp': last_commit_timestamp}
+    with open("benchmark_data.json", "w") as f:
+        json.dump(data, f)
 
 # Generate plots
 df = pd.DataFrame({bm_name: results[bm_name] for bm_name in bm_names},
