@@ -22,6 +22,11 @@ def benchmark(runs=1):
     coh_dm=coherent_dm(N,alpha)
     n=num(N)
 
+    # precompute hermiticity since we want to
+    # benchmark the expect function rather than
+    # isherm
+    coh.isherm, coh_dm.isherm, n.isherm
+
     tot_elapsed = 0
     for m in range(runs):
         tic = time.time()
