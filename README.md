@@ -3,6 +3,11 @@ continuous-benchmark
 
 Tools for continuously bench-marking qutip's development branch
 
+Summary
+-------
+
+![summary](https://raw.github.com/qutip/continuous-benchmark/master/graphs/summary.png)
+
 
 expect_25
 -----------------
