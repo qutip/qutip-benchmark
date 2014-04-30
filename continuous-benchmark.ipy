@@ -65,6 +65,9 @@ def qutip_install():
 
 for commit_idx, commit in enumerate(recent_commits):
     # checkout and install 
+    if str(commit) in ["661ecf336311f39aef4277a1e99abc6a814ecdf9", "20738e4b93a986f772b4f7d633c3e64057abc18e", "661ecf336311f39aef4277a1e99abc6a814ecdf9"]:
+        continue
+
     repo.git.checkout(commit)
     qutip_install()
 
@@ -77,6 +80,7 @@ for commit_idx, commit in enumerate(recent_commits):
         try:
             elapsed = !{env_dir}/bin/python {bm_dir}/{bm_file} -r {bm_runs}
             results[bm_names[idx]].append(float(elapsed[-1]))
+	    print(bm_names[idx] + " = " + str(float(elapsed[-1])))
         except Exception as e:
             print("Failed to store results for %s [%s]:%s" % (bm_file, str(elapsed), str(e)))
             results[bm_names[idx]].append(float('nan'))
@@ -92,7 +96,6 @@ for commit_idx, commit in enumerate(recent_commits):
 df = pd.DataFrame({bm_name: results[bm_name] for bm_name in bm_names},
                   index=results['timestamp'])
 df.index = pd.to_datetime((df.index.values*1e9).astype(int))
-print(df)
 
 for bm_name in bm_names:
     fig, ax = plt.subplots(1,1, figsize=(16, 4))
@@ -106,7 +109,27 @@ for bm_name in bm_names:
     except Exception as e:
         print("skipping %s: %s" % (bm_name, str(e)))
 
+
+# Generate aggregate plot
+df = pd.DataFrame({bm_name: np.array(results[bm_name]) / results[bm_name][0] for bm_name in bm_names},
+                  index=results['timestamp'])
+df.index = pd.to_datetime((df.index.values*1e9).astype(int))
+
+fig, ax = plt.subplots(1,1, figsize=(16, 4))
+for bm_name in bm_names:
+    
+    try:
+        #df[bm_name].plot(ax=ax, x_compat=True)
+        ax.step(np.array(df.index.to_pydatetime()), np.array(df[bm_name]), lw=2, label=bm_name)
+    except Exception as e:
+        print("skipping %s: %s" % (bm_name, str(e)))
+
+ax.set_title("Normalized benchmarks")
+ax.set_ylabel("time (s)")
+lgd = ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+fig.savefig("graphs/summary.png", bbox_extra_artists=(lgd,), bbox_inches='tight');
+
 # Versions
 %load_ext version_information
-%version_information git, numpy, pandas, matplotlib
+%version_information git, numpy, scipy, pandas, matplotlib
 
