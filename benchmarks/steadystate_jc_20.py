@@ -27,7 +27,7 @@ def benchmark(runs=1):
     tot_elapsed = 0
     for n in range(runs):
         tic = time.time()
-        rhoss = steadystate(H, c_ops)
+        rhoss = steadystate(H, c_ops, use_umfpack=True)
         toc = time.time()
         tot_elapsed += toc - tic
     
