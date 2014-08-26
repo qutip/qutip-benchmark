@@ -19,7 +19,7 @@ def benchmark_qobj_expm(runs=1):
     for n in range(runs):
         tic=time.time()
         coherent(20, alpha)
-        squeez(20, sp)
+        squeeze(20, sp)
         toc=time.time()
         tot_elapsed += toc - tic
 
