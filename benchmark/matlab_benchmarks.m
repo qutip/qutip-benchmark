@@ -494,13 +494,13 @@ test_results(1,15)=time/3.0;
 %test #16
 %steadystate optomechanical system
 clearvars -except test_results;
-Nc=6;
-Nm=30;
+Nc=4;
+Nm=45;
 alpha=0.311;
 g0=0.36;						
 kappa=0.3;
 gamma=0.00147;
-delta=0.0;
+delta=-kappa;
 idc=identity(Nc);
 idm=identity(Nm);
 a=tensor(destroy(Nc),idm);

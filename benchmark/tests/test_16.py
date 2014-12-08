@@ -1,4 +1,5 @@
 from qutip import *
+from numpy import sqrt
 from time import time
 
 def test_16(runs=1):
@@ -6,13 +7,13 @@ def test_16(runs=1):
     optomechanical steady state
     """
     test_name='opto steady [180]'
-    Nc=6						#Number of cavity states
-    Nm=30						#Number of mechanical states
+    Nc=4						#Number of cavity states
+    Nm=45						#Number of mechanical states
     alpha=0.311					#Coherent state amplitude
     g0=0.36						#Coupling strength
     kappa=0.3					#Cavity damping rate
     gamma=0.00147				#Mech damping rate
-    delta=0						#detuning
+    delta=-kappa				#detuning
 
     #operators
     idc=qeye(Nc)
@@ -29,7 +30,8 @@ def test_16(runs=1):
     tot_elapsed = 0
     for n in range(runs):
         tic=time()
-        steadystate(H,c_op_list, use_rcm=True)
+        steadystate(H,c_op_list, method='iterative-gmres',tol=1e-15, 
+                    drop_tol=1e-3,use_precond=True,use_rcm=True)
         toc=time()
         tot_elapsed += toc - tic
 
@@ -37,4 +39,4 @@ def test_16(runs=1):
  
 
 if __name__=='__main__':
-    test_16()
+    print(test_16())

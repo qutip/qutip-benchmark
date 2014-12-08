@@ -1,4 +1,5 @@
 from qutip import *
+from numpy import pi
 from time import time
 
 def test_1(runs=1):
@@ -9,7 +10,7 @@ def test_1(runs=1):
     wc = 1.0 * 2 * pi  
     wa = 1.0 * 2 * pi
     g  = 0.05 * 2 * pi
-    Nc=10
+    Nc = 10
     tot_elapsed = 0
     for n in range(runs):
         tic = time()
@@ -21,5 +22,3 @@ def test_1(runs=1):
 
     return [test_name], [tot_elapsed / runs]
  
-
-

@@ -20,6 +20,7 @@
 import platform
 import json
 import numpy as np
+import scipy
 from scipy import *
 from qutip import *
 from tests import *
@@ -42,7 +43,7 @@ args = parser.parse_args()
 
 qutip_info = [{'label': 'QuTiP', 'value': qutip.__version__},
               {'label': 'Python', 'value': platform.python_version()},
-              {'label': 'NumPy', 'value': numpy.__version__},
+              {'label': 'NumPy', 'value': np.__version__},
               {'label': 'SciPy', 'value': scipy.__version__}]
 
 

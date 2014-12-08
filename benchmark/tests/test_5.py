@@ -1,4 +1,5 @@
 from qutip import *
+from numpy import sqrt
 from time import time
 
 def test_5(runs=1):
@@ -22,8 +23,7 @@ def test_5(runs=1):
         C2=sqrt(gamma)*sm
         C1dC1=C1.dag() * C1
         C2dC2=C2.dag() * C2
-        L = liouvillian(H, [C1, C2])
-        rhoss=steady(L)
+        rhoss = steadystate(H, [C1, C2])
         toc=time()
         tot_elapsed += toc - tic
     
