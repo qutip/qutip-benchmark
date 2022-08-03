@@ -59,10 +59,8 @@ def main(args=[]):
                                      arguments as pytest/pytest-benchmark. The
                                      script must be run from the root of the
                                      repository.""")
-    if args:
-        args, other_args = parser.parse_known_args([])
-    else:
-        args, other_args = parser.parse_known_args()
+
+    args, other_args = parser.parse_known_args()
 
     run_benchmarks(other_args)
     benchmark_latest = get_latest_benchmark()
