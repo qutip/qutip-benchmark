@@ -63,12 +63,10 @@ def matrix_2(matrix, size,density,dtype,request):
         return res
 
 def add(A, B):
-    x = A+B
-    return x
+    return A+B
 
 def matmul(A, B):
-    x = A@B
-    return x
+    return A@B
 
 
 def test_add(benchmark, matrix, request):
