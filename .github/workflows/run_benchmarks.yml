@@ -1,7 +1,3 @@
-# The name is short because we mostly care how it appears in the pull request
-# "checks" dialogue box - it looks like
-#     Tests / ubuntu-latest, python-3.9, defaults
-# or similar.
 name: Benchmarks
 
 on:
@@ -13,7 +9,7 @@ defaults:
   run:
     # The slightly odd shell call is to force bash to read .bashrc, which is
     # necessary for having conda behave sensibly.  We use bash as the shell even
-    # on Windows, since we don't run anything much complicated, and it makes
+    # on Windows, since we don't run anything complicated, and it makes
     # things much simpler.
     shell: bash -l {0}
 
@@ -25,8 +21,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        # Test other versions of Python in special cases to avoid exploding the
-        # matrix size; make sure to test all supported versions in some form.
         python-version: ["3.9"]
         case-name: [defaults]
         numpy-requirement: ["=1.22.4"]
