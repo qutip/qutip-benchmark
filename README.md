@@ -43,13 +43,9 @@ data type.
 benchmarks for `add` with dense random matrices for all the specialisations in
 QuTiP. 
 
--`python benchmarks/benchmarks.py -k"expm and -512-"`: Runs only the
-benchmarks for `expm` for a matrix of size 512x512 (the size can only be
-2,4,8...,512,1024).
-
--`python benchmarks/benchmarks.py -k"(tensorflow or numpy or qutip_dense) and
+-`python benchmarks/benchmarks.py -k"(numpy or qutip_dense) and
 -2-"`: Runs the benchmarks for every operation with hermitian
-matrices of size 2x2 represented with either `tensorflow`, `numpy` or the
+matrices of size 2x2 represented with either `numpy` or the
 `qutip_dense` data type.
 
 
