@@ -6,7 +6,7 @@ import scipy as sc
 
 
 # Available datatypes
-@pytest.fixture(params = ['numpy', 'scipy_csr', 'dense', 'csr'])
+@pytest.fixture(params = ['numpy', 'scipy_csr', 'qutip_dense', 'qutip_csr'])
 def dtype(request): return request.param
 
 
@@ -44,7 +44,7 @@ def matrix(size, density, dtype):
         return sc.sparse.csr_matrix(res)
     else:
         res = qt.Qobj(res)
-        return res.to(dtype)
+        return res.to(dtype[6:])
 
 @pytest.fixture(params=["op", 'ket'])
 def matrix_2(matrix, size,density,dtype,request):
@@ -76,9 +76,10 @@ def test_add(benchmark, matrix, request):
     benchmark.group = group
 
     A = matrix
+    B = matrix
 
     # Benchmark operations
-    result = benchmark(add,A,A)
+    result = benchmark(add,A,B)
 
     return result
 
