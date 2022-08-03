@@ -5,7 +5,8 @@ import numpy as np
 import scipy as sc
 
 
-# Available datatypes
+# Available datatypes (using qutip_dense and qutip_csr to avoid confusion
+# with density parameters)
 @pytest.fixture(params = ['numpy', 'scipy_csr', 'qutip_dense', 'qutip_csr'])
 def dtype(request): return request.param
 
@@ -44,6 +45,7 @@ def matrix(size, density, dtype):
         return sc.sparse.csr_matrix(res)
     else:
         res = qt.Qobj(res)
+        # the to() method only accepts dense or csr as inputs
         return res.to(dtype[6:])
 
 @pytest.fixture(params=["op", 'ket'])
