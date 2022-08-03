@@ -1,0 +1,77 @@
+# The name is short because we mostly care how it appears in the pull request
+# "checks" dialogue box - it looks like
+#     Tests / ubuntu-latest, python-3.9, defaults
+# or similar.
+name: Benchmarks
+
+on:
+  [push, pull_request]
+
+
+
+defaults:
+  run:
+    # The slightly odd shell call is to force bash to read .bashrc, which is
+    # necessary for having conda behave sensibly.  We use bash as the shell even
+    # on Windows, since we don't run anything much complicated, and it makes
+    # things much simpler.
+    shell: bash -l {0}
+
+jobs:
+  cases:
+    name: ${{ matrix.os }}, python${{ matrix.python-version }}, ${{ matrix.case-name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        # Test other versions of Python in special cases to avoid exploding the
+        # matrix size; make sure to test all supported versions in some form.
+        python-version: ["3.9"]
+        case-name: [defaults]
+        numpy-requirement: ["=1.22.4"]
+        scipy-requirement: ["=1.8.1"]
+        cython-requirement: ["=0.29.30"]
+        pytest-requirement: ["=7.1.2"]
+        pytest-benchmark-requirement: ["=3.4.1"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: actions-bench
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+
+      - name: Install dependencies
+        run: |
+           conda install nomkl "numpy${{ matrix.numpy-requirement }}" "scipy${{ matrix.scipy-requirement }}" "cython${{ matrix.cython-requirement }}" "pytest${{ matrix.pytest-requirement }}" "pytest-benchmark${{ matrix.pytest-benchmark-requirement }}" matplotlib pandas
+           python -m pip install pygal pygaljs
+           
+      - name: Install Qutip
+        run: |
+           git clone --branch dev.major https://github.com/qutip/qutip
+           cd qutip
+           echo "recursive-include qutip *.h" >> MANIFEST.in
+           python setup.py install
+           cd ..
+
+      - name: delete qutip directory
+        run: |
+           rm -r qutip/
+           ls
+    
+      - name: Run benchmarks
+        run: |
+          python benchmarks/benchmarks.py -k "matmul or add" -v 
+        
+      - name: Create artefact containing benchmarks
+        uses: actions/upload-artifact@v2
+        with: 
+          name: benchmarks
+          path: .benchmarks
+
+
+
