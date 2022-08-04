@@ -7,7 +7,7 @@ import scipy as sc
 
 # Available datatypes (using qutip_dense and qutip_csr to avoid confusion
 # with density parameters)
-@pytest.fixture(params = ['numpy', 'scipy_csr', 'qutip_dense', 'qutip_csr'])
+@pytest.fixture(params=['numpy', 'scipy_csr', 'qutip_dense', 'qutip_csr'])
 def dtype(request): return request.param
 
 
@@ -34,7 +34,6 @@ def matrix(size, density, dtype):
                np.diag(diag, k=0) +
                np.diag(ofdiag.conj(), k=1))
 
-
     elif density == "dense":
         H = np.random.random((size, size)) + 1j*np.random.random((size, size))
         res = H + H.T.conj()
@@ -48,24 +47,27 @@ def matrix(size, density, dtype):
         # the to() method only accepts dense or csr as inputs
         return res.to(dtype[6:])
 
+
 @pytest.fixture(params=["op", 'ket'])
-def matrix_2(matrix, size,density,dtype,request):
+def matrix_2(matrix, size, density, dtype, request):
     if request.param == "op":
         return matrix
-    elif(density == "sparse"):
-        res = qt.rand_ket(size,density=0.3)
+    if density == "sparse":
+        res = qt.rand_ket(size, density=0.3)
     else:
-        res =  qt.rand_ket(size,density=1)
-    
+        res = qt.rand_ket(size, density=1)
+
     if dtype == 'numpy':
         return res.full()
-    elif dtype == 'scipy_csr':
+    if dtype == 'scipy_csr':
         return sc.sparse.csr_matrix(res.full())
     else:
         return res
 
+
 def add(A, B):
     return A+B
+
 
 def matmul(A, B):
     return A@B
@@ -81,11 +83,9 @@ def test_add(benchmark, matrix, request):
     B = matrix
 
     # Benchmark operations
-    result = benchmark(add,A,B)
+    result = benchmark(add, A, B)
 
     return result
-
-
 
 
 def test_matmul(benchmark, matrix, matrix_2, request):
@@ -98,6 +98,6 @@ def test_matmul(benchmark, matrix, matrix_2, request):
     B = matrix_2
 
     # Benchmark operations
-    result = benchmark(matmul,A,B)
+    result = benchmark(matmul, A, B)
 
     return result

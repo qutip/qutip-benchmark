@@ -12,7 +12,6 @@ def pkg_version(package):
         return None
 
 
-
 def get_latest_benchmark():
     """Returns the path to the latest benchmark run from `./.benchmarks/`"""
 
@@ -54,11 +53,11 @@ def run_benchmarks(args):
 
 
 def main(args=[]):
-    parser = argparse.ArgumentParser(description="""Run and plot the benchmarks.
-                                     The script also accepts the same
-                                     arguments as pytest/pytest-benchmark. The
-                                     script must be run from the root of the
-                                     repository.""")
+    parser = argparse.ArgumentParser(description="""Run and plot the
+                                     benchmarks. The script also accepts the
+                                     same arguments as pytest/pytest-benchmark.
+                                     The script must be run from the root of
+                                     the repository.""")
 
     args, other_args = parser.parse_known_args()
 
