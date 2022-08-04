@@ -20,7 +20,7 @@ def density(request): return request.param
 
 
 @pytest.fixture()
-def matrix(size, density, dtype):
+def left_oper(size, density, dtype):
     """Return a random matrix of size `sizexsize'. Density is either 'dense'
     or 'sparse' and returns a fully dense or a tridiagonal matrix respectively.
     The matrices are Hermitian."""
@@ -48,10 +48,36 @@ def matrix(size, density, dtype):
         return res.to(dtype[6:])
 
 
-@pytest.fixture(params=["op", 'ket'])
-def matrix_2(matrix, size, density, dtype, request):
-    if request.param == "op":
-        return matrix
+@pytest.fixture()
+def right_oper(size, density, dtype):
+    """Return a random matrix of size `sizexsize'. Density is either 'dense'
+    or 'sparse' and returns a fully dense or a tridiagonal matrix respectively.
+    The matrices are Hermitian."""
+    np.random.seed(1)
+
+    if density == "sparse":
+        ofdiag = np.random.rand(size-1) + 1j*np.random.rand(size-1)
+        diag = np.random.rand(size) + 1j*np.random.rand(size)
+
+        res = (np.diag(ofdiag, k=-1) +
+               np.diag(diag, k=0) +
+               np.diag(ofdiag.conj(), k=1))
+
+    elif density == "dense":
+        H = np.random.random((size, size)) + 1j*np.random.random((size, size))
+        res = H + H.T.conj()
+
+    if dtype == 'numpy':
+        return res
+    if dtype == 'scipy_csr':
+        return scipy.sparse.csr_matrix(res)
+    res = qutip.Qobj(res)
+    # the to() method only accepts dense or csr as inputs
+    return res.to(dtype[6:])
+
+
+@pytest.fixture()
+def right_ket(size, density, dtype):
     if density == "sparse":
         res = qutip.rand_ket(size, density=0.3)
     else:
@@ -64,39 +90,54 @@ def matrix_2(matrix, size, density, dtype, request):
     return res.to(dtype[6:])
 
 
-def add(A, B):
-    return A+B
+def add(left, right):
+    return left+right
 
 
-def matmul(A, B):
-    return A@B
+def matmul(left, right):
+    return left@right
 
 
-def test_add(benchmark, matrix, request):
+def test_add(benchmark, left_oper, right_oper, request):
     # Group benchmark by operation, density and size.
     group = request.node.callspec.id
     group = "Add-" + group
     benchmark.group = group
 
-    A = matrix
-    B = matrix
+    left = left_oper
+    right = right_oper
 
     # Benchmark operations
-    result = benchmark(add, A, B)
+    result = benchmark(add, left, right)
 
     return result
 
 
-def test_matmul(benchmark, matrix, matrix_2, request):
+def test_matmul_oper_oper(benchmark, left_oper, right_oper, request):
     # Group benchmark by operation, density and size.
     group = request.node.callspec.id
-    group = "Matmul-" + group
+    group = "Matmul_op@op-" + group
     benchmark.group = group
 
-    A = matrix
-    B = matrix_2
+    left = left_oper
+    right = right_oper
 
     # Benchmark operations
-    result = benchmark(matmul, A, B)
+    result = benchmark(matmul, left, right)
+
+    return result
+
+
+def test_matmul_oper_ket(benchmark, left_oper, right_ket, request):
+    # Group benchmark by operation, density and size.
+    group = request.node.callspec.id
+    group = "Matmul_op@ket-" + group
+    benchmark.group = group
+
+    left = left_oper
+    right = right_ket
+
+    # Benchmark operations
+    result = benchmark(matmul, left, right)
 
     return result
