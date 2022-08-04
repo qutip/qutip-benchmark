@@ -61,9 +61,7 @@ def matrix_2(matrix, size, density, dtype, request):
         return res.full()
     if dtype == 'scipy_csr':
         return scipy.sparse.csr_matrix(res.full())
-    if dtype == "qutip_csr":
-        return res.to("csr")
-    return res.to("dense")
+    return res.to(dtype[6:])
 
 
 def add(A, B):
