@@ -59,8 +59,7 @@ We are proud to be affiliated with [Unitary Fund](https://unitary.fund) and
 [NumFOCUS](https://numfocus.org).  QuTiP development is supported by [Nori's
 lab](https://dml.riken.jp/) at RIKEN, by the University of Sherbrooke, and by
 Aberystwyth University, [among other supporting
-organizations](https://qutip.org/#supporting-organizations).  Initial work on
-this project was sponsored by [Google Summer of Code
+organizations](https://qutip.org/#supporting-organizations). The update of this project was sponsored by [Google Summer of Code
 2022](https://summerofcode.withgoogle.com).
 
 
