@@ -1,8 +1,8 @@
 """This file contains the benchmarks that are run the benchmark.py script."""
 import pytest
-import qutip as qt
+import qutip
+import scipy
 import numpy as np
-import scipy as sc
 
 
 # Available datatypes (using qutip_dense and qutip_csr to avoid confusion
@@ -41,9 +41,9 @@ def matrix(size, density, dtype):
     if dtype == 'numpy':
         return res
     elif dtype == 'scipy_csr':
-        return sc.sparse.csr_matrix(res)
+        return scipy.sparse.csr_matrix(res)
     else:
-        res = qt.Qobj(res)
+        res = qutip.Qobj(res)
         # the to() method only accepts dense or csr as inputs
         return res.to(dtype[6:])
 
@@ -53,16 +53,17 @@ def matrix_2(matrix, size, density, dtype, request):
     if request.param == "op":
         return matrix
     if density == "sparse":
-        res = qt.rand_ket(size, density=0.3)
+        res = qutip.rand_ket(size, density=0.3)
     else:
-        res = qt.rand_ket(size, density=1)
+        res = qutip.rand_ket(size, density=1)
 
     if dtype == 'numpy':
         return res.full()
     if dtype == 'scipy_csr':
-        return sc.sparse.csr_matrix(res.full())
-    else:
-        return res
+        return scipy.sparse.csr_matrix(res.full())
+    if dtype == "qutip_csr":
+        return res.to("csr")
+    return res.to("dense")
 
 
 def add(A, B):
