@@ -22,28 +22,19 @@ def density(request): return request.param
 @pytest.fixture()
 def left_oper(size, density, dtype):
     """Return a random matrix of size `sizexsize'. Density is either 'dense'
-    or 'sparse' and returns a fully dense or a tridiagonal matrix respectively.
+    or 'sparse' and returns a fully dense or a sparse matrix respectively.
     The matrices are Hermitian."""
-    np.random.seed(1)
 
     if density == "sparse":
-        ofdiag = np.random.rand(size-1) + 1j*np.random.rand(size-1)
-        diag = np.random.rand(size) + 1j*np.random.rand(size)
-
-        res = (np.diag(ofdiag, k=-1) +
-               np.diag(diag, k=0) +
-               np.diag(ofdiag.conj(), k=1))
-
+        res = qutip.rand_herm(size, density=1/size)
     elif density == "dense":
-        H = np.random.random((size, size)) + 1j*np.random.random((size, size))
-        res = H + H.T.conj()
+        res = qutip.rand_herm(size, density=1)
 
     if dtype == 'numpy':
-        return res
+        return res.full()
     elif dtype == 'scipy_csr':
-        return scipy.sparse.csr_matrix(res)
+        return scipy.sparse.csr_matrix(res.full())
     else:
-        res = qutip.Qobj(res)
         # the to() method only accepts dense or csr as inputs
         return res.to(dtype[6:])
 
@@ -51,29 +42,21 @@ def left_oper(size, density, dtype):
 @pytest.fixture()
 def right_oper(size, density, dtype):
     """Return a random matrix of size `sizexsize'. Density is either 'dense'
-    or 'sparse' and returns a fully dense or a tridiagonal matrix respectively.
+    or 'sparse' and returns a fully dense or a sparse matrix respectively.
     The matrices are Hermitian."""
-    np.random.seed(1)
 
     if density == "sparse":
-        ofdiag = np.random.rand(size-1) + 1j*np.random.rand(size-1)
-        diag = np.random.rand(size) + 1j*np.random.rand(size)
-
-        res = (np.diag(ofdiag, k=-1) +
-               np.diag(diag, k=0) +
-               np.diag(ofdiag.conj(), k=1))
-
+        res = qutip.rand_herm(size, density=1/size)
     elif density == "dense":
-        H = np.random.random((size, size)) + 1j*np.random.random((size, size))
-        res = H + H.T.conj()
+        res = qutip.rand_herm(size, density=1)
 
     if dtype == 'numpy':
-        return res
-    if dtype == 'scipy_csr':
-        return scipy.sparse.csr_matrix(res)
-    res = qutip.Qobj(res)
-    # the to() method only accepts dense or csr as inputs
-    return res.to(dtype[6:])
+        return res.full()
+    elif dtype == 'scipy_csr':
+        return scipy.sparse.csr_matrix(res.full())
+    else:
+        # the to() method only accepts dense or csr as inputs
+        return res.to(dtype[6:])
 
 
 @pytest.fixture()
