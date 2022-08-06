@@ -4,6 +4,7 @@ import argparse
 import glob
 from importlib.metadata import version, PackageNotFoundError
 
+
 def pkg_version(package):
     try:
         return version(package)
@@ -43,11 +44,11 @@ def add_packages_to_json(filepath):
 
 def run_benchmarks(args):
     "Run pytest benchmark with sensible defaults."
-    pytest.main(["-m nightly","--benchmark-only",
+    pytest.main(["benchmarks/tests", "-m nightly", "--benchmark-only",
                  "--benchmark-columns=Mean,StdDev,rounds,Iterations",
                  "--benchmark-sort=name",
                  "--benchmark-autosave",
-                 "-Wdefault",] +
+                 "-Wdefault"] +
                 args)
 
 
