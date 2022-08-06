@@ -87,11 +87,8 @@ def test_add(benchmark, left_oper, right_oper, request):
     group = "Add-" + group
     benchmark.group = group
 
-    left = left_oper
-    right = right_oper
-
     # Benchmark operations
-    result = benchmark(add, left, right)
+    result = benchmark(add, left_oper, right_oper)
 
     return result
 
@@ -102,11 +99,8 @@ def test_matmul_oper_oper(benchmark, left_oper, right_oper, request):
     group = "Matmul_op@op-" + group
     benchmark.group = group
 
-    left = left_oper
-    right = right_oper
-
     # Benchmark operations
-    result = benchmark(matmul, left, right)
+    result = benchmark(matmul, left_oper, right_oper)
 
     return result
 
@@ -117,10 +111,7 @@ def test_matmul_oper_ket(benchmark, left_oper, right_ket, request):
     group = "Matmul_op@ket-" + group
     benchmark.group = group
 
-    left = left_oper
-    right = right_ket
-
     # Benchmark operations
-    result = benchmark(matmul, left, right)
+    result = benchmark(matmul, left_oper, right_ket)
 
     return result
