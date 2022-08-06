@@ -21,8 +21,10 @@ The benchmarks run the same operations for different hermitian matrix sizes
 that can either be dense or sparse (tridiagonal).  The script also includes 
 a few other options.
 You can get a description of the arguments with `python
-benchmarks/benchmarks.py --help`. It also accepts any argument that
-[pytest-benchmark](https://pytest-benchmark.readthedocs.io/en/latest/) accepts.
+benchmarks/benchmarks.py --help` or
+see the [Pytest documentation](https://docs.pytest.org/en/7.1.x/reference/reference.html#command-line-flags) 
+and [Pytest-Benchmark documetation](https://pytest-benchmark.readthedocs.io/en/stable/usage.html#commandline-options)
+for all command line flags.
 Examples:
 
 -`python benchmarks/benchmarks.py -k"test_linear_algebra" --collect-only`:
@@ -32,21 +34,6 @@ argument.
 -`python benchmarks/benchmarks.py -k"matmul"`: Runs only the benchmarks for
 `matmul`.
 
--`python benchmarks/benchmarks.py -k"add and -dense-"`: Runs only the
-benchmarks for `add` (addition) with dense random matrices. 
-
--`python benchmarks/benchmarks.py -k"add and -dense- and qutip_dense"`: runs only the
-benchmarks for `add` with dense random matrices and only for the `qutip_dense`
-data type. 
-
--`python benchmarks/benchmarks.py -k"add and -dense- and qutip_"`: runs only the
-benchmarks for `add` with dense random matrices for all the specialisations in
-QuTiP. 
-
--`python benchmarks/benchmarks.py -k"(numpy or qutip_dense) and
--2-"`: Runs the benchmarks for every operation with hermitian
-matrices of size 2x2 represented with either `numpy` or the
-`qutip_dense` data type.
 
 
 Support
