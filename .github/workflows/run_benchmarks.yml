@@ -23,11 +23,6 @@ jobs:
         os: [ubuntu-latest]
         python-version: ["3.9"]
         case-name: [defaults]
-        numpy-requirement: ["=1.22.4"]
-        scipy-requirement: ["=1.8.1"]
-        cython-requirement: ["=0.29.30"]
-        pytest-requirement: ["=7.1.2"]
-        pytest-benchmark-requirement: ["=3.4.1"]
 
     steps:
       - uses: actions/checkout@v2
@@ -41,7 +36,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-           conda install nomkl "numpy${{ matrix.numpy-requirement }}" "scipy${{ matrix.scipy-requirement }}" "cython${{ matrix.cython-requirement }}" "pytest${{ matrix.pytest-requirement }}" "pytest-benchmark${{ matrix.pytest-benchmark-requirement }}" matplotlib pandas
+           conda install numpy scipy cython
+           conda install pytest pytest-benchmark
+           conda install pandas matplotlib
            python -m pip install pygal pygaljs
            
       - name: Install Qutip
