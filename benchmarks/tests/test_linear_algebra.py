@@ -40,6 +40,7 @@ def left_oper(size, density, dtype):
         return res.to("csr")
     raise Exception("The specified dtype is invalid")
 
+
 @pytest.fixture()
 def right_oper(size, density, dtype):
     """Return a random matrix of size `sizexsize'. Density is either 'dense'
@@ -80,9 +81,9 @@ def right_ket(size, density, dtype):
     raise Exception("The specified dtype is invalid")
 
 
-
 def matmul(left, right):
     return left@right
+
 
 @pytest.mark.nightly
 def test_add(benchmark, left_oper, right_oper, request):
@@ -91,7 +92,7 @@ def test_add(benchmark, left_oper, right_oper, request):
     group = "Add-" + group
     benchmark.group = group
 
-    #Operation to be benchmarked
+    # Operation to be benchmarked
     def add(left, right):
         return left+right
 
@@ -99,6 +100,7 @@ def test_add(benchmark, left_oper, right_oper, request):
     result = benchmark(add, left_oper, right_oper)
 
     return result
+
 
 @pytest.mark.nightly
 def test_matmul_oper_oper(benchmark, left_oper, right_oper, request):
@@ -111,6 +113,7 @@ def test_matmul_oper_oper(benchmark, left_oper, right_oper, request):
     result = benchmark(matmul, left_oper, right_oper)
 
     return result
+
 
 @pytest.mark.nightly
 def test_matmul_oper_ket(benchmark, left_oper, right_ket, request):
