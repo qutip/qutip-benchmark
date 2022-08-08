@@ -43,16 +43,7 @@ jobs:
            
       - name: Install Qutip
         run: |
-           git clone --branch dev.major https://github.com/qutip/qutip
-           cd qutip
-           echo "recursive-include qutip *.h" >> MANIFEST.in
-           python setup.py install
-           cd ..
-
-      - name: delete qutip directory
-        run: |
-           rm -r qutip/
-           ls
+           python -m pip install git+https://github.com/qutip/qutip@dev.major
     
       - name: Run benchmarks
         run: |
