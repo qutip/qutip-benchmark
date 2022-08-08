@@ -13,20 +13,18 @@ def density(request): return request.param
 
 
 @pytest.fixture(scope='function')
-def right_ket(size, density):
-    if density == "sparse":
-        return qutip.rand_ket(size, density=1/size)
+def right_ket(size):
     return qutip.rand_ket(size, density=1)
 
 
-# Supported dtypes
-dtype = ['function', 'array', 'string']
-@pytest.fixture(params=dtype)
-def dtype(request): return request.param
+# Supported coeftypes
+coeftype = ['function', 'array', 'string']
+@pytest.fixture(params=coeftype)
+def coeftype(request): return request.param
 
 
 @pytest.fixture(scope='function')
-def left_QobjEvo(size, density, dtype):
+def left_QobjEvo(size, density, coeftype):
     """Return a random QobjEvo of size `sizexsize'. Density is either 'dense'
     or 'sparse' and returns a fully dense or a reandomly sparse matrix
     respectively. The matrices are Hermitian."""
@@ -37,12 +35,12 @@ def left_QobjEvo(size, density, dtype):
     elif density == "dense":
         res = qutip.rand_herm(size, density=1)
 
-    if dtype == 'function':
+    if coeftype == 'function':
         def cos_t(t):
             return np.cos(t)
         return qutip.QobjEvo([res, cos_t])
 
-    if dtype == 'string':
+    if coeftype == 'string':
         return qutip.QobjEvo([res, 'cos(t)'])
 
     tlist = np.linspace(0, 10, 101)
