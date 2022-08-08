@@ -1,8 +1,8 @@
-qutip-benchmark:
-================
+qutip-benchmark
+===============
 
 
-To run the benchmarks first clone and install Qutip (this plugin is meant to run with qutip v5 which is not realeased yet).
+To run the benchmarks first clone and install QuTiP (this plugin is meant to run with qutip v5 which is not realeased yet).
 ```
 pip install git+https://github.com/qutip/qutip@dev.major
 
