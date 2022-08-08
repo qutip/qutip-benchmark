@@ -34,10 +34,11 @@ def left_oper(size, density, dtype):
         return res.full()
     elif dtype == 'scipy_csr':
         return scipy.sparse.csr_matrix(res.full())
-    else:
-        # the to() method only accepts dense or csr as inputs
-        return res.to(dtype[6:])
-
+    if dtype == 'qutip_dense':
+        return res.to("dense")
+    if dtype == 'qutip_csr':
+        return res.to("csr")
+    raise Exception("The specified dtype is invalid")
 
 @pytest.fixture()
 def right_oper(size, density, dtype):
@@ -54,9 +55,11 @@ def right_oper(size, density, dtype):
         return res.full()
     elif dtype == 'scipy_csr':
         return scipy.sparse.csr_matrix(res.full())
-    else:
-        # the to() method only accepts dense or csr as inputs
-        return res.to(dtype[6:])
+    if dtype == 'qutip_dense':
+        return res.to("dense")
+    if dtype == 'qutip_csr':
+        return res.to("csr")
+    raise Exception("The specified dtype is invalid")
 
 
 @pytest.fixture()
@@ -70,7 +73,11 @@ def right_ket(size, density, dtype):
         return res.full()
     if dtype == 'scipy_csr':
         return scipy.sparse.csr_matrix(res.full())
-    return res.to(dtype[6:])
+    if dtype == 'qutip_dense':
+        return res.to("dense")
+    if dtype == 'qutip_csr':
+        return res.to("csr")
+    raise Exception("The specified dtype is invalid")
 
 
 def add(left, right):
