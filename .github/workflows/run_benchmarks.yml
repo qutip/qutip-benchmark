@@ -48,6 +48,19 @@ jobs:
         run: |
            python -m pip install git+https://github.com/qutip/qutip@dev.major
     
+      - name: Package information
+        run: |
+          conda list
+          python -c "import qutip; qutip.about()"
+      - name: Environment information
+        run: |
+          uname -a
+          if [[ "ubuntu-latest" == "${{ matrix.os }}" ]]; then
+              hostnamectl
+              lscpu
+              free -h
+          fi
+
       - name: Run benchmarks
         run: |
           python benchmarks/benchmarks.py -m "nightly" -v 
