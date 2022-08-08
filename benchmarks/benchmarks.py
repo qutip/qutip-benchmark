@@ -44,7 +44,7 @@ def add_packages_to_json(filepath):
 
 def run_benchmarks(args):
     "Run pytest benchmark with sensible defaults."
-    pytest.main(["benchmarks/tests", "-m nightly", "--benchmark-only",
+    pytest.main(["benchmarks/tests", "--benchmark-only",
                  "--benchmark-columns=Mean,StdDev,rounds,Iterations",
                  "--benchmark-sort=name",
                  "--benchmark-autosave",
