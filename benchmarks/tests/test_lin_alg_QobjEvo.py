@@ -12,12 +12,6 @@ def size(request): return request.param
 def density(request): return request.param
 
 
-@pytest.fixture(scope='function')
-def right_ket(size):
-    return qutip.rand_ket(size, density=1)
-
-
-# Supported coeftypes
 coeftype = ['function', 'array', 'string']
 @pytest.fixture(params=coeftype)
 def coeftype(request): return request.param
@@ -29,23 +23,35 @@ def left_QobjEvo(size, density, coeftype):
     or 'sparse' and returns a fully dense or a reandomly sparse matrix
     respectively. The matrices are Hermitian."""
 
+    # Creating static Qobj
     if density == "sparse":
-        res = qutip.rand_herm(size, density=1/size)
+        q_obj = qutip.rand_herm(size, density=1/size)
 
     elif density == "dense":
-        res = qutip.rand_herm(size, density=1)
+        q_obj = qutip.rand_herm(size, density=1)
 
+    # Creating coefficients
+    tlist = None
     if coeftype == 'function':
         def cos_t(t):
             return np.cos(t)
-        return qutip.QobjEvo([res, cos_t])
+        coeff = cos_t
 
-    if coeftype == 'string':
-        return qutip.QobjEvo([res, 'cos(t)'])
+    elif coeftype == 'string':
+        coeff = 'cos(t)'
 
-    tlist = np.linspace(0, 10, 101)
-    values = np.cos(tlist)
-    return qutip.QobjEvo([res, values], tlist=tlist)
+    elif coeftype == "array":
+        tlist = np.linspace(0, 10, 101)
+        coeff = np.cos(tlist)
+    else:
+        raise Exception("Invalid coefficient type")
+
+    return qutip.QobjEvo([q_obj, coeff], tlist=tlist)
+
+
+@pytest.fixture(scope='function')
+def right_ket(size):
+    return qutip.rand_ket(size, density=1)
 
 
 def matmul(left, right):
