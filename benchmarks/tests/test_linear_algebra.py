@@ -80,9 +80,6 @@ def right_ket(size, density, dtype):
     raise Exception("The specified dtype is invalid")
 
 
-def add(left, right):
-    return left+right
-
 
 def matmul(left, right):
     return left@right
@@ -94,7 +91,11 @@ def test_add(benchmark, left_oper, right_oper, request):
     group = "Add-" + group
     benchmark.group = group
 
-    # Benchmark operations
+    #Operation to be benchmarked
+    def add(left, right):
+        return left+right
+
+    # Run benchmark
     result = benchmark(add, left_oper, right_oper)
 
     return result
@@ -118,7 +119,7 @@ def test_matmul_oper_ket(benchmark, left_oper, right_ket, request):
     group = "Matmul_op@ket-" + group
     benchmark.group = group
 
-    # Benchmark operations
+    # Run benchmark
     result = benchmark(matmul, left_oper, right_ket)
 
     return result
