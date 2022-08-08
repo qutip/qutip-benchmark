@@ -33,6 +33,9 @@ jobs:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          use-mamba: true
 
       - name: Install dependencies
         run: |
