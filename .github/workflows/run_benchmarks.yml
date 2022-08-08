@@ -1,9 +1,9 @@
 name: Benchmarks
 
+
 on:
   [push, pull_request]
-
-
+  
 
 defaults:
   run:
@@ -12,6 +12,7 @@ defaults:
     # on Windows, since we don't run anything complicated, and it makes
     # things much simpler.
     shell: bash -l {0}
+
 
 jobs:
   cases:
@@ -26,7 +27,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: actions-bench
