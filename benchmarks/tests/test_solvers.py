@@ -6,19 +6,18 @@ from qutip.solve.mcsolve import mcsolve
 from qutip.solve.steadystate import steadystate
 
 
-@pytest.fixture(params=np.flip(np.logspace(2, 8, 7, base=2, dtype=int)).tolist())
+@pytest.fixture(params=np.logspace(2, 8, 7, base=2, dtype=int).tolist())
 def dimension(request): return request.param
 
 
-@pytest.fixture(params=["jc", "cavity", "qubit"])
+@pytest.fixture(params=["Jaynes-Cummings", "Cavity", "Qubit Spin Chain"])
 def model_solve(request): return request.param
 
 
-@pytest.fixture(params=["jc", "cavity"])
+@pytest.fixture(params=["Jaynes-Cummings", "Cavity"])
 def model_steady(request): return request.param
 
 
-@pytest.fixture(scope='function')
 def jc_setup(dimension):
     dimension = int(dimension/2)
 
@@ -59,13 +58,12 @@ def jc_setup(dimension):
     c_ops = [
         (np.sqrt(kappa*(1+n_th)) * a) & Ia,
         (np.sqrt(kappa*n_th) * a_dag) & Ia,
-        Ic&(np.sqrt(gamma) * sm),
+        Ic & (np.sqrt(gamma) * sm),
     ]
 
     return (H, psi0, tlist, c_ops, [n & Ia])
 
 
-@pytest.fixture(scope='function')
 def cavity_setup(dimension):
     kappa = 1.
     eta = 1.5
@@ -86,7 +84,6 @@ def cavity_setup(dimension):
     return (H, psi0, tlist, c_ops, [n])
 
 
-@pytest.fixture(scope='function')
 def qubit_setup(dimension):
     N = int(np.log2(dimension))
 
@@ -152,44 +149,44 @@ def steady_state(H, c_ops):
 
 
 @pytest.mark.nightly
-def test_mesolve(benchmark, model_solve, jc_setup, cavity_setup, qubit_setup):
+def test_mesolve(benchmark, model_solve, dimension):
     benchmark.group = 'Solvers'
 
-    if (model_solve == 'cavity'):
-        H, psi0, tspan, c_ops, e_ops = cavity_setup
-    elif (model_solve == 'jc'):
-        H, psi0, tspan, c_ops, e_ops = jc_setup
-    elif (model_solve == 'qubit'):
-        H, psi0, tspan, c_ops, e_ops = qubit_setup
+    if (model_solve == 'Cavity'):
+        H, psi0, tspan, c_ops, e_ops = cavity_setup(dimension)
+    elif (model_solve == 'Jaynes-Cummings'):
+        H, psi0, tspan, c_ops, e_ops = jc_setup(dimension)
+    elif (model_solve == 'Qubit Spin Chain'):
+        H, psi0, tspan, c_ops, e_ops = qubit_setup(dimension)
 
     result = benchmark(me_solve, H, psi0, tspan, c_ops, e_ops)
     return result
 
 
-def test_mcsolve(benchmark, model_solve, jc_setup, cavity_setup, qubit_setup):
+def test_mcsolve(benchmark, model_solve, dimension):
     benchmark.group = 'Solvers'
 
-    if (model_solve == 'cavity'):
-        H, psi0, tspan, c_ops, e_ops = cavity_setup
-    elif (model_solve == 'jc'):
-        H, psi0, tspan, c_ops, e_ops = jc_setup
-    elif (model_solve == 'qubit'):
-        H, psi0, tspan, c_ops, e_ops = qubit_setup
+    if (model_solve == 'Cavity'):
+        H, psi0, tspan, c_ops, e_ops = cavity_setup(dimension)
+    elif (model_solve == 'Jaynes-Cummings'):
+        H, psi0, tspan, c_ops, e_ops = jc_setup(dimension)
+    elif (model_solve == 'Qubit Spin Chain'):
+        H, psi0, tspan, c_ops, e_ops = qubit_setup(dimension)
 
     result = benchmark(mc_solve, H, psi0, tspan, c_ops, e_ops)
     return result
 
 
 @pytest.mark.nightly
-def test_steadystate(benchmark, model_steady, jc_setup, cavity_setup,):
+def test_steadystate(benchmark, model_steady, dimension):
     benchmark.group = 'Solvers'
 
-    if (model_steady == 'cavity'):
-        H, _, _, c_ops, _ = cavity_setup
+    if (model_steady == 'Cavity'):
+        H, _, _, c_ops, _ = cavity_setup(dimension)
         result = benchmark(steady_state, H, c_ops)
 
-    elif (model_steady == 'jc'):
-        H, _, _, c_ops, _ = jc_setup
+    elif (model_steady == 'Jaynes-Cummings'):
+        H, _, _, c_ops, _ = jc_setup(dimension)
         result = benchmark(steady_state, H, c_ops)
 
     return result
