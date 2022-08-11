@@ -6,7 +6,7 @@ from qutip.solve.mcsolve import mcsolve
 from qutip.solve.steadystate import steadystate
 
 
-@pytest.fixture(params=np.logspace(2, 8, 7, base=2, dtype=int).tolist())
+@pytest.fixture(params=np.flip(np.logspace(2, 8, 7, base=2, dtype=int)).tolist())
 def dimension(request): return request.param
 
 
@@ -47,25 +47,20 @@ def jc_setup(dimension):
     sp = qutip.sigmap()
     sz = qutip.sigmaz()
 
-    H = (wc * (n & Ia)) + (Ic & (wa / 2. * sz)) + (g *
-                                                   ((a_dag & sm) + (a & sp)))
+    H = (wc * (n & Ia))
+    H += (Ic & (wa / 2. * sz))
+    H += (g * ((a_dag & sm) + (a & sp)))
 
     # Collapse operators
     c_ops = []
 
-    n_th_a = 0.0  # zero temperature
+    n_th = 0.0  # zero temperature
 
-    rate = kappa * (1 + n_th_a)
-    if rate > 0.0:
-        c_ops.append((np.sqrt(rate) * a) & Ia)
-
-    rate = kappa * n_th_a
-    if rate > 0.0:
-        c_ops.append((np.sqrt(rate) * a_dag) & Ia)
-
-    rate = gamma
-    if rate > 0.0:
-        c_ops.append(Ic & (np.sqrt(rate) * sm))
+    c_ops = [
+        (np.sqrt(kappa*(1+n_th)) * a) & Ia,
+        (np.sqrt(kappa*n_th) * a_dag) & Ia,
+        Ic&(np.sqrt(gamma) * sm),
+    ]
 
     return (H, psi0, tlist, c_ops, [n & Ia])
 
@@ -171,7 +166,6 @@ def test_mesolve(benchmark, model_solve, jc_setup, cavity_setup, qubit_setup):
     return result
 
 
-@pytest.mark.nightly
 def test_mcsolve(benchmark, model_solve, jc_setup, cavity_setup, qubit_setup):
     benchmark.group = 'Solvers'
 
