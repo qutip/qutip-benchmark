@@ -1,5 +1,6 @@
 from cmath import nan
 import json
+from tkinter.ttk import Separator
 import pandas as pd
 import matplotlib.pyplot as plt
 import glob
@@ -211,16 +212,8 @@ def compare_operations(df):
         plt.close()
 
 
-def compare_solvers(df):
-    """Plots comparison of solver performance for inreasing Hilbert Space
-    dimensions using Matplotlib"""
-
-    # Create storage folder
-    folder = Path("images/compare")
-    folder.mkdir(parents=True, exist_ok=True)
-
-    # plot mcsolve and mesolve
-    grouped = df.groupby(['params_model_solve'])
+def plot_compare_solvers(df, separator):
+    grouped = df.groupby(separator)
     for (model), group in grouped:
         if model != nan:
             for solver, g in group.groupby('params_operation'):
@@ -234,26 +227,22 @@ def compare_solvers(df):
             plt.yscale('log')
             plt.xlabel("N")
             plt.ylabel("time (s)")
-            plt.savefig(f"./images/compare/solvers_{model}.png")
+            plt.savefig(f"./images/compare/{separator[13:]}_{model}.png")
             plt.close()
 
+def compare_solvers(df):
+    """Plots comparison of solver performance for inreasing Hilbert Space
+    dimensions using Matplotlib"""
+
+    # Create storage folder
+    folder = Path("images/compare")
+    folder.mkdir(parents=True, exist_ok=True)
+
+    # plot mcsolve and mesolve
+    plot_compare_solvers(df, "params_model_solve")
+    
     # plot steadystate
-    grouped = df.groupby(['params_model_steady'])
-    for model, group in grouped:
-        if model != nan:
-            for solver, g in group.groupby('params_operation'):
-                plt.errorbar(
-                    g.params_dimension, g.stats_mean,
-                    g.stats_stddev, fmt='.-', label=solver
-                    )
-
-            plt.title(f"{model}")
-            plt.legend()
-            plt.yscale('log')
-            plt.xlabel("N")
-            plt.ylabel("time (s)")
-            plt.savefig(f"./images/compare/steadystate_{model}.png")
-            plt.close()
+    plot_compare_solvers(df, "params_model_steady")
 
 
 def get_paths():
@@ -301,9 +290,9 @@ def main(args=[]):
     data = create_dataframe(paths)
     latest_data = json_to_dataframe(latest_path)
 
-    plot_operations(data)
-    plot_solvers(data)
-    compare_operations(latest_data)
+    # plot_operations(data)
+    # plot_solvers(data)
+    # compare_operations(latest_data)
     compare_solvers(latest_data)
 
 
