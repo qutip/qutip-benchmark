@@ -134,7 +134,7 @@ def qubit_setup(dimension):
 
 
 @pytest.mark.nightly
-def test_mesolve(benchmark, model_solve, dimension,request):
+def test_mesolve(benchmark, model_solve, dimension, request):
     # Group benchmark by operation, density and size.
     group = request.node.callspec.id
     group = "mesolve-" + group
@@ -151,7 +151,7 @@ def test_mesolve(benchmark, model_solve, dimension,request):
     return result
 
 
-def test_mcsolve(benchmark, model_solve, dimension,request):
+def test_mcsolve(benchmark, model_solve, dimension, request):
     # Group benchmark by operation, density and size.
     group = request.node.callspec.id
     group = "mcsolve-" + group
@@ -169,7 +169,7 @@ def test_mcsolve(benchmark, model_solve, dimension,request):
 
 
 @pytest.mark.nightly
-def test_steadystate(benchmark, model_steady, dimension,request):
+def test_steadystate(benchmark, model_steady, dimension, request):
     # Group benchmark by operation, density and size.
     group = request.node.callspec.id
     group = "steadystate-" + group
