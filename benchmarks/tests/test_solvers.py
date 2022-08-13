@@ -137,7 +137,7 @@ def qubit_setup(dimension):
 def test_mesolve(benchmark, model_solve, dimension,request):
     # Group benchmark by operation, density and size.
     group = request.node.callspec.id
-    group = "mesolve" + group
+    group = "mesolve-" + group
     benchmark.group = group
 
     if (model_solve == 'Cavity'):
