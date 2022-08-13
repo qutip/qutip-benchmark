@@ -290,9 +290,9 @@ def main(args=[]):
     data = create_dataframe(paths)
     latest_data = json_to_dataframe(latest_path)
 
-    # plot_operations(data)
-    # plot_solvers(data)
-    # compare_operations(latest_data)
+    plot_operations(data)
+    plot_solvers(data)
+    compare_operations(latest_data)
     compare_solvers(latest_data)
 
 
