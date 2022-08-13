@@ -97,7 +97,7 @@ def plot_data(df, separator, sep_labels, ax, restrict_cpu=False):
     handles += [f(markers[i], "k") for i in range(len(cpus))]
     sep_labels += cpus
     ax.legend(handles, sep_labels)
-    
+
     ax.set_xlabel("date")
     ax.set_ylabel("time (s)")
     ax.set_yscale('log')
@@ -106,7 +106,7 @@ def plot_data(df, separator, sep_labels, ax, restrict_cpu=False):
 def plot_operations(df, matrix_size=[64, 256]):
     """Plots the evolution over time of the add and matmul operation
     benchmarks for a specified matrix size"""
-    
+
     # Create storage folder
     folder = Path("images/plots")
     folder.mkdir(parents=True, exist_ok=True)
@@ -147,7 +147,7 @@ def plot_operations(df, matrix_size=[64, 256]):
 def plot_solvers(df, dimension_size=[32, 128]):
     """Plots the evolution over time of solver
     benchmarks for a specified Hilbert Dimension"""
-    
+
     # Create storage folder
     folder = Path("images/plots")
     folder.mkdir(parents=True, exist_ok=True)
@@ -156,7 +156,7 @@ def plot_solvers(df, dimension_size=[32, 128]):
     grouped = df.groupby(['params_operation', 'params_dimension'])
     for (operation, dimension), group in grouped:
         if (dimension in dimension_size):
-            
+
             # Create figure
             dimension = int(dimension)
             fig, ax = plt.subplots(1, 1)
@@ -166,7 +166,7 @@ def plot_solvers(df, dimension_size=[32, 128]):
                 )
             fig.set_size_inches(9, 9)
 
-            #Plot data
+            # Plot data
             if operation == 'steadystate':
                 labels = ["Jaynes Cummings", "Cavity"]
                 plot_data(group, 'params_model_steady', labels, ax)
@@ -186,8 +186,8 @@ def plot_solvers(df, dimension_size=[32, 128]):
 
 
 def compare_operations(df):
-    """Plots comaprison results using matplotlib. It iterates params_operation and
-    params_density and plots time vs N (for NxN matrices)"""
+    """Plots comaprison results using matplotlib. It iterates params_operation
+    and params_density and plots time vs N (for NxN matrices)"""
 
     # Create storage folder
     folder = Path("images/compare")
@@ -226,7 +226,7 @@ def compare_solvers(df):
     # Create storage folder
     folder = Path("images/compare")
     folder.mkdir(parents=True, exist_ok=True)
-    
+
     # plot mcsolve and mesolve
     grouped = df.groupby(['params_model_solve'])
     for (model), group in grouped:
@@ -308,7 +308,7 @@ def main(args=[]):
     latest_path = get_latest_benchmark_path()
     data = create_dataframe(paths)
     latest_data = json_to_dataframe(latest_path)
-    
+
     plot_operations(data)
     plot_solvers(data)
     compare_operations(latest_data)
