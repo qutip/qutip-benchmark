@@ -7,7 +7,6 @@ import glob
 from pathlib import Path
 
 
-
 def unravel(data, key):
     """Transforms {key:{another_key: values, another_key2: value2}} into
     {key_another_key:value, key_another_key2:value}"""
@@ -230,6 +229,7 @@ def plot_compare_solvers(df, separator):
             plt.savefig(f"./images/compare/{separator[13:]}_{model}.png")
             plt.close()
 
+
 def compare_solvers(df):
     """Plots comparison of solver performance for inreasing Hilbert Space
     dimensions using Matplotlib"""
@@ -240,7 +240,7 @@ def compare_solvers(df):
 
     # plot mcsolve and mesolve
     plot_compare_solvers(df, "params_model_solve")
-    
+
     # plot steadystate
     plot_compare_solvers(df, "params_model_steady")
 
