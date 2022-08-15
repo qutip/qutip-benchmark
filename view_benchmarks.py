@@ -111,8 +111,9 @@ def plot_operations(df, matrix_size, path):
 
             # Create Figure
             fig, ax = plt.subplots(1, 1)
+            op_title = operation.replace("_", " ")
             fig.suptitle(
-                f'Matrix density: {density}  Matrix Size: {size}x{size}',
+                f'Operation:{op_title} \n Matrix density: {density}  Matrix Size: {size}x{size}',
                 fontsize=20
                 )
             fig.set_size_inches(9, 9)
@@ -127,7 +128,6 @@ def plot_operations(df, matrix_size, path):
 
             # Save figure
             fig.tight_layout()
-            fig.subplots_adjust(top=0.95)
             plt.gcf().autofmt_xdate()
             plt.savefig(
                 f"{path}/history/{operation}_{density}_{size}.png",
@@ -201,11 +201,12 @@ def compare_operations(df, path):
                     fmt='.-', label=coeftype
                     )
 
-        plt.title(f"{operation} {density} {cpu}")
+        op_title = operation.replace("_", " ")
+        plt.title(f"{op_title} {density} Comparison")
         plt.legend()
         plt.yscale('log')
 
-        plt.xlabel("N")
+        plt.xlabel("Matrix Size")
         plt.ylabel("time (s)")
         plt.savefig(f"{path}/compare/{operation}_{density}.png")
         plt.close()
@@ -220,10 +221,10 @@ def plot_compare_solvers(df, separator, path):
                 g.stats_stddev, fmt='.-', label=solver
                 )
 
-        plt.title(f"{model}")
+        plt.title(f"{model} Solver Comparison")
         plt.legend()
         plt.yscale('log')
-        plt.xlabel("N")
+        plt.xlabel("Hilbert Dimension")
         plt.ylabel("time (s)")
         plt.savefig(f"{path}/compare/{separator[13:]}_{model}.png")
         plt.close()
