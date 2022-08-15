@@ -112,7 +112,8 @@ def plot_operations(df, matrix_size, path):
             fig, ax = plt.subplots(1, 1)
             op_title = operation.replace("_", " ")
             fig.suptitle(
-                f'Operation:{op_title} \n Matrix density: {density}  Matrix Size: {size}x{size}',
+                f"""Operation:{op_title}
+                Matrix density: {density}  Matrix Size: {size}x{size}""",
                 fontsize=20
                 )
             fig.set_size_inches(9, 9)
