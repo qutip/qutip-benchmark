@@ -1,10 +1,10 @@
 from cmath import nan
 import json
-from tkinter.ttk import Separator
 import pandas as pd
 import matplotlib.pyplot as plt
 import glob
 from pathlib import Path
+import argparse
 
 
 def unravel(data, key):
@@ -95,12 +95,12 @@ def plot_data(df, separator, sep_labels, ax, restrict_cpu=False):
     ax.set_yscale('log')
 
 
-def plot_operations(df, matrix_size=[64, 256]):
+def plot_operations(df, matrix_size, path):
     """Plots the evolution over time of the add and matmul operation
     benchmarks for a specified matrix size"""
 
     # Create storage folder
-    folder = Path("images/plots")
+    folder = Path(path)
     folder.mkdir(parents=True, exist_ok=True)
 
     # Group by operation, density and size
@@ -130,18 +130,18 @@ def plot_operations(df, matrix_size=[64, 256]):
             fig.subplots_adjust(top=0.95)
             plt.gcf().autofmt_xdate()
             plt.savefig(
-                f"./images/plots/{operation}_{density}_{size}.png",
+                f"{path}/history/{operation}_{density}_{size}.png",
                 bbox_inches='tight'
                 )
             plt.close()
 
 
-def plot_solvers(df, dimension_size=[32, 128]):
+def plot_solvers(df, dimension_size, path):
     """Plots the evolution over time of solver
     benchmarks for a specified Hilbert Dimension"""
 
     # Create storage folder
-    folder = Path("images/plots")
+    folder = Path(path)
     folder.mkdir(parents=True, exist_ok=True)
 
     # Groub by solver type and Hibert space dimension
@@ -171,18 +171,18 @@ def plot_solvers(df, dimension_size=[32, 128]):
             fig.subplots_adjust(top=0.95)
             plt.gcf().autofmt_xdate()
             plt.savefig(
-                f"./images/plots/{operation}_{dimension}.png",
+                f"{path}/history/{operation}_{dimension}.png",
                 bbox_inches='tight'
                 )
             plt.close()
 
 
-def compare_operations(df):
+def compare_operations(df, path):
     """Plots comaprison results using matplotlib. It iterates params_operation
     and params_density and plots time vs N (for NxN matrices)"""
 
     # Create storage folder
-    folder = Path("images/compare")
+    folder = Path(path)
     folder.mkdir(parents=True, exist_ok=True)
 
     grouped = df.groupby(['params_operation', 'params_density'])
@@ -207,42 +207,41 @@ def compare_operations(df):
 
         plt.xlabel("N")
         plt.ylabel("time (s)")
-        plt.savefig(f"./images/compare/{operation}_{density}.png")
+        plt.savefig(f"{path}/compare/{operation}_{density}.png")
         plt.close()
 
 
-def plot_compare_solvers(df, separator):
+def plot_compare_solvers(df, separator, path):
     grouped = df.groupby(separator)
     for (model), group in grouped:
-        if model != nan:
-            for solver, g in group.groupby('params_operation'):
-                plt.errorbar(
-                    g.params_dimension, g.stats_mean,
-                    g.stats_stddev, fmt='.-', label=solver
-                    )
+        for solver, g in group.groupby('params_operation'):
+            plt.errorbar(
+                g.params_dimension, g.stats_mean,
+                g.stats_stddev, fmt='.-', label=solver
+                )
 
-            plt.title(f"{model}")
-            plt.legend()
-            plt.yscale('log')
-            plt.xlabel("N")
-            plt.ylabel("time (s)")
-            plt.savefig(f"./images/compare/{separator[13:]}_{model}.png")
-            plt.close()
+        plt.title(f"{model}")
+        plt.legend()
+        plt.yscale('log')
+        plt.xlabel("N")
+        plt.ylabel("time (s)")
+        plt.savefig(f"{path}/compare/{separator[13:]}_{model}.png")
+        plt.close()
 
 
-def compare_solvers(df):
+def compare_solvers(df, path):
     """Plots comparison of solver performance for inreasing Hilbert Space
     dimensions using Matplotlib"""
 
     # Create storage folder
-    folder = Path("images/compare")
+    folder = Path(path)
     folder.mkdir(parents=True, exist_ok=True)
 
     # plot mcsolve and mesolve
-    plot_compare_solvers(df, "params_model_solve")
+    plot_compare_solvers(df, "params_model_solve", path)
 
     # plot steadystate
-    plot_compare_solvers(df, "params_model_steady")
+    plot_compare_solvers(df, "params_model_steady", path)
 
 
 def get_paths():
@@ -284,16 +283,30 @@ def create_dataframe(paths):
 
 
 def main(args=[]):
-    folder = Path("images")
+    parser = argparse.ArgumentParser(description="""Choose what to plot and
+                    where to store it, by defautl all benchmarks will be
+                    plotted""")
+    parser.add_argument('--path', default=["./images"], type=Path,
+                        help="""Path to folder in which the plots will be
+                        stored""")
+    parser.add_argument('--size', nargs="+", default=[64, 256], type=int,
+                        help="""Size of the matrices on which the operations
+                        will be performed in the history benchmarks, has to be
+                        a power of 2, max=256, min=4, default=[64,256], """)
+    parser.add_argument('--dimension', nargs="+", default=[32, 128], type=int,
+                        help="""Size of the matrices on which the operations
+                        will be performed in the history benchmarks, has to be
+                        a power of 2, max=256, min=4, default[32,128]""")
+    args = parser.parse_args()
     paths = get_paths()
     latest_path = get_latest_benchmark_path()
     data = create_dataframe(paths)
     latest_data = json_to_dataframe(latest_path)
 
-    plot_operations(data)
-    plot_solvers(data)
-    compare_operations(latest_data)
-    compare_solvers(latest_data)
+    plot_operations(data, args.size, args.path)
+    plot_solvers(data, args.dimension, args.path)
+    compare_operations(latest_data, args.path)
+    compare_solvers(latest_data, args.path)
 
 
 if __name__ == '__main__':
