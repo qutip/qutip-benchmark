@@ -32,7 +32,7 @@ def jc_setup(dimension):
     kappa = 0.015       # cavity dissipation rate
     gamma = 0.15        # atom dissipation rate
 
-    tlist = np.linspace(0, 25, 100)
+    tlist = np.linspace(0, 100, 200)
 
     # Hamiltonian
     Ia = qutip.qeye(2)
@@ -71,7 +71,7 @@ def cavity_setup(dimension):
     wl = 2.
     delta_c = wl - wc
     alpha0 = 0.3 - 0.5j
-    tlist = np.linspace(0, 10, 200)
+    tlist = np.linspace(0, 100, 200)
 
     a = qutip.destroy(dimension)
     a_dag = qutip.create(dimension)
