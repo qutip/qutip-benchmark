@@ -325,19 +325,19 @@ def main(args=[]):
     elif args.operations and args.history:
         plot_operations(data, args.size, args.path)
 
-    elif args.operations:
+    elif args.operations and not args.solve:
         plot_operations(data, args.size, args.path)
         compare_operations(latest_data, args.path)
 
-    elif args.solve:
+    elif args.solve and not args.operations:
         plot_solvers(data, args.dimension, args.path)
         compare_solvers(latest_data, args.path)
 
-    elif args.compare:
+    elif args.compare and not args.history:
         compare_operations(latest_data, args.path)
         compare_solvers(latest_data, args.path)
 
-    elif args.history:
+    elif args.history and not args.compare:
         plot_operations(data, args.size, args.path)
         plot_solvers(data, args.dimension, args.path)
 
