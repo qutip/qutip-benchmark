@@ -100,7 +100,7 @@ def plot_operations(df, matrix_size, path):
     benchmarks for a specified matrix size"""
 
     # Create storage folder
-    folder = Path(path)
+    folder = Path(f"{path}/history")
     folder.mkdir(parents=True, exist_ok=True)
 
     # Group by operation, density and size
@@ -141,7 +141,7 @@ def plot_solvers(df, dimension_size, path):
     benchmarks for a specified Hilbert Dimension"""
 
     # Create storage folder
-    folder = Path(path)
+    folder = Path(f"{path}/history")
     folder.mkdir(parents=True, exist_ok=True)
 
     # Groub by solver type and Hibert space dimension
@@ -182,7 +182,7 @@ def compare_operations(df, path):
     and params_density and plots time vs N (for NxN matrices)"""
 
     # Create storage folder
-    folder = Path(path)
+    folder = Path(f"{path}/compare")
     folder.mkdir(parents=True, exist_ok=True)
 
     grouped = df.groupby(['params_operation', 'params_density'])
@@ -234,7 +234,7 @@ def compare_solvers(df, path):
     dimensions using Matplotlib"""
 
     # Create storage folder
-    folder = Path(path)
+    folder = Path(f"{path}/compare")
     folder.mkdir(parents=True, exist_ok=True)
 
     # plot mcsolve and mesolve
@@ -284,9 +284,9 @@ def create_dataframe(paths):
 
 def main(args=[]):
     parser = argparse.ArgumentParser(description="""Choose what to plot and
-                    where to store it, by defautl all benchmarks will be
-                    plotted""")
-    parser.add_argument('--path', default=["./images"], type=Path,
+                    where to store it, by default all benchmarks will be
+                    plotted using default size and dimensions""")
+    parser.add_argument('--path', default="./images", type=Path,
                         help="""Path to folder in which the plots will be
                         stored""")
     parser.add_argument('--size', nargs="+", default=[64, 256], type=int,
@@ -297,16 +297,55 @@ def main(args=[]):
                         help="""Size of the matrices on which the operations
                         will be performed in the history benchmarks, has to be
                         a power of 2, max=256, min=4, default[32,128]""")
+    parser.add_argument('--solve',action='store_true',
+                        help="""Only plot solvers""")
+    parser.add_argument('--operations', action='store_true',
+                        help="""Only plot operations""")
+    parser.add_argument('--compare', action='store_true',
+                        help="""Only plot comparison benchmarks""")
+    parser.add_argument('--history', action='store_true',
+                        help="""Only plot history benchmarks""")
+
     args = parser.parse_args()
+
     paths = get_paths()
     latest_path = get_latest_benchmark_path()
     data = create_dataframe(paths)
     latest_data = json_to_dataframe(latest_path)
 
-    plot_operations(data, args.size, args.path)
-    plot_solvers(data, args.dimension, args.path)
-    compare_operations(latest_data, args.path)
-    compare_solvers(latest_data, args.path)
+    if args.solve and args.compare:
+        compare_solvers(latest_data, args.path)
+    
+    elif args.solve and args.history:
+        plot_solvers(data, args.dimension, args.path)
+    
+    elif args.operations and args.compare:
+        compare_operations(data, args.path)
+    
+    elif args.operations and args.history:
+        plot_operations(data, args.size, args.path)
+   
+    elif args.operations:
+        plot_operations(data, args.size, args.path)
+        compare_operations(latest_data, args.path)
+    
+    elif args.solve:
+        plot_solvers(data, args.dimension, args.path)
+        compare_solvers(latest_data, args.path)
+    
+    elif args.compare:
+        compare_operations(latest_data, args.path)
+        compare_solvers(latest_data, args.path)
+    
+    elif args.history:
+        plot_operations(data, args.size, args.path)
+        plot_solvers(data, args.dimension, args.path)
+    
+    else:
+        plot_operations(data, args.size, args.path)
+        plot_solvers(data, args.dimension, args.path)
+        compare_operations(latest_data, args.path)
+        compare_solvers(latest_data, args.path)
 
 
 if __name__ == '__main__':
