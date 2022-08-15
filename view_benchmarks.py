@@ -297,7 +297,7 @@ def main(args=[]):
                         help="""Size of the matrices on which the operations
                         will be performed in the history benchmarks, has to be
                         a power of 2, max=256, min=4, default[32,128]""")
-    parser.add_argument('--solve',action='store_true',
+    parser.add_argument('--solve', action='store_true',
                         help="""Only plot solvers""")
     parser.add_argument('--operations', action='store_true',
                         help="""Only plot operations""")
@@ -315,32 +315,32 @@ def main(args=[]):
 
     if args.solve and args.compare:
         compare_solvers(latest_data, args.path)
-    
+
     elif args.solve and args.history:
         plot_solvers(data, args.dimension, args.path)
-    
+
     elif args.operations and args.compare:
         compare_operations(data, args.path)
-    
+
     elif args.operations and args.history:
         plot_operations(data, args.size, args.path)
-   
+
     elif args.operations:
         plot_operations(data, args.size, args.path)
         compare_operations(latest_data, args.path)
-    
+
     elif args.solve:
         plot_solvers(data, args.dimension, args.path)
         compare_solvers(latest_data, args.path)
-    
+
     elif args.compare:
         compare_operations(latest_data, args.path)
         compare_solvers(latest_data, args.path)
-    
+
     elif args.history:
         plot_operations(data, args.size, args.path)
         plot_solvers(data, args.dimension, args.path)
-    
+
     else:
         plot_operations(data, args.size, args.path)
         plot_solvers(data, args.dimension, args.path)
