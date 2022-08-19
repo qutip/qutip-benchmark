@@ -45,27 +45,168 @@ def json_to_dataframe(filepath):
         return data
 
 
-def prep_data(df, separators):
-    """creates a list of dicts of the form 
-    [(plot1),{line1:values;line2:values...},(plot2),{line1:values; ...}...}]
+def get_paths():
+    """Returns the path to the latest benchmark run from `./.benchmarks/`"""
+
+    benchmark_paths = glob.glob("./.benchmarks/*/*.json")
+    dates = [''.join(_b.split("/")[-1].split('_')[2:4])
+             for _b in benchmark_paths]
+    zipped = zip(dates, benchmark_paths)
+    tmp = sorted(zipped, key=lambda x: x[0])
+    res = list(zip(*tmp))
+
+    return res[1]
+
+
+def create_dataframe(paths):
+    df = pd.DataFrame()
+
+    for path in paths:
+        data = json_to_dataframe(path)
+        df = pd.concat([df, data])
+
+    return pd.DataFrame(df)
+
+
+def get_title_path(title, folder):
+    op_title = title[0]
+    if len(title) == 3:
+        fig_title = f"""Operation:{op_title}
+        Matrix density: {title[1]} Matrix Size: {title[2]}x{title[2]}"""
+
+        fig_path = f"{folder}/{title[0]}_{title[2]}_{title[1]}.png"
+    elif len(title) == 2:
+        fig_title = f"""Solver: {op_title}
+        Hilbert Space Dimension: {title[1]}"""
+
+        fig_path = f"{folder}/{title[0]}_{title[1]}.png"
+    return fig_title, fig_path
+
+def get_line_sep(param):
+    if len(param) == 3:
+        if 'QobjEvo' in param[0]:
+            return 'params_coeftype'
+        return 'params_dtype'
+
+    elif len(param) == 2:
+        if 'steadystate' in param[0]:
+            return 'params_model_steady'
+        return 'params_model_solve'
+
+
+def prep_data(df, plot_separators,size):
+    """creates a list of dicts of the form
+    [((plot1_id),{line1:values;line2:values...}),((plot2_id),{line1:values; ...}...})]
     with values stored as dataframes"""
     res = []
-    for plot_separators in separators:
-        for line_separators in plot_separators[1]:
-            plot_id = {
-                    plot: {
-                        line: line_data for line, line_data
-                        in plot_data.groupby(line_separators)
-                        }
-                    for plot, plot_data in df.groupby(plot_separators[0])
+    for line_separators in plot_separators[1]:
+        plot_id = {
+                plot: {
+                    line: line_data for line, line_data
+                    in plot_data.groupby(line_separators)
                     }
+                for plot, plot_data in df.groupby(plot_separators[0])
+                }
 
-            # delete empty entries caused by plots with same
-            # plot separators but different line separators
-            tmp = {key: data for key, data in plot_id.items() if data}
-            res += tmp.items()
+        # delete empty entries caused by plots with same
+        # plot separators but different line separators
+        tmp = {key: data for key, data in plot_id.items() if data and key[1] in size}
+        res += tmp.items()
     return res
 
+
+def separate_plots(df, plot_sep, path, size, restrict_cpu=None):
+    """Plots the evolution over time of the add and matmul operation
+    benchmarks for a specified matrix size"""
+    res = []
+    # Create storage folder
+    folder = Path(f"{path}/nightly")
+    folder.mkdir(parents=True, exist_ok=True)
+
+    # Group group based onn plot_sep parameters
+    grouped = df.groupby(plot_sep)
+
+    for param, group in grouped:
+
+        # get title path and line separator
+        fig_title, fig_path = get_title_path(param,folder)
+        line_sep = get_line_sep(param)
+
+        # Create labels for each line
+        labels = group[line_sep].unique().tolist()
+
+        # Plot data if size equals parameters
+        if param[1] in size:
+            res.append(
+                (group, line_sep, labels,
+                 fig_title, fig_path, restrict_cpu)
+                )
+    return res
+
+
+def plot_prepped_data(data, path, restrict_cpu=None):
+    # Create storage folder
+    folder = Path(f"{path}/nightly")
+    folder.mkdir(parents=True, exist_ok=True)
+
+    for plot in data:
+        fig_title, fig_path = get_title_path(plot[0],folder)
+
+        #Create figure
+        fig, ax = plt.subplots(1, 1)
+
+        fig.suptitle(fig_title, fontsize=20)
+        fig.set_size_inches(9, 9)
+
+        # Set colors and markers for legend
+        colors = [
+            "blue", "orange", "green",
+            "red", "black", "gray",
+            "pink", "purple", "cyan"]
+        markers = ['o--', 'x-', 'v:', "1-.", "*:"]
+        labels  = list(plot[1].keys())
+
+        for line in plot[1]:
+            count = 0
+            cpus = []
+            # Separate by CPU
+            for cpu, gr in plot[1][line].groupby('cpu'):
+                if restrict_cpu:
+                    if restrict_cpu in cpu:
+                        cpus.append(cpu)
+                        for i, label in enumerate(labels):
+                            if line == label:
+                                ax.plot(
+                                    gr.datetime, gr.stats_mean,
+                                    markers[count], color=colors[i]
+                                    )
+                        count = count+1
+                else:
+                    cpus.append(cpu)
+                    for i, label in enumerate(labels):
+                        if line == label:
+                            ax.plot(
+                                gr.datetime, gr.stats_mean,
+                                markers[count], color=colors[i]
+                                )
+                    count = count+1
+
+        # Generate legend
+        def f(m, c):
+            return plt.plot([], [], m, color=c)[0]
+        handles = [f("s", colors[i]) for i in range(len(labels))]
+        handles += [f(markers[i], "k") for i in range(len(cpus))]
+        labels += cpus
+        ax.legend(handles, labels)
+
+        ax.set_xlabel("date")
+        ax.set_ylabel("time (s)")
+        ax.set_yscale('log')
+
+        fig.tight_layout()
+        plt.gcf().autofmt_xdate()
+        plt.savefig(fig_path, bbox_inches='tight')
+        plt.close()
 
 
 def plot_data(df, line_sep, labels, fig_title, fig_path, restrict_cpu):
@@ -128,80 +269,6 @@ def plot_data(df, line_sep, labels, fig_title, fig_path, restrict_cpu):
     plt.gcf().autofmt_xdate()
     plt.savefig(fig_path, bbox_inches='tight')
     plt.close()
-
-
-def separate_plots(df, plot_sep, path, size, restrict_cpu=None):
-    """Plots the evolution over time of the add and matmul operation
-    benchmarks for a specified matrix size"""
-    res = []
-    # Create storage folder
-    folder = Path(f"{path}/nightly")
-    folder.mkdir(parents=True, exist_ok=True)
-
-    # Group group based onn plot_sep parameters
-    grouped = df.groupby(plot_sep)
-
-    for param, group in grouped:
-
-        op_title = params[0].replace("_", " ")
-
-        # Determine whether it is a solver or a matrix operation
-        # based on amount of parameters (3 = operations; 2 = solvers)
-        if len(param) == 3:
-            fig_title = f"""Operation:{op_title}
-            Matrix density: {param[2]} Matrix Size: {param[1]}x{param[1]}"""
-
-            fig_path = f"{path}/nightly/{param[0]}_{param[2]}_{param[1]}.png"
-
-            if 'QobjEvo' in param[0]:
-                line_sep = 'params_coeftype'
-            else:
-                line_sep = 'params_dtype'
-
-        elif len(param) == 2:
-            fig_title = f"""Solver: {op_title}
-            Hilbert Space Dimension: {param[1]}"""
-
-            fig_path = f"{path}/nightly/{param[0]}_{param[1]}.png"
-
-            if 'steadystate' in param[0]:
-                line_sep = 'params_model_steady'
-            else:
-                line_sep = 'params_model_solve'
-
-        # Create labels for each line
-        labels = group[line_sep].unique().tolist()
-
-        # Plot data if size equals parameters
-        if param[1] in size:
-            res.append(
-                (group, line_sep, labels,
-                 fig_title, fig_path, restrict_cpu)
-                )
-    return res
-
-
-def get_paths():
-    """Returns the path to the latest benchmark run from `./.benchmarks/`"""
-
-    benchmark_paths = glob.glob("./.benchmarks/*/*.json")
-    dates = [''.join(_b.split("/")[-1].split('_')[2:4])
-             for _b in benchmark_paths]
-    zipped = zip(dates, benchmark_paths)
-    tmp = sorted(zipped, key=lambda x: x[0])
-    res = list(zip(*tmp))
-
-    return res[1]
-
-
-def create_dataframe(paths):
-    df = pd.DataFrame()
-
-    for path in paths:
-        data = json_to_dataframe(path)
-        df = pd.concat([df, data])
-
-    return pd.DataFrame(df)
 
 
 def main(args=[]):
@@ -270,13 +337,23 @@ def main(args=[]):
     ###     Method 2     ###
     ###                  ###
 
-    separators = [
-        [['params_operation', 'params_size', 'params_density'],
-            ['params_coeftype','params_dtype']],
-        [['params_operation', 'params_dimension'],
+    #Separators
+    lin_alg_separators =[['params_operation', 'params_size', 'params_density'],
+            ['params_coeftype','params_dtype']]
+    solve_separators = [['params_operation', 'params_dimension'],
             ['params_model_steady','params_model_solve']]
-        ]
-    prep_data(data,separators)
+    
+    if args.operations and not args.solve:
+        plots = prep_data(data,lin_alg_separators, args.size)
+
+    elif args.solve and not args.operation:
+        plots = prep_data(data,solve_separators, args.dimension)
+
+    else:
+        plots = prep_data(data,lin_alg_separators, args.size)
+        plots += prep_data(data,solve_separators, args.dimension)
+
+    plot_prepped_data(plots,args.path)
 
 if __name__ == '__main__':
     main()
