@@ -82,6 +82,7 @@ def get_title_path(title, folder):
         fig_path = f"{folder}/{title[0]}_{title[1]}.png"
     return fig_title, fig_path
 
+
 def get_line_sep(param):
     if len(param) == 3:
         if 'QobjEvo' in param[0]:
@@ -94,9 +95,10 @@ def get_line_sep(param):
         return 'params_model_solve'
 
 
-def prep_data(df, plot_separators,size):
+def prep_data(df, plot_separators, size):
     """creates a list of dicts of the form
-    [((plot1_id),{line1:values;line2:values...}),((plot2_id),{line1:values; ...}...})]
+    [((plot1_id),{line1:values;line2:values...}),
+        ((plot2_id),{line1:values; ...}...})]
     with values stored as dataframes"""
     res = []
     for line_separators in plot_separators[1]:
@@ -110,7 +112,9 @@ def prep_data(df, plot_separators,size):
 
         # delete empty entries caused by plots with same
         # plot separators but different line separators
-        tmp = {key: data for key, data in plot_id.items() if data and key[1] in size}
+        tmp = {
+            key: data for key, data in plot_id.items()
+            if data and key[1] in size}
         res += tmp.items()
     return res
 
@@ -129,7 +133,7 @@ def separate_plots(df, plot_sep, path, size, restrict_cpu=None):
     for param, group in grouped:
 
         # get title path and line separator
-        fig_title, fig_path = get_title_path(param,folder)
+        fig_title, fig_path = get_title_path(param, folder)
         line_sep = get_line_sep(param)
 
         # Create labels for each line
@@ -150,9 +154,9 @@ def plot_prepped_data(data, path, restrict_cpu=None):
     folder.mkdir(parents=True, exist_ok=True)
 
     for plot in data:
-        fig_title, fig_path = get_title_path(plot[0],folder)
+        fig_title, fig_path = get_title_path(plot[0], folder)
 
-        #Create figure
+        # Create figure
         fig, ax = plt.subplots(1, 1)
 
         fig.suptitle(fig_title, fontsize=20)
@@ -164,7 +168,7 @@ def plot_prepped_data(data, path, restrict_cpu=None):
             "red", "black", "gray",
             "pink", "purple", "cyan"]
         markers = ['o--', 'x-', 'v:', "1-.", "*:"]
-        labels  = list(plot[1].keys())
+        labels = list(plot[1].keys())
 
         for line in plot[1]:
             count = 0
@@ -297,9 +301,9 @@ def main(args=[]):
     paths = get_paths()
     data = create_dataframe(paths)
 
-    ###                  ###
-    ###     Method 1     ###
-    ###                  ###
+    #               #
+    #    Method 1   #
+    #               #
 
     # data separators
     # lin_alg_plot_sep = ['params_operation', 'params_size', 'params_density']
@@ -332,28 +336,32 @@ def main(args=[]):
     # for plot in plots:
     #     plot_data(*plot)
 
+    #              #
+    #   Method 2   #
+    #              #
 
-    ###                  ###
-    ###     Method 2     ###
-    ###                  ###
+    # Separators
+    lin_alg_separators = [
+        ['params_operation', 'params_size', 'params_density'],
+        ['params_coeftype', 'params_dtype']
+        ]
+    solve_separators = [
+        ['params_operation', 'params_dimension'],
+        ['params_model_steady', 'params_model_solve']
+        ]
 
-    #Separators
-    lin_alg_separators =[['params_operation', 'params_size', 'params_density'],
-            ['params_coeftype','params_dtype']]
-    solve_separators = [['params_operation', 'params_dimension'],
-            ['params_model_steady','params_model_solve']]
-    
     if args.operations and not args.solve:
-        plots = prep_data(data,lin_alg_separators, args.size)
+        plots = prep_data(data, lin_alg_separators, args.size)
 
     elif args.solve and not args.operation:
-        plots = prep_data(data,solve_separators, args.dimension)
+        plots = prep_data(data, solve_separators, args.dimension)
 
     else:
-        plots = prep_data(data,lin_alg_separators, args.size)
-        plots += prep_data(data,solve_separators, args.dimension)
+        plots = prep_data(data, lin_alg_separators, args.size)
+        plots += prep_data(data, solve_separators, args.dimension)
 
-    plot_prepped_data(plots,args.path)
+    plot_prepped_data(plots, args.path)
+
 
 if __name__ == '__main__':
     main()
