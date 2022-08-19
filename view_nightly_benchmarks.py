@@ -45,21 +45,27 @@ def json_to_dataframe(filepath):
         return data
 
 
-def prep_data(df, plot_separators, line_separators):
-    """creates dict of the form {plot1:{line1:values;line2:values...}...}
+def prep_data(df, separators):
+    """creates a list of dicts of the form 
+    [(plot1),{line1:values;line2:values...},(plot2),{line1:values; ...}...}]
     with values stored as dataframes"""
-    plots = {
-            plot: {
-                line: line_data for line, line_data
-                in plot_data.groupby(line_separators)
-                }
-            for plot, plot_data in df.groupby(plot_separators)
-            }
+    res = []
+    for plot_separators in separators:
+        for line_separators in plot_separators[1]:
+            plot_id = {
+                    plot: {
+                        line: line_data for line, line_data
+                        in plot_data.groupby(line_separators)
+                        }
+                    for plot, plot_data in df.groupby(plot_separators[0])
+                    }
 
-    # delete empty entries caused by plots with same
-    # plot separators but different line separators
-    res = {k: v for k, v in plots.items() if v}
-    print(res)
+            # delete empty entries caused by plots with same
+            # plot separators but different line separators
+            tmp = {key: data for key, data in plot_id.items() if data}
+            res += tmp.items()
+    return res
+
 
 
 def plot_data(df, line_sep, labels, fig_title, fig_path, restrict_cpu):
@@ -224,37 +230,53 @@ def main(args=[]):
     paths = get_paths()
     data = create_dataframe(paths)
 
+    ###                  ###
+    ###     Method 1     ###
+    ###                  ###
+
     # data separators
-    lin_alg_plot_sep = ['params_operation', 'params_size', 'params_density']
-    solver_plot_sep = ['params_operation', 'params_dimension']
+    # lin_alg_plot_sep = ['params_operation', 'params_size', 'params_density']
+    # solver_plot_sep = ['params_operation', 'params_dimension']
 
-    # Separate data
-    if args.operations:
-        plots = separate_plots(
-                            data, lin_alg_plot_sep,
-                            args.path, args.size
-                            )
+    # # Separate data
+    # if args.operations and not args.solve:
+    #     plots = separate_plots(
+    #                         data, lin_alg_plot_sep,
+    #                         args.path, args.size
+    #                         )
 
-    elif args.solve:
-        plots = separate_plots(
-                            data, solver_plot_sep,
-                            args.path, args.dimension
-                            )
+    # elif args.solve and not args.operation:
+    #     plots = separate_plots(
+    #                         data, solver_plot_sep,
+    #                         args.path, args.dimension
+    #                         )
 
-    else:
-        plots = separate_plots(
-                            data, lin_alg_plot_sep,
-                            args.path, args.size
-                            )
-        plots += separate_plots(
-                            data, solver_plot_sep,
-                            args.path, args.dimension
-                            )
+    # else:
+    #     plots = separate_plots(
+    #                         data, lin_alg_plot_sep,
+    #                         args.path, args.size
+    #                         )
+    #     plots += separate_plots(
+    #                         data, solver_plot_sep,
+    #                         args.path, args.dimension
+    #                         )
 
-    # Plot data
-    for plot in plots:
-        plot_data(*plot)
+    # # Plot data
+    # for plot in plots:
+    #     plot_data(*plot)
 
+
+    ###                  ###
+    ###     Method 2     ###
+    ###                  ###
+
+    separators = [
+        [['params_operation', 'params_size', 'params_density'],
+            ['params_coeftype','params_dtype']],
+        [['params_operation', 'params_dimension'],
+            ['params_model_steady','params_model_solve']]
+        ]
+    prep_data(data,separators)
 
 if __name__ == '__main__':
     main()
