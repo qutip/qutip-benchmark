@@ -96,6 +96,34 @@ def filter_ops(df, filter=None):
     return data
 
 
+def filter_params(data, line_sep=['coeftype', 'dtype', 'model'], filter=None):
+    output = {}
+    for op in data:
+        # get names of parameter columns and drop the one containing operations
+        params = [
+            param for param in list(data[op].columns)
+            if "params_" in param and "operation" not in param
+            ]
+        separator = []
+        # drop parameters that will be used as line separators
+        if line_sep:
+            for sep in line_sep:
+                for param in params:
+                    if sep in param:
+                        separator.append(param)
+            for sep in separator:
+                params.remove(sep)
+        for plot_params, plot_data in data[op].groupby(params):
+            if type(plot_params) is tuple:
+                key = [op]
+                for i in plot_params:
+                    key.append(i)
+            else:
+                key = [op, plot_params]
+            key = " ".join([str(item) for item in key])
+            output[key] = plot_data
+    return output
+
 def get_title_path(title, folder):
     op_title = title[0]
     if len(title) == 3:
