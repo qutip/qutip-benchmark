@@ -68,6 +68,6 @@ jobs:
       - name: Create artefact containing benchmarks
         uses: actions/upload-artifact@v2
         with: 
-          name: benchmarks
+          name: test_benchmarks
           path: .benchmarks
 
