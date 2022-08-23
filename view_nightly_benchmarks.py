@@ -42,6 +42,16 @@ def json_to_dataframe(filepath):
         data['datetime'] = time
         data['datetime'] = pd.to_datetime(data['datetime'])
 
+        # drop unused columns
+        data = data[[
+            'group', 'name', 'fullname', 'param', 'stats_min',
+            'stats_max', 'stats_mean', 'stats_stddev', 'params_size',
+            'params_density', 'params_coeftype', 'params_dtype',
+            'params_model_solve', 'params_dimension',
+            'params_model_steady', 'params_operation', 'cpu',
+            'datetime'
+            ]]
+
         return data
 
 
@@ -60,12 +70,27 @@ def get_paths():
 
 def create_dataframe(paths):
     df = pd.DataFrame()
-
+    dfs = []
     for path in paths:
         data = json_to_dataframe(path)
-        df = pd.concat([df, data])
+        dfs.append(data)
+    df = pd.concat(dfs)
+    ops = list(df['params_operation'].unique())
 
-    return pd.DataFrame(df)
+    return df
+
+
+def filter_ops(df, filter=None):
+    if filter:
+        ops = filter
+    else:
+        ops = list(df['params_operation'].unique())
+
+    data = {}
+    for op in ops:
+        data[op] = df[df["params_operation"] == op]
+
+    return data
 
 
 def get_title_path(title, folder):
@@ -96,26 +121,7 @@ def get_line_sep(param):
 
 
 def prep_data(df, plot_separators, size):
-    """creates a list of dicts of the form
-    [((plot1_id),{line1:values;line2:values...}),
-        ((plot2_id),{line1:values; ...}...})]
-    with values stored as dataframes"""
-    res = []
-    for line_separators in plot_separators[1]:
-        plot_id = {
-                plot: {
-                    line: line_data for line, line_data
-                    in plot_data.groupby(line_separators)
-                    }
-                for plot, plot_data in df.groupby(plot_separators[0])
-                }
 
-        # delete empty entries caused by plots with same
-        # plot separators but different line separators
-        tmp = {
-            key: data for key, data in plot_id.items()
-            if data and key[1] in size}
-        res += tmp.items()
     return res
 
 
@@ -139,7 +145,7 @@ def separate_plots(df, plot_sep, path, size, restrict_cpu=None):
         # Create labels for each line
         labels = group[line_sep].unique().tolist()
 
-        # Plot data if size equals parameters
+        # add data if size equals parameters
         if param[1] in size:
             res.append(
                 (group, line_sep, labels,
@@ -300,7 +306,7 @@ def main(args=[]):
     # fetch data
     paths = get_paths()
     data = create_dataframe(paths)
-
+    filter_ops(data)
     #               #
     #    Method 1   #
     #               #
@@ -350,17 +356,17 @@ def main(args=[]):
         ['params_model_steady', 'params_model_solve']
         ]
 
-    if args.operations and not args.solve:
-        plots = prep_data(data, lin_alg_separators, args.size)
+    # if args.operations and not args.solve:
+    #     plots = prep_data(data, lin_alg_separators, args.size)
 
-    elif args.solve and not args.operation:
-        plots = prep_data(data, solve_separators, args.dimension)
+    # elif args.solve and not args.operation:
+    #     plots = prep_data(data, solve_separators, args.dimension)
 
-    else:
-        plots = prep_data(data, lin_alg_separators, args.size)
-        plots += prep_data(data, solve_separators, args.dimension)
+    # else:
+    #     plots = prep_data(data, lin_alg_separators, args.size)
+    #     plots += prep_data(data, solve_separators, args.dimension)
 
-    plot_prepped_data(plots, args.path)
+    # plot_prepped_data(plots, args.path)
 
 
 if __name__ == '__main__':
