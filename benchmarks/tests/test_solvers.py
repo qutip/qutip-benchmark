@@ -7,7 +7,7 @@ from qutip.solve.steadystate import steadystate
 
 
 @pytest.fixture(params=np.logspace(2, 8, 7, base=2, dtype=int).tolist())
-def dimension(request): return request.param
+def size(request): return request.param
 
 
 @pytest.fixture(params=["Jaynes-Cummings", "Cavity", "Qubit Spin Chain"])
@@ -22,11 +22,11 @@ def model_steady(request): return request.param
 tlist = np.linspace(0, 20, 80)
 
 
-def jc_setup(dimension):
-    dimension = int(dimension/2)
+def jc_setup(size):
+    size = int(size/2)
 
     # initial state
-    psi0 = qutip.fock(dimension, 0) & ((qutip.basis(2, 0) +
+    psi0 = qutip.fock(size, 0) & ((qutip.basis(2, 0) +
                                         qutip.basis(2, 1)).unit())
 
     wc = 1.0 * 2 * np.pi   # cavity frequency
@@ -38,10 +38,10 @@ def jc_setup(dimension):
 
     # Hamiltonian
     Ia = qutip.qeye(2)
-    Ic = qutip.qeye(dimension)
+    Ic = qutip.qeye(size)
 
-    a = qutip.destroy(dimension)
-    a_dag = qutip.create(dimension)
+    a = qutip.destroy(size)
+    a_dag = qutip.create(size)
     n = a_dag * a
 
     sm = qutip.sigmam()
@@ -66,7 +66,7 @@ def jc_setup(dimension):
     return (H, psi0, tlist, c_ops, [n & Ia])
 
 
-def cavity_setup(dimension):
+def cavity_setup(size):
     kappa = 1.
     eta = 1.5
     wc = 1.8
@@ -74,19 +74,19 @@ def cavity_setup(dimension):
     delta_c = wl - wc
     alpha0 = 0.3 - 0.5j
 
-    a = qutip.destroy(dimension)
-    a_dag = qutip.create(dimension)
+    a = qutip.destroy(size)
+    a_dag = qutip.create(size)
     n = a_dag * a
 
     H = delta_c * n + eta * (a + a_dag)
     c_ops = [np.sqrt(kappa) * a]
 
-    psi0 = qutip.coherent(dimension, alpha0)
+    psi0 = qutip.coherent(size, alpha0)
     return (H, psi0, tlist, c_ops, [n])
 
 
-def qubit_setup(dimension):
-    N = int(np.log2(dimension))
+def qubit_setup(size):
+    N = int(np.log2(size))
 
     # initial state
     state_list = [qutip.basis(2, 1)] + [qutip.basis(2, 0)] * (N - 1)
@@ -132,53 +132,53 @@ def qubit_setup(dimension):
 
 
 @pytest.mark.nightly
-def test_mesolve(benchmark, model_solve, dimension, request):
+def test_mesolve(benchmark, model_solve, size, request):
     # Group benchmark by operation, density and size.
     group = request.node.callspec.id
     group = "mesolve-" + group
     benchmark.group = group
 
     if (model_solve == 'Cavity'):
-        H, psi0, tspan, c_ops, e_ops = cavity_setup(dimension)
+        H, psi0, tspan, c_ops, e_ops = cavity_setup(size)
     elif (model_solve == 'Jaynes-Cummings'):
-        H, psi0, tspan, c_ops, e_ops = jc_setup(dimension)
+        H, psi0, tspan, c_ops, e_ops = jc_setup(size)
     elif (model_solve == 'Qubit Spin Chain'):
-        H, psi0, tspan, c_ops, e_ops = qubit_setup(dimension)
+        H, psi0, tspan, c_ops, e_ops = qubit_setup(size)
 
     result = benchmark(mesolve, H, psi0, tspan, c_ops, e_ops)
     return result
 
 
-def test_mcsolve(benchmark, model_solve, dimension, request):
+def test_mcsolve(benchmark, model_solve, size, request):
     # Group benchmark by operation, density and size.
     group = request.node.callspec.id
     group = "mcsolve-" + group
     benchmark.group = group
 
     if (model_solve == 'Cavity'):
-        H, psi0, tspan, c_ops, e_ops = cavity_setup(dimension)
+        H, psi0, tspan, c_ops, e_ops = cavity_setup(size)
     elif (model_solve == 'Jaynes-Cummings'):
-        H, psi0, tspan, c_ops, e_ops = jc_setup(dimension)
+        H, psi0, tspan, c_ops, e_ops = jc_setup(size)
     elif (model_solve == 'Qubit Spin Chain'):
-        H, psi0, tspan, c_ops, e_ops = qubit_setup(dimension)
+        H, psi0, tspan, c_ops, e_ops = qubit_setup(size)
 
     result = benchmark(mcsolve, H, psi0, tspan, c_ops, e_ops)
     return result
 
 
 @pytest.mark.nightly
-def test_steadystate(benchmark, model_steady, dimension, request):
+def test_steadystate(benchmark, model_steady, size, request):
     # Group benchmark by operation, density and size.
     group = request.node.callspec.id
     group = "steadystate-" + group
     benchmark.group = group
 
     if (model_steady == 'Cavity'):
-        H, _, _, c_ops, _ = cavity_setup(dimension)
+        H, _, _, c_ops, _ = cavity_setup(size)
         result = benchmark(steadystate, H, c_ops)
 
     elif (model_steady == 'Jaynes-Cummings'):
-        H, _, _, c_ops, _ = jc_setup(dimension)
+        H, _, _, c_ops, _ = jc_setup(size)
         result = benchmark(steadystate, H, c_ops)
 
     return result
