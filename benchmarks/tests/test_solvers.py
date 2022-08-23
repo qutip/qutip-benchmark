@@ -63,7 +63,7 @@ def jc_setup(size):
         Ic & (np.sqrt(gamma) * sm),
     ]
 
-    return (H, psi0, tlist, c_ops, [n & Ia])
+    return (H, psi0, c_ops, [n & Ia])
 
 
 def cavity_setup(size):
@@ -82,7 +82,7 @@ def cavity_setup(size):
     c_ops = [np.sqrt(kappa) * a]
 
     psi0 = qutip.coherent(size, alpha0)
-    return (H, psi0, tlist, c_ops, [n])
+    return (H, psi0, c_ops, [n])
 
 
 def qubit_setup(size):
@@ -128,7 +128,7 @@ def qubit_setup(size):
     # collapse operators
     c_ops = [np.sqrt(gamma[i]) * sz_list[i] for i in range(N)]
 
-    return (H, psi0, tlist, c_ops, [])
+    return (H, psi0, c_ops, [])
 
 
 @pytest.mark.nightly
@@ -139,13 +139,13 @@ def test_mesolve(benchmark, model_solve, size, request):
     benchmark.group = group
 
     if (model_solve == 'Cavity'):
-        H, psi0, tspan, c_ops, e_ops = cavity_setup(size)
+        H, psi0, c_ops, e_ops = cavity_setup(size)
     elif (model_solve == 'Jaynes-Cummings'):
-        H, psi0, tspan, c_ops, e_ops = jc_setup(size)
+        H, psi0, c_ops, e_ops = jc_setup(size)
     elif (model_solve == 'Qubit Spin Chain'):
-        H, psi0, tspan, c_ops, e_ops = qubit_setup(size)
+        H, psi0, c_ops, e_ops = qubit_setup(size)
 
-    result = benchmark(mesolve, H, psi0, tspan, c_ops, e_ops)
+    result = benchmark(mesolve, H, psi0, tlist, c_ops, e_ops)
     return result
 
 
@@ -156,13 +156,13 @@ def test_mcsolve(benchmark, model_solve, size, request):
     benchmark.group = group
 
     if (model_solve == 'Cavity'):
-        H, psi0, tspan, c_ops, e_ops = cavity_setup(size)
+        H, psi0, c_ops, e_ops = cavity_setup(size)
     elif (model_solve == 'Jaynes-Cummings'):
-        H, psi0, tspan, c_ops, e_ops = jc_setup(size)
+        H, psi0, c_ops, e_ops = jc_setup(size)
     elif (model_solve == 'Qubit Spin Chain'):
-        H, psi0, tspan, c_ops, e_ops = qubit_setup(size)
+        H, psi0, c_ops, e_ops = qubit_setup(size)
 
-    result = benchmark(mcsolve, H, psi0, tspan, c_ops, e_ops)
+    result = benchmark(mcsolve, H, psi0, tlist, c_ops, e_ops)
     return result
 
 
