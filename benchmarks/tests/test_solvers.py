@@ -17,8 +17,10 @@ def model_solve(request): return request.param
 @pytest.fixture(params=["Jaynes-Cummings", "Cavity"])
 def model_steady(request): return request.param
 
+
 # times
 tlist = np.linspace(0, 20, 80)
+
 
 def jc_setup(dimension):
     dimension = int(dimension/2)
