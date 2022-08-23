@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import qutip
 from qutip.solver.mesolve import mesolve
-from qutip.solve.mcsolve import mcsolve
+from qutip.solver.mcsolve import mcsolve
 from qutip.solve.steadystate import steadystate
 
 
@@ -175,10 +175,9 @@ def test_steadystate(benchmark, model_steady, size, request):
 
     if model_steady == 'Cavity':
         H, _, c_ops, _ = cavity_setup(size)
-        result = benchmark(steadystate, H, c_ops)
 
     elif model_steady == 'Jaynes-Cummings':
         H, _, c_ops, _ = jc_setup(size)
-        result = benchmark(steadystate, H, c_ops)
 
+    result = benchmark(steadystate, H, c_ops)
     return result
