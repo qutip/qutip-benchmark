@@ -27,7 +27,7 @@ def jc_setup(size):
 
     # initial state
     psi0 = qutip.fock(size, 0) & ((qutip.basis(2, 0) +
-                                        qutip.basis(2, 1)).unit())
+                                   qutip.basis(2, 1)).unit())
 
     wc = 1.0 * 2 * np.pi   # cavity frequency
     wa = 1.0 * 2 * np.pi   # atom frequency
