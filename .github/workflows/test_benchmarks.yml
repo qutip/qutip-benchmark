@@ -1,10 +1,9 @@
-name: Nightly Benchmarks
+name: Test Benchmarks
+
 
 on:
-  schedule:
-    # Run every day at midnight
-    - cron: "0 0 * * *"
-
+  [push, pull_request]
+  
 
 defaults:
   run:
@@ -64,11 +63,11 @@ jobs:
 
       - name: Run benchmarks
         run: |
-          python benchmarks/benchmarks.py -m "nightly" -v 
+          python benchmarks/benchmarks.py -v 
         
       - name: Create artefact containing benchmarks
         uses: actions/upload-artifact@v2
         with: 
-          name: nightly_benchmarks
+          name: benchmarks
           path: .benchmarks
 

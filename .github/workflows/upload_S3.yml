@@ -1,9 +1,9 @@
 name: Upload S3
 
-# Only trigger, when the benchmark workflow succeeded
+# Only trigger, when the nightly benchmark workflow succeeded
 on:
   workflow_run:
-    workflows: ["Benchmarks"]
+    workflows: ["Nightly Benchmarks"]
     types:
       - completed
 
@@ -26,7 +26,7 @@ jobs:
         with:
           workflow: run_benchmarks.yml
           workflow_conclusion: success
-          name: benchmarks
+          name: nightly_benchmarks
           path: ./benchmarks/
 
       - name: upload to s3
