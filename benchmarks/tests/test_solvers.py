@@ -138,11 +138,11 @@ def test_mesolve(benchmark, model_solve, size, request):
     group = "mesolve-" + group
     benchmark.group = group
 
-    if (model_solve == 'Cavity'):
+    if model_solve == 'Cavity':
         H, psi0, c_ops, e_ops = cavity_setup(size)
-    elif (model_solve == 'Jaynes-Cummings'):
+    elif model_solve == 'Jaynes-Cummings':
         H, psi0, c_ops, e_ops = jc_setup(size)
-    elif (model_solve == 'Qubit Spin Chain'):
+    elif model_solve == 'Qubit Spin Chain':
         H, psi0, c_ops, e_ops = qubit_setup(size)
 
     result = benchmark(mesolve, H, psi0, tlist, c_ops, e_ops)
@@ -155,11 +155,11 @@ def test_mcsolve(benchmark, model_solve, size, request):
     group = "mcsolve-" + group
     benchmark.group = group
 
-    if (model_solve == 'Cavity'):
+    if model_solve == 'Cavity':
         H, psi0, c_ops, e_ops = cavity_setup(size)
-    elif (model_solve == 'Jaynes-Cummings'):
+    elif model_solve == 'Jaynes-Cummings':
         H, psi0, c_ops, e_ops = jc_setup(size)
-    elif (model_solve == 'Qubit Spin Chain'):
+    elif model_solve == 'Qubit Spin Chain':
         H, psi0, c_ops, e_ops = qubit_setup(size)
 
     result = benchmark(mcsolve, H, psi0, tlist, c_ops, e_ops)
@@ -173,12 +173,12 @@ def test_steadystate(benchmark, model_steady, size, request):
     group = "steadystate-" + group
     benchmark.group = group
 
-    if (model_steady == 'Cavity'):
-        H, _, _, c_ops, _ = cavity_setup(size)
+    if model_steady == 'Cavity':
+        H, _, c_ops, _ = cavity_setup(size)
         result = benchmark(steadystate, H, c_ops)
 
-    elif (model_steady == 'Jaynes-Cummings'):
-        H, _, _, c_ops, _ = jc_setup(size)
+    elif model_steady == 'Jaynes-Cummings':
+        H, _, c_ops, _ = jc_setup(size)
         result = benchmark(steadystate, H, c_ops)
 
     return result
