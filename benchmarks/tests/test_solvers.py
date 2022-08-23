@@ -6,7 +6,7 @@ from qutip.solver.mcsolve import mcsolve
 from qutip.solve.steadystate import steadystate
 
 
-@pytest.fixture(params=np.logspace(2, 8, 7, base=2, dtype=int).tolist())
+@pytest.fixture(params=np.logspace(2, 7, 6, base=2, dtype=int).tolist())
 def size(request): return request.param
 
 
@@ -179,5 +179,5 @@ def test_steadystate(benchmark, model_steady, size, request):
     elif model_steady == 'Jaynes-Cummings':
         H, _, c_ops, _ = jc_setup(size)
 
-    result = benchmark(steadystate, H, c_ops)
+    result = benchmark(steadystate, H, c_ops, method='iterative-lgmres')
     return result
