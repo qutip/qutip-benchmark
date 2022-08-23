@@ -55,10 +55,10 @@ def json_to_dataframe(filepath):
         return data
 
 
-def get_paths():
-    """Returns the path to the latest benchmark run from `./.benchmarks/`"""
+def get_paths(folder):
+    """Returns paths to all benchmark runs from `./.benchmarks/`"""
 
-    benchmark_paths = glob.glob("./.benchmarks/*/*.json")
+    benchmark_paths = glob.glob(f"{folder}/*/*.json")
     dates = [''.join(_b.split("/")[-1].split('_')[2:4])
              for _b in benchmark_paths]
     zipped = zip(dates, benchmark_paths)
@@ -90,6 +90,9 @@ def filter_ops(df, filter=None):
     for op in ops:
         data[op] = df[df["params_operation"] == op]
 
+        # drop columns that apply to other operations
+        data[op] = data[op].dropna(axis=1, how='all')
+
     return data
 
 
@@ -118,11 +121,6 @@ def get_line_sep(param):
         if 'steadystate' in param[0]:
             return 'params_model_steady'
         return 'params_model_solve'
-
-
-def prep_data(df, plot_separators, size):
-
-    return res
 
 
 def separate_plots(df, plot_sep, path, size, restrict_cpu=None):
@@ -285,8 +283,11 @@ def main(args=[]):
     parser = argparse.ArgumentParser(description="""Choose what to plot and
                     where to store it, by default all benchmarks will be
                     plotted using default size and dimensions""")
-    parser.add_argument('--path', default="./images", type=Path,
+    parser.add_argument('--plotpath', default="./images", type=Path,
                         help="""Path to folder in which the plots will be
+                        stored""")
+    parser.add_argument('--benchpath', default="./.benchmarks", type=Path,
+                        help="""Path to folder in which the benchmarks are
                         stored""")
     parser.add_argument('--size', nargs="+", default=[64, 256], type=int,
                         help="""Size of the matrices on which the operations
@@ -304,9 +305,10 @@ def main(args=[]):
     args = parser.parse_args()
 
     # fetch data
-    paths = get_paths()
+    paths = get_paths(args.benchpath)
     data = create_dataframe(paths)
-    filter_ops(data)
+    data = filter_ops(data)
+    filter_params(data)
     #               #
     #    Method 1   #
     #               #
