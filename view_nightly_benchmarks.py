@@ -6,81 +6,122 @@ from pathlib import Path
 import argparse
 
 
-def unravel(data, key):
-    """Transforms {key:{another_key: values, another_key2: value2}} into
-    {key_another_key:value, key_another_key2:value}"""
-    for d in data:
-        values = d.pop(key)
-        for k, v in values.items():
-            d[key+'_'+k] = v
-    return data
-
-
 def json_to_dataframe(filepath):
-    """Loads a JSON file where the benchmark is stored and returns a dataframe
-    with the benchmar information."""
+    """Loads a JSON file from the specified path and returns a dataframe
+    with the benchmark information.
+
+    Parameters
+    ----------
+    filepath : string
+        path to the benchmark file
+
+    Returns
+    -------
+    data : DataFrame
+        DataFrame containing all the required plotting data from the
+        benchmark file.
+
+    """
+
     with open(filepath) as f:
         data_json = json.load(f)
-        cpu = data_json['machine_info']["cpu"]["brand_raw"]
-        time = data_json['datetime']
-
-        data = data_json['benchmarks']
-        data = unravel(data, 'options')
-        data = unravel(data, 'stats')
-        data = unravel(data, 'params')
-        data = unravel(data, 'extra_info')
 
         # Create dataframe
-        data = pd.DataFrame(data)
+        data = pd.json_normalize(data_json["benchmarks"], sep="_")
 
         # Set operation from group name
         data["params_operation"] = data.group.str.split('-')
         data.params_operation = [d[0] for d in data.params_operation]
 
         # Add time and cpu to dataframe
-        data['cpu'] = cpu
-        data['datetime'] = time
+        data['cpu'] = data_json['machine_info']["cpu"]["brand_raw"]
+        data['datetime'] = data_json['datetime']
         data['datetime'] = pd.to_datetime(data['datetime'])
 
         # drop unused columns
-        data = data[[
-            'group', 'name', 'fullname', 'param', 'stats_min',
-            'stats_max', 'stats_mean', 'stats_stddev', 'params_size',
-            'params_density', 'params_coeftype', 'params_dtype',
-            'params_model_solve', 'params_dimension',
-            'params_model_steady', 'params_operation', 'cpu',
-            'datetime'
-            ]]
+        unused = [
+            'options_disable_gc', 'options_timer', 'options_min_rounds',
+            'options_max_time', 'options_min_time', 'options_warmup',
+            'stats_min', 'stats_max', 'stats_median', 'stats_iqr', 'stats_q1',
+            'stats_q3', 'stats_iqr_outliers', 'stats_stddev_outliers',
+            'stats_outliers', 'stats_ld15iqr', 'stats_hd15iqr', 'stats_ops',
+            'stats_total', 'stats_iterations', 'stats_rounds'
+            ]
+        data = data.drop(unused, axis="columns")
 
         return data
 
 
 def get_paths(folder):
-    """Returns paths to all benchmark runs from `./.benchmarks/`"""
+    """Returns a list of paths to all benchmark runs
+
+    Parameters
+    ----------
+    folder : str
+        path to the benchmarks folder
+
+    Returns
+    -------
+    Paths : list
+        list of the paths to each benchmark file
+
+    """
 
     benchmark_paths = glob.glob(f"{folder}/*/*.json")
     dates = [''.join(_b.split("/")[-1].split('_')[2:4])
              for _b in benchmark_paths]
     zipped = zip(dates, benchmark_paths)
     tmp = sorted(zipped, key=lambda x: x[0])
-    res = list(zip(*tmp))
+    paths = list(zip(*tmp))
 
-    return res[1]
+    return paths[1]
 
 
 def create_dataframe(paths):
-    df = pd.DataFrame()
+    """ fetch all required data
+
+    Parameters
+    ----------
+    paths : list
+        List containing all the paths to the benchmark files.
+
+    Returns
+    -------
+    data : DataFrame
+        Pandas dataframe containing all the required plotting data
+        from all the benchmarks.
+
+    """
+
     dfs = []
     for path in paths:
-        data = json_to_dataframe(path)
-        dfs.append(data)
-    df = pd.concat(dfs)
-    ops = list(df['params_operation'].unique())
+        df = json_to_dataframe(path)
+        dfs.append(df)
+    data = pd.concat(dfs)
 
-    return df
+    return data
 
 
 def filter_ops(df, filter=None):
+    """Filters the input dataframe by operation
+
+    Parameters
+    ----------
+    df : DataFrame
+        Dataframe containing data to be filtered.
+
+    filter : list
+        list of desired operation names in the output,
+        if None the function will output all operations in
+        the dataframe.
+
+    Returns
+    -------
+    data : dict
+        Dictionnary of the form {"operation": dataframe}.
+
+    """
+
     if filter:
         ops = filter
     else:
@@ -90,18 +131,46 @@ def filter_ops(df, filter=None):
     for op in ops:
         data[op] = df[df["params_operation"] == op]
 
-        # drop columns that apply to other operations
+        # drop columns that only exist for other operations
         data[op] = data[op].dropna(axis=1, how='all')
 
     return data
 
 
-def filter_params(data, line_sep=['coeftype', 'dtype', 'model'], filter=None):
-    output = {}
-    for op in data:
+def filter_params(df, line_sep=['coeftype', 'dtype', 'model'], filter=None):
+    """Filters the input dataframe by parameters used
+    to separate each plot
+
+    Parameters
+    ----------
+    df : DataFrame
+        Dataframe containing data to be filtered.
+
+    line_sep : list
+        specifies which paramters should be used as line separators
+        rather than plot separators. These need to be a substring contained
+        in the parameter name. e.g: "type" will apply to both "params_coeftype"
+        and "params_dtype".
+
+    filter : list (Not implemented yet)
+        list of desired parameters in the output,
+        if None the function will find all available parameters
+        for each operation and use them to separate the data.
+
+    Returns
+    -------
+    data : dict
+        Dictionnary of the form {"operation-param_1-param_2...": dataframe}.
+
+    separators : list
+        List of the exact parameter names used as line separators.
+    """
+
+    data = {}
+    for op in df:
         # get names of parameter columns and drop the one containing operations
         params = [
-            param for param in list(data[op].columns)
+            param for param in list(df[op].columns)
             if "params_" in param and "operation" not in param
             ]
         separator = []
@@ -113,7 +182,7 @@ def filter_params(data, line_sep=['coeftype', 'dtype', 'model'], filter=None):
                         separator.append(param)
             for sep in separator:
                 params.remove(sep)
-        for plot_params, plot_data in data[op].groupby(params):
+        for plot_params, plot_df in df[op].groupby(params):
             if type(plot_params) is tuple:
                 key = [op]
                 for i in plot_params:
@@ -121,190 +190,8 @@ def filter_params(data, line_sep=['coeftype', 'dtype', 'model'], filter=None):
             else:
                 key = [op, plot_params]
             key = " ".join([str(item) for item in key])
-            output[key] = plot_data
-    return output
-
-def get_title_path(title, folder):
-    op_title = title[0]
-    if len(title) == 3:
-        fig_title = f"""Operation:{op_title}
-        Matrix density: {title[1]} Matrix Size: {title[2]}x{title[2]}"""
-
-        fig_path = f"{folder}/{title[0]}_{title[2]}_{title[1]}.png"
-    elif len(title) == 2:
-        fig_title = f"""Solver: {op_title}
-        Hilbert Space Dimension: {title[1]}"""
-
-        fig_path = f"{folder}/{title[0]}_{title[1]}.png"
-    return fig_title, fig_path
-
-
-def get_line_sep(param):
-    if len(param) == 3:
-        if 'QobjEvo' in param[0]:
-            return 'params_coeftype'
-        return 'params_dtype'
-
-    elif len(param) == 2:
-        if 'steadystate' in param[0]:
-            return 'params_model_steady'
-        return 'params_model_solve'
-
-
-def separate_plots(df, plot_sep, path, size, restrict_cpu=None):
-    """Plots the evolution over time of the add and matmul operation
-    benchmarks for a specified matrix size"""
-    res = []
-    # Create storage folder
-    folder = Path(f"{path}/nightly")
-    folder.mkdir(parents=True, exist_ok=True)
-
-    # Group group based onn plot_sep parameters
-    grouped = df.groupby(plot_sep)
-
-    for param, group in grouped:
-
-        # get title path and line separator
-        fig_title, fig_path = get_title_path(param, folder)
-        line_sep = get_line_sep(param)
-
-        # Create labels for each line
-        labels = group[line_sep].unique().tolist()
-
-        # add data if size equals parameters
-        if param[1] in size:
-            res.append(
-                (group, line_sep, labels,
-                 fig_title, fig_path, restrict_cpu)
-                )
-    return res
-
-
-def plot_prepped_data(data, path, restrict_cpu=None):
-    # Create storage folder
-    folder = Path(f"{path}/nightly")
-    folder.mkdir(parents=True, exist_ok=True)
-
-    for plot in data:
-        fig_title, fig_path = get_title_path(plot[0], folder)
-
-        # Create figure
-        fig, ax = plt.subplots(1, 1)
-
-        fig.suptitle(fig_title, fontsize=20)
-        fig.set_size_inches(9, 9)
-
-        # Set colors and markers for legend
-        colors = [
-            "blue", "orange", "green",
-            "red", "black", "gray",
-            "pink", "purple", "cyan"]
-        markers = ['o--', 'x-', 'v:', "1-.", "*:"]
-        labels = list(plot[1].keys())
-
-        for line in plot[1]:
-            count = 0
-            cpus = []
-            # Separate by CPU
-            for cpu, gr in plot[1][line].groupby('cpu'):
-                if restrict_cpu:
-                    if restrict_cpu in cpu:
-                        cpus.append(cpu)
-                        for i, label in enumerate(labels):
-                            if line == label:
-                                ax.plot(
-                                    gr.datetime, gr.stats_mean,
-                                    markers[count], color=colors[i]
-                                    )
-                        count = count+1
-                else:
-                    cpus.append(cpu)
-                    for i, label in enumerate(labels):
-                        if line == label:
-                            ax.plot(
-                                gr.datetime, gr.stats_mean,
-                                markers[count], color=colors[i]
-                                )
-                    count = count+1
-
-        # Generate legend
-        def f(m, c):
-            return plt.plot([], [], m, color=c)[0]
-        handles = [f("s", colors[i]) for i in range(len(labels))]
-        handles += [f(markers[i], "k") for i in range(len(cpus))]
-        labels += cpus
-        ax.legend(handles, labels)
-
-        ax.set_xlabel("date")
-        ax.set_ylabel("time (s)")
-        ax.set_yscale('log')
-
-        fig.tight_layout()
-        plt.gcf().autofmt_xdate()
-        plt.savefig(fig_path, bbox_inches='tight')
-        plt.close()
-
-
-def plot_data(df, line_sep, labels, fig_title, fig_path, restrict_cpu):
-    """Uses the line_sep (dtype,coeftype,model) to plot differnt lines,
-    assigns them a different color and assigns different line markers
-    for each cpu"""
-
-    # Create figure
-    fig, ax = plt.subplots(1, 1)
-
-    fig.suptitle(fig_title, fontsize=20)
-    fig.set_size_inches(9, 9)
-
-    # Set colors and markers for legend
-    colors = [
-        "blue", "orange", "green",
-        "red", "black", "gray",
-        "pink", "purple", "cyan"]
-    markers = ['o--', 'x-', 'v:', "1-.", "*:"]
-
-    # Separate using line separator
-    for sep, g in df.groupby(line_sep):
-        count = 0
-        cpus = []
-        # Separate by CPU
-        for cpu, gr in g.groupby('cpu'):
-            if restrict_cpu:
-                if restrict_cpu in cpu:
-                    cpus.append(cpu)
-                    for i, label in enumerate(labels):
-                        if sep == label:
-                            ax.plot(
-                                gr.datetime, gr.stats_mean,
-                                markers[count], color=colors[i]
-                                )
-                    count = count+1
-            else:
-                cpus.append(cpu)
-                for i, label in enumerate(labels):
-                    if sep == label:
-                        ax.plot(
-                            gr.datetime, gr.stats_mean,
-                            markers[count], color=colors[i]
-                            )
-                count = count+1
-
-    # Generate legend
-    def f(m, c):
-        return plt.plot([], [], m, color=c)[0]
-    handles = [f("s", colors[i]) for i in range(len(labels))]
-    handles += [f(markers[i], "k") for i in range(len(cpus))]
-    labels += cpus
-    ax.legend(handles, labels)
-
-    ax.set_xlabel("date")
-    ax.set_ylabel("time (s)")
-    ax.set_yscale('log')
-
-    fig.tight_layout()
-    plt.gcf().autofmt_xdate()
-    plt.savefig(fig_path, bbox_inches='tight')
-    plt.close()
+            data[key] = plot_df
+    return data, separator
 
 
 def main(args=[]):
@@ -335,69 +222,8 @@ def main(args=[]):
     # fetch data
     paths = get_paths(args.benchpath)
     data = create_dataframe(paths)
-    data = filter_ops(data)
-    filter_params(data)
-    #               #
-    #    Method 1   #
-    #               #
-
-    # data separators
-    # lin_alg_plot_sep = ['params_operation', 'params_size', 'params_density']
-    # solver_plot_sep = ['params_operation', 'params_dimension']
-
-    # # Separate data
-    # if args.operations and not args.solve:
-    #     plots = separate_plots(
-    #                         data, lin_alg_plot_sep,
-    #                         args.path, args.size
-    #                         )
-
-    # elif args.solve and not args.operation:
-    #     plots = separate_plots(
-    #                         data, solver_plot_sep,
-    #                         args.path, args.dimension
-    #                         )
-
-    # else:
-    #     plots = separate_plots(
-    #                         data, lin_alg_plot_sep,
-    #                         args.path, args.size
-    #                         )
-    #     plots += separate_plots(
-    #                         data, solver_plot_sep,
-    #                         args.path, args.dimension
-    #                         )
-
-    # # Plot data
-    # for plot in plots:
-    #     plot_data(*plot)
-
-    #              #
-    #   Method 2   #
-    #              #
-
-    # Separators
-    lin_alg_separators = [
-        ['params_operation', 'params_size', 'params_density'],
-        ['params_coeftype', 'params_dtype']
-        ]
-    solve_separators = [
-        ['params_operation', 'params_dimension'],
-        ['params_model_steady', 'params_model_solve']
-        ]
-
-    # if args.operations and not args.solve:
-    #     plots = prep_data(data, lin_alg_separators, args.size)
-
-    # elif args.solve and not args.operation:
-    #     plots = prep_data(data, solve_separators, args.dimension)
-
-    # else:
-    #     plots = prep_data(data, lin_alg_separators, args.size)
-    #     plots += prep_data(data, solve_separators, args.dimension)
-
-    # plot_prepped_data(plots, args.path)
-
+    # data = filter_ops(data)
+    # filter_params(data)
 
 if __name__ == '__main__':
     main()
