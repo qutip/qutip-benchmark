@@ -206,9 +206,69 @@ def filter_params(df, line_sep=None):
 
             # Append sub dict to main dict
             data[key] = tmp_dict
-    print(data)
-    return data, separator
+    return data
 
+def plot_data(data, path):
+
+    # create storage folder
+    folder = Path(f"{path}")
+    folder.mkdir(parents=True, exist_ok=True)
+
+    # Set colors and markers for legend
+    colors = [
+        "blue", "orange", "green",
+        "red", "black", "gray",
+        "pink", "purple", "cyan"]
+    markers = ['o--', 'x-', 'v:', "1-.", "*:"]
+
+    for plot in data:
+        line_sep = data[plot]["line_sep"]
+        df = data[plot]["data"]
+
+        # Create figure
+        fig, ax = plt.subplots(1, 1)
+
+        fig.suptitle(plot, fontsize=20)
+        fig.set_size_inches(9, 9)
+
+        if line_sep:
+            labels = list(df[line_sep].unique())
+
+            for sep, g in df.groupby(line_sep):
+                count = 0
+                cpus = []
+                # Separate by CPU
+                for cpu, gr in g.groupby('cpu'):
+                    cpus.append(cpu)
+                    for i, label in enumerate(labels):
+                        if sep == label:
+                            ax.plot(
+                                gr.datetime, gr.stats_mean,
+                                markers[count], color=colors[i]
+                                )
+                    count = count+1
+
+            # Generate legend
+            def f(m, c):
+                return plt.plot([], [], m, color=c)[0]
+            handles = [f("s", colors[i]) for i in range(len(labels))]
+            handles += [f(markers[i], "k") for i in range(len(cpus))]
+            labels += cpus
+            ax.legend(handles, labels)
+        else:
+            ax.plot(
+                    df.datetime, df.stats_mean
+                    )
+
+        ax.set_xlabel("date")
+        ax.set_ylabel("time (s)")
+        ax.set_yscale('log')
+
+        fig.tight_layout()
+        plt.gcf().autofmt_xdate()
+        plt.savefig(f"{folder}/{plot}.png", bbox_inches='tight')
+        plt.close()
+            
 
 def main(args=[]):
     parser = argparse.ArgumentParser(description="""Choose what to plot and
@@ -239,7 +299,8 @@ def main(args=[]):
     paths = get_paths(args.benchpath)
     data = create_dataframe(paths)
     data = filter_ops(data)
-    filter_params(data)
+    data = filter_params(data)
+    plot_data(data, args.plotpath)
 
 if __name__ == '__main__':
     main()
