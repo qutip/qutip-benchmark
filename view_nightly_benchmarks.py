@@ -373,7 +373,7 @@ def main(args=[]):
     parser.add_argument('--operations', nargs="+", default=None, type=str,
                         help="""Specify which operations to plot, plots all by
                         default or if nothing specified""")
-    parser.add_argument('--line_sep', nargs="*", default=None, type=int,
+    parser.add_argument('--line_sep', nargs="*", default=None, type=str,
                         help="""Specify which parameter should be used
                         to separate line on the plot instead of separating the
                         plots. default=None, ['type', 'model'] if nothing
