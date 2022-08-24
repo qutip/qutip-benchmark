@@ -12,7 +12,7 @@ def json_to_dataframe(filepath):
 
     Parameters
     ----------
-    filepath : string
+    filepath : str
         path to the benchmark file
 
     Returns
@@ -137,7 +137,7 @@ def filter_ops(df, filter=None):
     return data
 
 
-def filter_params(df, line_sep=['coeftype', 'dtype', 'model'], filter=None):
+def filter_params(df, line_sep=None):
     """Filters the input dataframe by parameters used
     to separate each plot
 
@@ -152,20 +152,18 @@ def filter_params(df, line_sep=['coeftype', 'dtype', 'model'], filter=None):
         in the parameter name. e.g: "type" will apply to both "params_coeftype"
         and "params_dtype".
 
-    filter : list (Not implemented yet)
-        list of desired parameters in the output,
-        if None the function will find all available parameters
-        for each operation and use them to separate the data.
-
     Returns
     -------
     data : dict
-        Dictionnary of the form {"operation-param_1-param_2...": dataframe}.
+        Nested Dictionnary of the form {"operation-param_1-param_2-...":
+        {data: dataframe; line_sep: str}}. line_sep = None if the parameter
+        wasn't specified.
 
     separators : list
         List of the exact parameter names used as line separators.
     """
 
+    #TODO add filter paramter to include only specfic filtering params
     data = {}
     for op in df:
         # get names of parameter columns and drop the one containing operations
@@ -173,24 +171,42 @@ def filter_params(df, line_sep=['coeftype', 'dtype', 'model'], filter=None):
             param for param in list(df[op].columns)
             if "params_" in param and "operation" not in param
             ]
-        separator = []
+
+        separator = None
+
         # drop parameters that will be used as line separators
         if line_sep:
+            # find the full line separator params_name from the initial substrings
             for sep in line_sep:
                 for param in params:
                     if sep in param:
-                        separator.append(param)
-            for sep in separator:
-                params.remove(sep)
+                        separator = param
+                # remove separator prameter from parameter list
+                if separator in params:
+                    params.remove(separator)
+
+        # create dataframe grouped by the remaining params
         for plot_params, plot_df in df[op].groupby(params):
+
+            #handle cases for multiple and single parameters
             if type(plot_params) is tuple:
                 key = [op]
                 for i in plot_params:
                     key.append(i)
             else:
                 key = [op, plot_params]
-            key = " ".join([str(item) for item in key])
-            data[key] = plot_df
+
+            # Creat key string id
+            key = "-".join([str(item) for item in key])
+
+            #Create sub dict
+            tmp_dict = {}
+            tmp_dict["data"] = plot_df
+            tmp_dict["line_sep"] = separator
+
+            # Append sub dict to main dict
+            data[key] = tmp_dict
+    print(data)
     return data, separator
 
 
@@ -222,8 +238,8 @@ def main(args=[]):
     # fetch data
     paths = get_paths(args.benchpath)
     data = create_dataframe(paths)
-    # data = filter_ops(data)
-    # filter_params(data)
+    data = filter_ops(data)
+    filter_params(data)
 
 if __name__ == '__main__':
     main()
