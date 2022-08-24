@@ -365,11 +365,15 @@ def main(args=[]):
                         help="""Size of the matrices on which the
                         operations will be performed in the history benchmarks,
                         has to be a power of 2, max=256, min=4,
-                        default=None, [32,128] if nothing specified""")
+                        default=None, [32,128] if nothing specified
+                        WARNING: If a parameter is used as line_sep it cannot
+                        be used as a filter""")
     parser.add_argument('--density', nargs="?", default=None, type=str,
                         help="""Density the matrices on which the
                         operations will be performed in the history benchmarks,
-                        values: 'sparse' or 'dense'""")
+                        values: 'sparse' or 'dense'
+                        WARNING: If a parameter is used as line_sep it cannot
+                        be used as a filter""")
     parser.add_argument('--operations', nargs="+", default=None, type=str,
                         help="""Specify which operations to plot, plots all by
                         default or if nothing specified""")
@@ -383,15 +387,21 @@ def main(args=[]):
     parser.add_argument('--dtype', nargs="+", default=None, type=str,
                         help="""Specify which dtypes to plot, plots all by
                         default or if nothing specified
-                        Only applies to linear algebra benchmarks""")
+                        Only applies to linear algebra benchmarks
+                        WARNING: If a parameter is used as line_sep it cannot
+                        be used as a filter""")
     parser.add_argument('--model', nargs="+", default=None, type=str,
                         help="""Specify which models to plot, plots all by
                         default or if nothing specified
-                        Only applies to solver benchmarks""")
+                        Only applies to solver benchmarks
+                        WARNING: If a parameter is used as line_sep it cannot
+                        be used as a filter""")
     parser.add_argument('--coeftype', nargs="+", default=None, type=str,
                         help="""Specify which coefficient types to plot, plots
                         all by default or if nothing specified
-                        Only applies to QobjEvo benchmarks""")
+                        Only applies to QobjEvo benchmarks
+                        WARNING: If a parameter is used as line_sep it cannot
+                        be used as a filter""")
 
     args = parser.parse_args()
     param_filters = None
