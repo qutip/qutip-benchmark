@@ -180,7 +180,6 @@ def filter_params(df, line_sep=None, filters=None):
         List of the exact parameter names used as line separators.
     """
 
-    # TODO add filter paramter to include only specfic filtering params
     data = {}
     for op in df:
         # get names of parameter columns and drop the one containing operations
@@ -415,7 +414,7 @@ def main(args=[]):
 
     # create param_filter dict if called
     if (args.density or args.size or args.model
-             or args.dtype or args.coeftype):
+       or args.dtype or args.coeftype):
         param_filters = {}
         if args.density:
             param_filters["density"] = args.density
