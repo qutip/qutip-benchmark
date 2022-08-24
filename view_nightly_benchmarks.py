@@ -361,45 +361,44 @@ def main(args=[]):
     parser.add_argument('--benchpath', default="./.benchmarks", type=Path,
                         help="""Path to folder in which the benchmarks are
                         stored""")
-    parser.add_argument('--size', nargs="*", default=None,
-                        type=int, help="""Size of the matrices on which the
+    parser.add_argument('--size', nargs="*", default=None, type=int,
+                        help="""Size of the matrices on which the
                         operations will be performed in the history benchmarks,
                         has to be a power of 2, max=256, min=4,
                         default=None, [32,128] if nothing specified""")
-    parser.add_argument('--density', nargs="?", default=None,
-                        type=str, help="""Density the matrices on which the
+    parser.add_argument('--density', nargs="?", default=None, type=str,
+                        help="""Density the matrices on which the
                         operations will be performed in the history benchmarks,
                         values: 'sparse' or 'dense'""")
     parser.add_argument('--operations', nargs="+", default=None, type=str,
                         help="""Specify which operations to plot, plots all by
                         default or if nothing specified""")
-    parser.add_argument('--line_sep', nargs="*", default=None,
-                        type=int, help="""Specify which parameter should be used
+    parser.add_argument('--line_sep', nargs="*", default=None, type=int,
+                        help="""Specify which parameter should be used
                         to separate line on the plot instead of separating the
                         plots. default=None, ['type', 'model'] if nothing
                         specified""")
 
-
     args = parser.parse_args()
-    param_filters=None
-    line_sep=None
+    param_filters = None
+    line_sep = None
 
     # because const isn't available for nargs="*"
     if args.size is not None and not args.size:
-        args.size=[16,32]
+        args.size = [16, 32]
     if args.line_sep is not None and not args.line_sep:
-        args.line_sep=['type','model']
+        args.line_sep = ['type', 'model']
 
-    #create param_filter dict if called
+    # create param_filter dict if called
     if args.density or args.size:
-        param_filters={}
+        param_filters = {}
         if args.density:
             param_filters["density"] = args.density
         if args.size:
             param_filters["size"] = args.size
 
     if args.line_sep:
-        line_sep=args.line_sep
+        line_sep = args.line_sep
 
     # fetch data
     paths = get_paths(args.benchpath)
