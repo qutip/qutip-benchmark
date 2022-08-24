@@ -210,7 +210,18 @@ def filter_params(df, line_sep=None):
 
 
 def plot_data(data, path):
+    """Plots the contents of the input dict, based on the given line_separators
 
+    Parameters
+    ----------
+    data : dict
+        Nested Dictionnary of the form {"operation-param_1-param_2-...":
+        {data: dataframe; line_sep: str/None}}.
+
+    path : str
+        location to store the plot folders.
+
+    """
     # create storage folder
     folder = Path(f"{path}")
     folder.mkdir(parents=True, exist_ok=True)
@@ -267,7 +278,7 @@ def plot_data(data, path):
                     if cpu == label:
                         ax.plot(
                             gr.datetime, gr.stats_mean,
-                            color=colors[i]
+                            'o--', color=colors[i]
                             )
 
             # Generate legend
@@ -315,8 +326,8 @@ def main(args=[]):
     paths = get_paths(args.benchpath)
     data = create_dataframe(paths)
     data = filter_ops(data)
-    data = filter_params(data, line_sep=['type', 'model'])
-    # data = filter_params(data)
+    #data = filter_params(data, line_sep=['type', 'model'])
+    data = filter_params(data)
     plot_data(data, args.plotpath)
 
 
