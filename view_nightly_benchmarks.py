@@ -113,7 +113,10 @@ def filter_ops(df, filter=None):
     filter : list
         list of desired operation names in the output,
         if None the function will output all operations in
-        the dataframe.
+        the dataframe. Not case sensitive and Name can be
+        substring of the full name. e.g: filter=[matmul], will
+        produce plots for 'Matmul_QobjEvo_op@ket', 'Matmul_op@op'
+        and 'Matmul_op@ket'.
 
     Returns
     -------
@@ -123,9 +126,14 @@ def filter_ops(df, filter=None):
     """
 
     if filter:
-        ops = filter
+        old_ops = list(df['params_operation'].unique())
+        ops = []
+        for param in filter:
+            for op in old_ops:
+                if param.lower() in op.lower():
+                    ops.append(op)
     else:
-        ops = list(df['params_operation'].unique())
+       ops = list(df['params_operation'].unique())
 
     data = {}
     for op in ops:
@@ -179,7 +187,7 @@ def filter_params(df, line_sep=None):
             # find the full param name from the initial substrings
             for sep in line_sep:
                 for param in params:
-                    if sep in param:
+                    if sep.lower() in param.lower():
                         separator = param
                 # remove separator prameter from parameter list
                 if separator in params:
@@ -307,28 +315,22 @@ def main(args=[]):
     parser.add_argument('--benchpath', default="./.benchmarks", type=Path,
                         help="""Path to folder in which the benchmarks are
                         stored""")
-    parser.add_argument('--size', nargs="+", default=[64, 256], type=int,
+    parser.add_argument('--size', nargs="+", default=[32, 128], type=int,
                         help="""Size of the matrices on which the operations
                         will be performed in the history benchmarks, has to be
                         a power of 2, max=256, min=4, default=[64,256], """)
-    parser.add_argument('--dimension', nargs="+", default=[32, 128], type=int,
-                        help="""Size of the matrices on which the operations
-                        will be performed in the history benchmarks, has to be
-                        a power of 2, max=256, min=4, default[32,128]""")
-    parser.add_argument('--solve', action='store_true',
-                        help="""Only plot solvers""")
-    parser.add_argument('--operations', action='store_true',
-                        help="""Only plot operations""")
-
+    parser.add_argument('--operations', nargs="+", default=None, type=str,
+                        help="""Specify which operations to plot, plots all by
+                        default""")
     args = parser.parse_args()
 
     # fetch data
     paths = get_paths(args.benchpath)
     data = create_dataframe(paths)
-    data = filter_ops(data)
-    #data = filter_params(data, line_sep=['type', 'model'])
-    data = filter_params(data)
-    plot_data(data, args.plotpath)
+    data = filter_ops(data,args.operations)
+    # data = filter_params(data, line_sep=['type', 'model'])
+    # # data = filter_params(data)
+    # plot_data(data, args.plotpath)
 
 
 if __name__ == '__main__':
