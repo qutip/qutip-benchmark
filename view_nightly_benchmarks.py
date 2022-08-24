@@ -163,7 +163,7 @@ def filter_params(df, line_sep=None):
         List of the exact parameter names used as line separators.
     """
 
-    #TODO add filter paramter to include only specfic filtering params
+    # TODO add filter paramter to include only specfic filtering params
     data = {}
     for op in df:
         # get names of parameter columns and drop the one containing operations
@@ -176,7 +176,7 @@ def filter_params(df, line_sep=None):
 
         # drop parameters that will be used as line separators
         if line_sep:
-            # find the full line separator params_name from the initial substrings
+            # find the full param name from the initial substrings
             for sep in line_sep:
                 for param in params:
                     if sep in param:
@@ -188,7 +188,7 @@ def filter_params(df, line_sep=None):
         # create dataframe grouped by the remaining params
         for plot_params, plot_df in df[op].groupby(params):
 
-            #handle cases for multiple and single parameters
+            # handle cases for multiple and single parameters
             if type(plot_params) is tuple:
                 key = [op]
                 for i in plot_params:
@@ -199,7 +199,7 @@ def filter_params(df, line_sep=None):
             # Creat key string id
             key = "-".join([str(item) for item in key])
 
-            #Create sub dict
+            # Create sub dict
             tmp_dict = {}
             tmp_dict["data"] = plot_df
             tmp_dict["line_sep"] = separator
@@ -207,6 +207,7 @@ def filter_params(df, line_sep=None):
             # Append sub dict to main dict
             data[key] = tmp_dict
     return data
+
 
 def plot_data(data, path):
 
@@ -231,9 +232,10 @@ def plot_data(data, path):
         fig.suptitle(plot, fontsize=20)
         fig.set_size_inches(9, 9)
 
+        # Separation by cpu andd line_sep
         if line_sep:
             labels = list(df[line_sep].unique())
-
+            # separate by line_sep
             for sep, g in df.groupby(line_sep):
                 count = 0
                 cpus = []
@@ -255,10 +257,24 @@ def plot_data(data, path):
             handles += [f(markers[i], "k") for i in range(len(cpus))]
             labels += cpus
             ax.legend(handles, labels)
+
+        # Only CPU line separation
         else:
-            ax.plot(
-                    df.datetime, df.stats_mean
-                    )
+            labels = list(df["cpu"].unique())
+            # Separate by CPU
+            for cpu, gr in df.groupby('cpu'):
+                for i, label in enumerate(labels):
+                    if cpu == label:
+                        ax.plot(
+                            gr.datetime, gr.stats_mean,
+                            color=colors[i]
+                            )
+
+            # Generate legend
+            def f(m, c):
+                return plt.plot([], [], m, color=c)[0]
+            handles = [f("s", colors[i]) for i in range(len(labels))]
+            ax.legend(handles, labels)
 
         ax.set_xlabel("date")
         ax.set_ylabel("time (s)")
@@ -268,7 +284,7 @@ def plot_data(data, path):
         plt.gcf().autofmt_xdate()
         plt.savefig(f"{folder}/{plot}.png", bbox_inches='tight')
         plt.close()
-            
+
 
 def main(args=[]):
     parser = argparse.ArgumentParser(description="""Choose what to plot and
@@ -299,8 +315,10 @@ def main(args=[]):
     paths = get_paths(args.benchpath)
     data = create_dataframe(paths)
     data = filter_ops(data)
-    data = filter_params(data)
+    data = filter_params(data, line_sep=['type', 'model'])
+    # data = filter_params(data)
     plot_data(data, args.plotpath)
+
 
 if __name__ == '__main__':
     main()
