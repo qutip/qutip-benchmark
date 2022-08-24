@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import glob
 from pathlib import Path
 import argparse
+import warnings
 
 
 def json_to_dataframe(filepath):
@@ -133,7 +134,7 @@ def filter_ops(df, filter=None):
                 if param.lower() in op.lower():
                     ops.append(op)
     else:
-       ops = list(df['params_operation'].unique())
+        ops = list(df['params_operation'].unique())
 
     data = {}
     for op in ops:
@@ -145,7 +146,7 @@ def filter_ops(df, filter=None):
     return data
 
 
-def filter_params(df, line_sep=None):
+def filter_params(df, line_sep=None, filters=None):
     """Filters the input dataframe by parameters used
     to separate each plot
 
@@ -159,6 +160,14 @@ def filter_params(df, line_sep=None):
         rather than plot separators. These need to be a substring contained
         in the parameter name. e.g: "type" will apply to both "params_coeftype"
         and "params_dtype".
+
+    filters : dict
+        dict of the form {param_name: [values]}, filters the data by the
+        given values for each parameter. Won't filter if the parameter doesn't
+        apply to a give operation
+        e.g: {param_size: [16,128]; param_density: [sparse]} will filter by
+        size and density for operations but only by size for solvers,
+        as solver benchmarks do not have a density parameter.
 
     Returns
     -------
@@ -195,25 +204,62 @@ def filter_params(df, line_sep=None):
 
         # create dataframe grouped by the remaining params
         for plot_params, plot_df in df[op].groupby(params):
+            if type(plot_params) is not tuple:
+                plot_params = (plot_params,)
 
-            # handle cases for multiple and single parameters
-            if type(plot_params) is tuple:
-                key = [op]
-                for i in plot_params:
-                    key.append(i)
-            else:
-                key = [op, plot_params]
+            dict_params = dict(zip(params, plot_params))
 
-            # Creat key string id
+            key = [op] + list(dict_params.values())
+
             key = "-".join([str(item) for item in key])
 
-            # Create sub dict
-            tmp_dict = {}
-            tmp_dict["data"] = plot_df
-            tmp_dict["line_sep"] = separator
+            if filters:
+                tmp_filters = {}
+                proceed = True
 
-            # Append sub dict to main dict
-            data[key] = tmp_dict
+                # create dict with correct keys from substring
+                for param in params:
+                    for f_key, f_item in filters.items():
+                        if f_key.lower() in param.lower():
+                            tmp_filters[param] = f_item
+
+                # if no dict was created raise warning but proceed anyway
+                if not tmp_filters:
+                    warning = "Filters don't apply to "
+                    warning += key
+                    warning += ", the plot will be made anyway \n"
+                    warning += "applied filters: "
+                    warning += ", ".join(list(filters.keys()))
+                    warning += "; available filters: " + ", ".join(params)
+                    warnings.warn(warning)
+
+                # if a plot parameter doesn't match the corresponding filter
+                # do not proceed
+                for f_key, f_item in tmp_filters.items():
+                    if dict_params[f_key] not in f_item:
+                        proceed = False
+
+                if proceed:
+                    print(key)
+                    # Create sub dict
+                    tmp_dict = {}
+                    tmp_dict["data"] = plot_df
+                    tmp_dict["line_sep"] = separator
+
+                    # Append sub dict to main dict
+                    data[key] = tmp_dict
+            else:
+                # Creat key string id
+                key = "-".join([str(item) for item in key])
+
+                # Create sub dict
+                tmp_dict = {}
+                tmp_dict["data"] = plot_df
+                tmp_dict["line_sep"] = separator
+
+                # Append sub dict to main dict
+                data[key] = tmp_dict
+
     return data
 
 
@@ -315,22 +361,55 @@ def main(args=[]):
     parser.add_argument('--benchpath', default="./.benchmarks", type=Path,
                         help="""Path to folder in which the benchmarks are
                         stored""")
-    parser.add_argument('--size', nargs="+", default=[32, 128], type=int,
-                        help="""Size of the matrices on which the operations
-                        will be performed in the history benchmarks, has to be
-                        a power of 2, max=256, min=4, default=[64,256], """)
+    parser.add_argument('--size', nargs="*", default=None,
+                        type=int, help="""Size of the matrices on which the
+                        operations will be performed in the history benchmarks,
+                        has to be a power of 2, max=256, min=4,
+                        default=None, [32,128] if nothing specified""")
+    parser.add_argument('--density', nargs="?", default=None,
+                        type=str, help="""Density the matrices on which the
+                        operations will be performed in the history benchmarks,
+                        values: 'sparse' or 'dense'""")
     parser.add_argument('--operations', nargs="+", default=None, type=str,
                         help="""Specify which operations to plot, plots all by
-                        default""")
+                        default or if nothing specified""")
+    parser.add_argument('--line_sep', nargs="*", default=None,
+                        type=int, help="""Specify which parameter should be used
+                        to separate line on the plot instead of separating the
+                        plots. default=None, ['type', 'model'] if nothing
+                        specified""")
+
+
     args = parser.parse_args()
+    param_filters=None
+    line_sep=None
+
+    # because const isn't available for nargs="*"
+    if args.size is not None and not args.size:
+        args.size=[16,32]
+    if args.line_sep is not None and not args.line_sep:
+        args.line_sep=['type','model']
+
+    #create param_filter dict if called
+    if args.density or args.size:
+        param_filters={}
+        if args.density:
+            param_filters["density"] = args.density
+        if args.size:
+            param_filters["size"] = args.size
+
+    if args.line_sep:
+        line_sep=args.line_sep
 
     # fetch data
     paths = get_paths(args.benchpath)
     data = create_dataframe(paths)
-    data = filter_ops(data,args.operations)
-    # data = filter_params(data, line_sep=['type', 'model'])
-    # # data = filter_params(data)
-    # plot_data(data, args.plotpath)
+    data = filter_ops(data, args.operations)
+    data = filter_params(
+        data, line_sep=line_sep,
+        filters=param_filters
+        )
+    plot_data(data, args.plotpath)
 
 
 if __name__ == '__main__':
