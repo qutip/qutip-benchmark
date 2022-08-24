@@ -73,7 +73,6 @@ jobs:
           name: nightly_benchmarks
           path: .benchmarks
 
-
       - name: upload to s3
         run: |
           aws s3 sync .benchmarks s3://qutip-benchmark-data
