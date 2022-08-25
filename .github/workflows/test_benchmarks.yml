@@ -1,0 +1,72 @@
+name: Test Benchmarks
+
+
+on:
+  [push, pull_request]
+  
+
+defaults:
+  run:
+    # The slightly odd shell call is to force bash to read .bashrc, which is
+    # necessary for having conda behave sensibly.  We use bash as the shell even
+    # on Windows, since we don't run anything complicated, and it makes
+    # things much simpler.
+    shell: bash -l {0}
+
+
+jobs:
+  cases:
+    name: ${{ matrix.os }}, python${{ matrix.python-version }}, ${{ matrix.case-name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.10"]
+        case-name: [defaults]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: actions-bench
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          use-mamba: true
+
+      - name: Install dependencies
+        run: |
+           conda install numpy scipy cython
+           conda install pytest pytest-benchmark
+           conda install pandas matplotlib
+           python -m pip install pygal pygaljs
+           
+      - name: Install Qutip
+        run: |
+           python -m pip install git+https://github.com/qutip/qutip@dev.major
+    
+      - name: Package information
+        run: |
+          conda list
+          python -c "import qutip; qutip.about()"
+      - name: Environment information
+        run: |
+          uname -a
+          if [[ "ubuntu-latest" == "${{ matrix.os }}" ]]; then
+              hostnamectl
+              lscpu
+              free -h
+          fi
+
+      - name: Run benchmarks
+        run: |
+          python benchmarks/benchmarks.py -v 
+        
+      - name: Create artefact containing benchmarks
+        uses: actions/upload-artifact@v2
+        with: 
+          name: test_benchmarks
+          path: .benchmarks
