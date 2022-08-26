@@ -243,8 +243,8 @@ def filter_params(df, line_sep=None, filters=None, exclude=None):
                         warning += "; available filters: " + ", ".join(params)
                         warnings.warn(warning)
 
-                    # if a plot parameter doesn't match the corresponding filter
-                    # do not proceed
+                    # if a plot parameter doesn't match the corresponding
+                    # filter do not proceed
                     for f_key, f_item in tmp_filters.items():
                         if dict_params[f_key] not in f_item:
                             proceed = False
@@ -310,7 +310,6 @@ def plot_data(data, x_axis, path):
         elif len(matching) == 0:
             raise Exception("Given x_axis doesn correspond to any columns ")
         x_axis = "".join(matching)
-
 
         # Create figure
         fig, ax = plt.subplots(1, 1)

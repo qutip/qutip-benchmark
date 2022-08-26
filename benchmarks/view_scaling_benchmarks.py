@@ -4,7 +4,10 @@ import matplotlib.pyplot as plt
 import glob
 from pathlib import Path
 import argparse
-from view_nightly_benchmarks import json_to_dataframe, filter_ops, filter_params, plot_data
+from view_nightly_benchmarks import (json_to_dataframe,
+                                     filter_ops,
+                                     filter_params,
+                                     plot_data)
 
 
 def get_latest_benchmark_path(folder):
@@ -31,8 +34,6 @@ def get_latest_benchmark_path(folder):
     benchmark_latest = benchmarks[latest]
 
     return benchmark_latest
-
-
 
 
 def main(args=[]):
