@@ -1,4 +1,3 @@
-import json
 import pandas as pd
 import matplotlib.pyplot as plt
 import glob
@@ -7,7 +6,7 @@ import argparse
 from view_nightly_benchmarks import (json_to_dataframe,
                                      sort_ops,
                                      sort_params,
-                                     plot_data, sort_ops)
+                                     plot_data)
 
 
 def get_latest_benchmark_path(folder):
@@ -36,7 +35,8 @@ def get_latest_benchmark_path(folder):
     return benchmark_latest
 
 
-def main(args=[]):
+def main():
+    """View scaling performance from the last benchmark file"""
     parser = argparse.ArgumentParser(description="""Choose what to plot and
                     where to store it, by default all benchmarks will be
                     plotted using default size and dimensions""")
@@ -110,10 +110,10 @@ def main(args=[]):
     data = json_to_dataframe(path)
     data = sort_ops(data, args.operations)
     data = sort_params(
-        data, line_sep=line_sep,
-        filters=param_filters, exclude=["size"]
+        data, line_sep,
+        param_filters, ["size"] 
         )
-    plot_data(data, 'size', args.plotpath)
+    plot_data(data, 'size','stats_mean',True, True, args.plotpath)
 
 
 if __name__ == '__main__':

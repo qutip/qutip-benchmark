@@ -24,7 +24,7 @@ def json_to_dataframe(filepath):
 
     """
 
-    with open(filepath) as f:
+    with open(filepath, encoding='utf-8') as f:
         data_json = json.load(f)
 
         # Create dataframe
@@ -103,7 +103,7 @@ def create_dataframe(paths):
     return data
 
 
-def sort_ops(df, filter=None):
+def sort_ops(df, filters=None):
     """Filters the input dataframe by operation
 
     Parameters
@@ -111,7 +111,7 @@ def sort_ops(df, filter=None):
     df : DataFrame
         Dataframe containing data to be filtered.
 
-    filter : list
+    filters : list
         list of desired operation names in the output,
         if None the function will output all operations in
         the dataframe. Not case sensitive and Name can be
@@ -126,10 +126,10 @@ def sort_ops(df, filter=None):
 
     """
 
-    if filter:
+    if filters:
         old_ops = list(df['params_operation'].unique())
         ops = []
-        for param in filter:
+        for param in filters:
             for op in old_ops:
                 if param.lower() in op.lower():
                     ops.append(op)
@@ -295,8 +295,24 @@ def sort_params(df, line_sep=None, filters=None, exclude=None):
             }
     return data
 
+def get_x_y_axes(cols ,x_axis,y_axis):
+    x_matching = [col for col in cols if x_axis.lower() in col.lower()]
+    if len(x_matching) > 1:
+        raise Exception("Given x_axis corresponds to more than 1 column")
+    elif len(x_matching) == 0:
+        raise Exception("Given x_axis doesn correspond to any columns ")
+    x_axis = "".join(x_matching)
 
-def plot_data(data, x_axis, path):
+    y_matching = [col for col in cols if y_axis.lower() in col.lower()]
+    if len(y_matching) > 1:
+        raise Exception("Given x_axis corresponds to more than 1 column")
+    elif len(y_matching) == 0:
+        raise Exception("Given x_axis doesn correspond to any columns ")
+    y_axis = "".join(y_matching)
+
+    return x_axis, y_axis
+
+def plot_data(data, x_axis, y_axis, x_log, y_log, path):
     """Plots the contents of the input dict, based on the given line_separators
 
     Parameters
@@ -325,12 +341,7 @@ def plot_data(data, x_axis, path):
         line_sep = data[plot]["line_sep"]
         df = data[plot]["data"]
         cols = list(df.columns)
-        matching = [col for col in cols if x_axis in col]
-        if len(matching) > 1:
-            raise Exception("Given x_axis corresponds to more than 1 column")
-        elif len(matching) == 0:
-            raise Exception("Given x_axis doesn correspond to any columns ")
-        x_axis = "".join(matching)
+        x_axis, y_axis = get_x_y_axes(cols ,x_axis,y_axis)
 
         # Create figure
         fig, ax = plt.subplots(1, 1)
@@ -351,7 +362,7 @@ def plot_data(data, x_axis, path):
                     for i, label in enumerate(labels):
                         if sep == label:
                             ax.plot(
-                                gr[x_axis], gr.stats_mean,
+                                gr[x_axis], gr[y_axis],
                                 markers[count], color=colors[i]
                                 )
                     count = count+1
@@ -372,7 +383,7 @@ def plot_data(data, x_axis, path):
                 for i, label in enumerate(labels):
                     if cpu == label:
                         ax.plot(
-                            gr[x_axis], gr.stats_mean,
+                            gr[x_axis], gr[y_axis],
                             'o--', color=colors[i]
                             )
 
@@ -384,7 +395,10 @@ def plot_data(data, x_axis, path):
 
         ax.set_xlabel(x_axis)
         ax.set_ylabel("time (s)")
-        ax.set_yscale('log')
+        if y_log:
+            ax.set_yscale('log')
+        if x_log:
+            ax.set_xscale('log')
 
         fig.tight_layout()
         if x_axis == "datetime":
@@ -393,7 +407,8 @@ def plot_data(data, x_axis, path):
         plt.close()
 
 
-def main(args=[]):
+def main():
+    """View historical performance of nightly benchmarks"""
     parser = argparse.ArgumentParser(description="""Choose what to plot and
                     where to store it, by default all benchmarks will be
                     plotted using default size and dimensions""")
@@ -478,10 +493,10 @@ def main(args=[]):
     data = create_dataframe(paths)
     data = sort_ops(data, args.operations)
     data = sort_params(
-        data, line_sep=line_sep,
-        filters=param_filters
+        data,line_sep,
+        param_filters
         )
-    plot_data(data, "datetime", args.plotpath)
+    plot_data(data, "datetime", "stats_mean", False, True, args.plotpath)
 
 
 if __name__ == '__main__':
