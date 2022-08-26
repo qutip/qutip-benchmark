@@ -103,7 +103,7 @@ def create_dataframe(paths):
     return data
 
 
-def filter_ops(df, filter=None):
+def sort_ops(df, filter=None):
     """Filters the input dataframe by operation
 
     Parameters
@@ -145,7 +145,59 @@ def filter_ops(df, filter=None):
     return data
 
 
-def filter_params(df, line_sep=None, filters=None, exclude=None):
+def param_filtering(filters, dict_params, key):
+    """Filters the input dataframe by parameters used
+    to separate each plot
+
+    Parameters
+    ----------
+    filters : dict
+        dict of the form {param_name: [accepted_values]}, filters the data by the
+        given values for each parameter. Won't filter if the parameter doesn't
+        apply to a give operation
+        e.g: {param_size: [16,128]; param_density: [sparse]} will filter by
+        size and density for operations but only by size for solvers,
+        as solver benchmarks do not have a density parameter.
+
+    params_dict : dict
+        dict of the form {param_name: value}
+    
+    key : str 
+        name of the plot to which the filtering is applied
+
+    Returns
+    -------
+    res : Bool
+        True if the params correspond to the filter, False otherwise
+    """
+    if filters:
+        tmp_filters = {}
+        params = list(dict_params.keys())
+        # create dict with correct keys from substring
+        for param in params:
+            for f_key, f_item in filters.items():
+                if f_key.lower() in param.lower():
+                    tmp_filters[param] = f_item
+
+        # if no dict was created raise warning but proceed anyway
+        if not tmp_filters:
+            warning = "Filters don't apply to "
+            warning += key
+            warning += ", the plot will be made anyway \n"
+            warning += "applied filters: "
+            warning += ", ".join(list(filters.keys()))
+            warning += "; available filters: " + ", ".join(params)
+            warnings.warn(warning)
+        else:
+            # if a plot parameter doesn't match the corresponding
+            # filter do not add data to output
+            for f_key, f_item in tmp_filters.items():
+                if dict_params[f_key] not in f_item:
+                    return False
+    return True
+
+
+def sort_params(df, line_sep=None, filters=None, exclude=None):
     """Filters the input dataframe by parameters used
     to separate each plot
 
@@ -214,64 +266,33 @@ def filter_params(df, line_sep=None, filters=None, exclude=None):
         if params:
             # create dataframe grouped by the remaining params
             for plot_params, plot_df in df[op].groupby(params):
+                # handle single parameter case
                 if type(plot_params) is not tuple:
                     plot_params = (plot_params,)
 
+                # create dict of parameters and their value
+                # in this iteration
                 dict_params = dict(zip(params, plot_params))
 
                 key = [op] + list(dict_params.values())
-
                 key = "-".join([str(item) for item in key])
 
-                if filters:
-                    tmp_filters = {}
-                    proceed = True
-
-                    # create dict with correct keys from substring
-                    for param in params:
-                        for f_key, f_item in filters.items():
-                            if f_key.lower() in param.lower():
-                                tmp_filters[param] = f_item
-
-                    # if no dict was created raise warning but proceed anyway
-                    if not tmp_filters:
-                        warning = "Filters don't apply to "
-                        warning += key
-                        warning += ", the plot will be made anyway \n"
-                        warning += "applied filters: "
-                        warning += ", ".join(list(filters.keys()))
-                        warning += "; available filters: " + ", ".join(params)
-                        warnings.warn(warning)
-
-                    # if a plot parameter doesn't match the corresponding
-                    # filter do not proceed
-                    for f_key, f_item in tmp_filters.items():
-                        if dict_params[f_key] not in f_item:
-                            proceed = False
-
-                    if proceed:
-                        # Create sub dict
-                        tmp_dict = {}
-                        tmp_dict["data"] = plot_df
-                        tmp_dict["line_sep"] = separator
-
-                        # Append sub dict to main dict
-                        data[key] = tmp_dict
-                else:
-                    # Create sub dict
-                    tmp_dict = {}
-                    tmp_dict["data"] = plot_df
-                    tmp_dict["line_sep"] = separator
-
-                    # Append sub dict to main dict
-                    data[key] = tmp_dict
+                # add data to outpu only if param value exists
+                #  in the filter
+                if param_filtering(filters, dict_params, key):
+                    data[key] = {
+                        "data" : plot_df,
+                        "line_sep" : separator
+                    }
         else:
+            # TODO Filtering when no params are left after
+            #exclude and/or line_sep
             key = [op]
             key = "-".join([str(item) for item in key])
-            tmp_dict = {}
-            tmp_dict["data"] = df[op]
-            tmp_dict["line_sep"] = separator
-            data[key] = tmp_dict
+            data[key] = {
+                "data" : df[op],
+                "line_sep" : separator
+            }
     return data
 
 
@@ -317,7 +338,7 @@ def plot_data(data, x_axis, path):
         fig.suptitle(plot, fontsize=20)
         fig.set_size_inches(9, 9)
 
-        # Separation by cpu andd line_sep
+        # Separation by cpu and line_sep
         if line_sep:
             labels = list(df[line_sep].unique())
             # separate by line_sep
@@ -455,8 +476,8 @@ def main(args=[]):
     # fetch data
     paths = get_paths(args.benchpath)
     data = create_dataframe(paths)
-    data = filter_ops(data, args.operations)
-    data = filter_params(
+    data = sort_ops(data, args.operations)
+    data = sort_params(
         data, line_sep=line_sep,
         filters=param_filters
         )

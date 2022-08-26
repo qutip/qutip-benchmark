@@ -5,9 +5,9 @@ import glob
 from pathlib import Path
 import argparse
 from view_nightly_benchmarks import (json_to_dataframe,
-                                     filter_ops,
-                                     filter_params,
-                                     plot_data)
+                                     sort_ops,
+                                     sort_params,
+                                     plot_data, sort_ops)
 
 
 def get_latest_benchmark_path(folder):
@@ -108,8 +108,8 @@ def main(args=[]):
     # fetch data
     path = get_latest_benchmark_path(args.benchpath)
     data = json_to_dataframe(path)
-    data = filter_ops(data, args.operations)
-    data = filter_params(
+    data = sort_ops(data, args.operations)
+    data = sort_params(
         data, line_sep=line_sep,
         filters=param_filters, exclude=["size"]
         )
