@@ -179,5 +179,5 @@ def test_steadystate(benchmark, model_steady, size, request):
     elif model_steady == 'Jaynes-Cummings':
         H, _, c_ops, _ = jc_setup(size)
 
-    result = benchmark(steadystate, H, c_ops, method='iterative-lgmres')
+    result = benchmark(steadystate, H, c_ops)
     return result
