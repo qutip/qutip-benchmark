@@ -152,17 +152,17 @@ def param_filtering(filters, dict_params, key):
     Parameters
     ----------
     filters : dict
-        dict of the form {param_name: [accepted_values]}, filters the data by the
-        given values for each parameter. Won't filter if the parameter doesn't
-        apply to a give operation
+        dict of the form {param_name: [accepted_values]}, filters the data by
+        the given values for each parameter. Won't filter if the parameter
+        doesn't apply to a give operation
         e.g: {param_size: [16,128]; param_density: [sparse]} will filter by
         size and density for operations but only by size for solvers,
         as solver benchmarks do not have a density parameter.
 
     params_dict : dict
         dict of the form {param_name: value}
-    
-    key : str 
+
+    key : str
         name of the plot to which the filtering is applied
 
     Returns
@@ -281,36 +281,38 @@ def sort_params(df, line_sep=None, filters=None, exclude=None):
                 #  in the filter
                 if param_filtering(filters, dict_params, key):
                     data[key] = {
-                        "data" : plot_df,
-                        "line_sep" : separator
+                        "data": plot_df,
+                        "line_sep": separator
                     }
         else:
             # TODO Filtering when no params are left after
-            #exclude and/or line_sep
+            # exclude and/or line_sep
             key = [op]
             key = "-".join([str(item) for item in key])
             data[key] = {
-                "data" : df[op],
-                "line_sep" : separator
+                "data": df[op],
+                "line_sep": separator
             }
     return data
 
-def get_x_y_axes(cols ,x_axis,y_axis):
+
+def get_x_y_axes(cols, x_axis, y_axis):
     x_matching = [col for col in cols if x_axis.lower() in col.lower()]
     if len(x_matching) > 1:
         raise Exception("Given x_axis corresponds to more than 1 column")
-    elif len(x_matching) == 0:
+    if len(x_matching) == 0:
         raise Exception("Given x_axis doesn correspond to any columns ")
     x_axis = "".join(x_matching)
 
     y_matching = [col for col in cols if y_axis.lower() in col.lower()]
     if len(y_matching) > 1:
         raise Exception("Given x_axis corresponds to more than 1 column")
-    elif len(y_matching) == 0:
+    if len(y_matching) == 0:
         raise Exception("Given x_axis doesn correspond to any columns ")
     y_axis = "".join(y_matching)
 
     return x_axis, y_axis
+
 
 def plot_data(data, x_axis, y_axis, x_log, y_log, path):
     """Plots the contents of the input dict, based on the given line_separators
@@ -341,7 +343,7 @@ def plot_data(data, x_axis, y_axis, x_log, y_log, path):
         line_sep = data[plot]["line_sep"]
         df = data[plot]["data"]
         cols = list(df.columns)
-        x_axis, y_axis = get_x_y_axes(cols ,x_axis,y_axis)
+        x_axis, y_axis = get_x_y_axes(cols, x_axis, y_axis)
 
         # Create figure
         fig, ax = plt.subplots(1, 1)
@@ -493,7 +495,7 @@ def main():
     data = create_dataframe(paths)
     data = sort_ops(data, args.operations)
     data = sort_params(
-        data,line_sep,
+        data, line_sep,
         param_filters
         )
     plot_data(data, "datetime", "stats_mean", False, True, args.plotpath)

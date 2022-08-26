@@ -111,9 +111,9 @@ def main():
     data = sort_ops(data, args.operations)
     data = sort_params(
         data, line_sep,
-        param_filters, ["size"] 
+        param_filters, ["size"]
         )
-    plot_data(data, 'size','stats_mean',True, True, args.plotpath)
+    plot_data(data, 'size', 'stats_mean', True, True, args.plotpath)
 
 
 if __name__ == '__main__':
