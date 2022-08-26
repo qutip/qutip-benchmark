@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import glob
 from pathlib import Path
-import argparse
 import warnings
 
 
@@ -51,6 +50,31 @@ def json_to_dataframe(filepath):
         data = data.drop(unused, axis="columns")
 
         return data
+
+def get_latest_benchmark_path(folder):
+    """Returns a list of paths to all benchmark runs
+
+    Parameters
+    ----------
+    folder : str
+        path to the benchmarks folder
+
+    Returns
+    -------
+    Paths : Path
+        Path to the latest bencchmark
+    """
+
+    benchmark_paths = glob.glob(f"{folder}/*/*.json")
+    dates = [''.join(_b.split("/")[-1].split('_')[2:4])
+             for _b in benchmark_paths]
+    benchmarks = {date: value for date, value in zip(dates, benchmark_paths)}
+
+    dates.sort()
+    latest = dates[-1]
+    benchmark_latest = benchmarks[latest]
+
+    return benchmark_latest
 
 
 def get_paths(folder):
@@ -297,6 +321,31 @@ def sort_params(df, line_sep=None, filters=None, exclude=None):
 
 
 def get_x_y_axes(cols, x_axis, y_axis):
+    """Replaces given x and y axes substrings with the exact name of the
+    corresponding column
+
+    Parameters
+    ----------
+    cols : list
+        lsit of all available column names
+
+    x_axis : str
+        substring contained in the column name to be used as the
+        x axis
+
+    y_axis : str
+        substring contained in the column name to be used as the
+        y axis
+
+    Returns
+    -------
+    x_axis : str
+        Exact column name to be used as the x axis
+
+    y_axis : str
+        Exact column name to be used as the y axis
+
+    """
     x_matching = [col for col in cols if x_axis.lower() in col.lower()]
     if len(x_matching) > 1:
         raise Exception("Given x_axis corresponds to more than 1 column")
@@ -407,99 +456,3 @@ def plot_data(data, x_axis, y_axis, x_log, y_log, path):
             plt.gcf().autofmt_xdate()
         plt.savefig(f"{folder}/{plot}.png", bbox_inches='tight')
         plt.close()
-
-
-def main():
-    """View historical performance of nightly benchmarks"""
-    parser = argparse.ArgumentParser(description="""Choose what to plot and
-                    where to store it, by default all benchmarks will be
-                    plotted using default size and dimensions""")
-    parser.add_argument('--plotpath', default="./images/nightly", type=Path,
-                        help="""Path to folder in which the plots will be
-                        stored""")
-    parser.add_argument('--benchpath', default="./.benchmarks", type=Path,
-                        help="""Path to folder in which the benchmarks are
-                        stored""")
-    parser.add_argument('--size', nargs="*", default=None, type=int,
-                        help="""Size of the matrices on which the
-                        operations will be performed in the history benchmarks,
-                        has to be a power of 2, max=256, min=4,
-                        default=None, [32,128] if nothing specified
-                        WARNING: If a parameter is used as line_sep it cannot
-                        be used as a filter""")
-    parser.add_argument('--density', nargs="?", default=None, type=str,
-                        help="""Density the matrices on which the
-                        operations will be performed in the history benchmarks,
-                        values: 'sparse' or 'dense'
-                        WARNING: If a parameter is used as line_sep it cannot
-                        be used as a filter""")
-    parser.add_argument('--operations', nargs="+", default=None, type=str,
-                        help="""Specify which operations to plot, plots all by
-                        default or if nothing specified""")
-    parser.add_argument('--line_sep', nargs="*", default=None, type=str,
-                        help="""Specify which parameter should be used
-                        to separate line on the plot instead of separating the
-                        plots. default=None, ['type', 'model'] if nothing
-                        specified
-                        WARNING: If a parameter is used as line_sep it cannot
-                        be used as a filter""")
-    parser.add_argument('--dtype', nargs="+", default=None, type=str,
-                        help="""Specify which dtypes to plot, plots all by
-                        default or if nothing specified
-                        Only applies to linear algebra benchmarks
-                        WARNING: If a parameter is used as line_sep it cannot
-                        be used as a filter""")
-    parser.add_argument('--model', nargs="+", default=None, type=str,
-                        help="""Specify which models to plot, plots all by
-                        default or if nothing specified
-                        Only applies to solver benchmarks
-                        WARNING: If a parameter is used as line_sep it cannot
-                        be used as a filter""")
-    parser.add_argument('--coeftype', nargs="+", default=None, type=str,
-                        help="""Specify which coefficient types to plot, plots
-                        all by default or if nothing specified
-                        Only applies to QobjEvo benchmarks
-                        WARNING: If a parameter is used as line_sep it cannot
-                        be used as a filter""")
-
-    args = parser.parse_args()
-    param_filters = None
-    line_sep = None
-
-    # because const isn't available for nargs="*"
-    if args.size is not None and not args.size:
-        args.size = [16, 32]
-    if args.line_sep is not None and not args.line_sep:
-        args.line_sep = ['type', 'model']
-
-    # create param_filter dict if called
-    if (args.density or args.size or args.model
-       or args.dtype or args.coeftype):
-        param_filters = {}
-        if args.density:
-            param_filters["density"] = args.density
-        if args.size:
-            param_filters["size"] = args.size
-        if args.dtype:
-            param_filters["dtype"] = args.dtype
-        if args.model:
-            param_filters["model"] = args.model
-        if args.coeftype:
-            param_filters["coeftype"] = args.coeftype
-
-    if args.line_sep:
-        line_sep = args.line_sep
-
-    # fetch data
-    paths = get_paths(args.benchpath)
-    data = create_dataframe(paths)
-    data = sort_ops(data, args.operations)
-    data = sort_params(
-        data, line_sep,
-        param_filters
-        )
-    plot_data(data, "datetime", "stats_mean", False, True, args.plotpath)
-
-
-if __name__ == '__main__':
-    main()

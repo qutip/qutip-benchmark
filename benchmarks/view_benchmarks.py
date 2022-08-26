@@ -1,51 +1,25 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import glob
 from pathlib import Path
 import argparse
-from view_nightly_benchmarks import (json_to_dataframe,
-                                     sort_ops,
-                                     sort_params,
-                                     plot_data)
-
-
-def get_latest_benchmark_path(folder):
-    """Returns a list of paths to all benchmark runs
-
-    Parameters
-    ----------
-    folder : str
-        path to the benchmarks folder
-
-    Returns
-    -------
-    Paths : Path
-        Path to the latest bencchmark
-    """
-
-    benchmark_paths = glob.glob(f"{folder}/*/*.json")
-    dates = [''.join(_b.split("/")[-1].split('_')[2:4])
-             for _b in benchmark_paths]
-    benchmarks = {date: value for date, value in zip(dates, benchmark_paths)}
-
-    dates.sort()
-    latest = dates[-1]
-    benchmark_latest = benchmarks[latest]
-
-    return benchmark_latest
-
+import view_funcs
 
 def main():
-    """View scaling performance from the last benchmark file"""
+    """View historical performance of nightly benchmarks"""
     parser = argparse.ArgumentParser(description="""Choose what to plot and
                     where to store it, by default all benchmarks will be
                     plotted using default size and dimensions""")
-    parser.add_argument('--plotpath', default="./images/scaling", type=Path,
+    parser.add_argument('--plotpath', default="./images", type=Path,
                         help="""Path to folder in which the plots will be
                         stored""")
     parser.add_argument('--benchpath', default="./.benchmarks", type=Path,
                         help="""Path to folder in which the benchmarks are
                         stored""")
+    parser.add_argument('--size', nargs="*", default=None, type=int,
+                        help="""Size of the matrices on which the
+                        operations will be performed in the history benchmarks,
+                        has to be a power of 2, max=256, min=4,
+                        default=None, [32,128] if nothing specified
+                        WARNING: If a parameter is used as line_sep it cannot
+                        be used as a filter""")
     parser.add_argument('--density', nargs="?", default=None, type=str,
                         help="""Density the matrices on which the
                         operations will be performed in the history benchmarks,
@@ -80,21 +54,29 @@ def main():
                         Only applies to QobjEvo benchmarks
                         WARNING: If a parameter is used as line_sep it cannot
                         be used as a filter""")
+    parser.add_argument('--scaling', action='store_true',
+                        help="""Run scaling benchmarks instead of history
+                        benchmarks.
+                        WARNING:cannot filter by size if used""")
 
     args = parser.parse_args()
     param_filters = None
     line_sep = None
 
     # because const isn't available for nargs="*"
+    if args.size is not None and not args.size:
+        args.size = [32, 128]
     if args.line_sep is not None and not args.line_sep:
         args.line_sep = ['type', 'model']
 
     # create param_filter dict if called
-    if (args.density or args.model
+    if (args.density or args.size or args.model
        or args.dtype or args.coeftype):
         param_filters = {}
         if args.density:
             param_filters["density"] = args.density
+        if args.size:
+            param_filters["size"] = args.size
         if args.dtype:
             param_filters["dtype"] = args.dtype
         if args.model:
@@ -105,15 +87,28 @@ def main():
     if args.line_sep:
         line_sep = args.line_sep
 
-    # fetch data
-    path = get_latest_benchmark_path(args.benchpath)
-    data = json_to_dataframe(path)
-    data = sort_ops(data, args.operations)
-    data = sort_params(
+    if not args.scaling:
+        if args.plotpath == Path('images'):
+            args.plotpath = args.plotpath / 'nightly'
+        paths = view_funcs.get_paths(args.benchpath)
+        data = view_funcs.create_dataframe(paths)
+        data = view_funcs.sort_ops(data, args.operations)
+        data = view_funcs.sort_params(
+            data, line_sep,
+            param_filters
+            )
+        view_funcs.plot_data(data, "datetime", "stats_mean", False, True, args.plotpath)
+    else:
+        if args.plotpath == Path('images'):
+            args.plotpath = args.plotpath / 'scaling'
+        path = view_funcs.get_latest_benchmark_path(args.benchpath)
+        data = view_funcs.json_to_dataframe(path)
+        data = view_funcs.sort_ops(data, args.operations)
+        data = view_funcs.sort_params(
         data, line_sep,
         param_filters, ["size"]
         )
-    plot_data(data, 'size', 'stats_mean', True, True, args.plotpath)
+        view_funcs.plot_data(data, 'size', 'stats_mean', True, True, args.plotpath)
 
 
 if __name__ == '__main__':
