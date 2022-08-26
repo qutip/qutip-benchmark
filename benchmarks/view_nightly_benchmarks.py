@@ -142,11 +142,10 @@ def filter_ops(df, filter=None):
 
         # drop columns that only exist for other operations
         data[op] = data[op].dropna(axis=1, how='all')
-
     return data
 
 
-def filter_params(df, line_sep=None, filters=None):
+def filter_params(df, line_sep=None, filters=None, exclude=None):
     """Filters the input dataframe by parameters used
     to separate each plot
 
@@ -197,49 +196,68 @@ def filter_params(df, line_sep=None, filters=None):
                 for param in params:
                     if sep.lower() in param.lower():
                         separator = param
-                # remove separator prameter from parameter list
+                # remove separator parameter from parameter list
                 if separator in params:
                     params.remove(separator)
 
-        # create dataframe grouped by the remaining params
-        for plot_params, plot_df in df[op].groupby(params):
-            if type(plot_params) is not tuple:
-                plot_params = (plot_params,)
-
-            dict_params = dict(zip(params, plot_params))
-
-            key = [op] + list(dict_params.values())
-
-            key = "-".join([str(item) for item in key])
-
-            if filters:
-                tmp_filters = {}
-                proceed = True
-
-                # create dict with correct keys from substring
+        # drop excluded parameters
+        if exclude:
+            # find the full param name from the initial substrings
+            for ex in exclude:
                 for param in params:
-                    for f_key, f_item in filters.items():
-                        if f_key.lower() in param.lower():
-                            tmp_filters[param] = f_item
+                    if ex.lower() in param.lower():
+                        excluded = param
+                # remove excluded parameter from parameter list
+                if excluded in params:
+                    params.remove(excluded)
 
-                # if no dict was created raise warning but proceed anyway
-                if not tmp_filters:
-                    warning = "Filters don't apply to "
-                    warning += key
-                    warning += ", the plot will be made anyway \n"
-                    warning += "applied filters: "
-                    warning += ", ".join(list(filters.keys()))
-                    warning += "; available filters: " + ", ".join(params)
-                    warnings.warn(warning)
+        if params:
+            # create dataframe grouped by the remaining params
+            for plot_params, plot_df in df[op].groupby(params):
+                if type(plot_params) is not tuple:
+                    plot_params = (plot_params,)
 
-                # if a plot parameter doesn't match the corresponding filter
-                # do not proceed
-                for f_key, f_item in tmp_filters.items():
-                    if dict_params[f_key] not in f_item:
-                        proceed = False
+                dict_params = dict(zip(params, plot_params))
 
-                if proceed:
-                    print(key)
+                key = [op] + list(dict_params.values())
+
+                key = "-".join([str(item) for item in key])
+
+                if filters:
+                    tmp_filters = {}
+                    proceed = True
+
+                    # create dict with correct keys from substring
+                    for param in params:
+                        for f_key, f_item in filters.items():
+                            if f_key.lower() in param.lower():
+                                tmp_filters[param] = f_item
+
+                    # if no dict was created raise warning but proceed anyway
+                    if not tmp_filters:
+                        warning = "Filters don't apply to "
+                        warning += key
+                        warning += ", the plot will be made anyway \n"
+                        warning += "applied filters: "
+                        warning += ", ".join(list(filters.keys()))
+                        warning += "; available filters: " + ", ".join(params)
+                        warnings.warn(warning)
+
+                    # if a plot parameter doesn't match the corresponding filter
+                    # do not proceed
+                    for f_key, f_item in tmp_filters.items():
+                        if dict_params[f_key] not in f_item:
+                            proceed = False
+
+                    if proceed:
+                        # Create sub dict
+                        tmp_dict = {}
+                        tmp_dict["data"] = plot_df
+                        tmp_dict["line_sep"] = separator
+
+                        # Append sub dict to main dict
+                        data[key] = tmp_dict
+                else:
                     # Create sub dict
                     tmp_dict = {}
                     tmp_dict["data"] = plot_df
@@ -247,22 +265,17 @@ def filter_params(df, line_sep=None, filters=None):
 
                     # Append sub dict to main dict
                     data[key] = tmp_dict
-            else:
-                # Creat key string id
-                key = "-".join([str(item) for item in key])
-
-                # Create sub dict
-                tmp_dict = {}
-                tmp_dict["data"] = plot_df
-                tmp_dict["line_sep"] = separator
-
-                # Append sub dict to main dict
-                data[key] = tmp_dict
-
+        else:
+            key = [op]
+            key = "-".join([str(item) for item in key])
+            tmp_dict = {}
+            tmp_dict["data"] = df[op]
+            tmp_dict["line_sep"] = separator
+            data[key] = tmp_dict
     return data
 
 
-def plot_data(data, path):
+def plot_data(data, x_axis, path):
     """Plots the contents of the input dict, based on the given line_separators
 
     Parameters
@@ -285,10 +298,19 @@ def plot_data(data, path):
         "red", "black", "gray",
         "pink", "purple", "cyan"]
     markers = ['o--', 'x-', 'v:', "1-.", "*:"]
-
+    i = 0
     for plot in data:
+
         line_sep = data[plot]["line_sep"]
         df = data[plot]["data"]
+        cols = list(df.columns)
+        matching = [col for col in cols if x_axis in col]
+        if len(matching) > 1:
+            raise Exception("Given x_axis corresponds to more than 1 column")
+        elif len(matching) == 0:
+            raise Exception("Given x_axis doesn correspond to any columns ")
+        x_axis = "".join(matching)
+
 
         # Create figure
         fig, ax = plt.subplots(1, 1)
@@ -309,7 +331,7 @@ def plot_data(data, path):
                     for i, label in enumerate(labels):
                         if sep == label:
                             ax.plot(
-                                gr.datetime, gr.stats_mean,
+                                gr[x_axis], gr.stats_mean,
                                 markers[count], color=colors[i]
                                 )
                     count = count+1
@@ -330,7 +352,7 @@ def plot_data(data, path):
                 for i, label in enumerate(labels):
                     if cpu == label:
                         ax.plot(
-                            gr.datetime, gr.stats_mean,
+                            gr[x_axis], gr.stats_mean,
                             'o--', color=colors[i]
                             )
 
@@ -340,12 +362,13 @@ def plot_data(data, path):
             handles = [f("s", colors[i]) for i in range(len(labels))]
             ax.legend(handles, labels)
 
-        ax.set_xlabel("date")
+        ax.set_xlabel(x_axis)
         ax.set_ylabel("time (s)")
         ax.set_yscale('log')
 
         fig.tight_layout()
-        plt.gcf().autofmt_xdate()
+        if x_axis == "datetime":
+            plt.gcf().autofmt_xdate()
         plt.savefig(f"{folder}/{plot}.png", bbox_inches='tight')
         plt.close()
 
@@ -354,7 +377,7 @@ def main(args=[]):
     parser = argparse.ArgumentParser(description="""Choose what to plot and
                     where to store it, by default all benchmarks will be
                     plotted using default size and dimensions""")
-    parser.add_argument('--plotpath', default="./images", type=Path,
+    parser.add_argument('--plotpath', default="./images/nightly", type=Path,
                         help="""Path to folder in which the plots will be
                         stored""")
     parser.add_argument('--benchpath', default="./.benchmarks", type=Path,
@@ -438,7 +461,7 @@ def main(args=[]):
         data, line_sep=line_sep,
         filters=param_filters
         )
-    plot_data(data, args.plotpath)
+    plot_data(data, "datetime", args.plotpath)
 
 
 if __name__ == '__main__':
