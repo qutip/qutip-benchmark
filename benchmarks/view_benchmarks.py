@@ -2,6 +2,7 @@ from pathlib import Path
 import argparse
 import view_funcs
 
+
 def main():
     """View historical performance of nightly benchmarks"""
     parser = argparse.ArgumentParser(description="""Choose what to plot and
@@ -98,7 +99,9 @@ def main():
             filters=param_filters,
             col_filters={'cpu': ["E5"]}
             )
-        view_funcs.plot_data(data, "datetime", "stats_mean", False, True, args.plotpath)
+        view_funcs.plot_data(
+            data, "datetime", "stats_mean",
+            False, True, args.plotpath)
     else:
         if args.plotpath == Path('images'):
             args.plotpath = args.plotpath / 'scaling'
@@ -110,7 +113,9 @@ def main():
             filters=param_filters,
             exclude=["size"]
         )
-        view_funcs.plot_data(data, 'size', 'stats_mean', True, True, args.plotpath)
+        view_funcs.plot_data(
+            data, 'size', 'stats_mean',
+            True, True, args.plotpath)
 
 
 if __name__ == '__main__':

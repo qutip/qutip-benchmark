@@ -51,6 +51,7 @@ def json_to_dataframe(filepath):
 
         return data
 
+
 def get_latest_benchmark_path(folder):
     """Returns a list of paths to all benchmark runs
 
@@ -220,17 +221,19 @@ def param_filtering(filters, dict_params, key):
                     return False
     return True
 
-def column_filtering(df, filters):
+
+def column_filtering(df, filters, key):
     """deletes rows that contain specified values of a column columns
 
     Parameters
     ----------
     filters : dict
         dict of the form {column_name: [deleted_values]}, filters the data by
-        the given values for each columns, the name is can be a substring of the
-        column and is not case sensitive.
-        e.g: {'CPU': ["Platinum"], "Size":[32,128]} will delete all rows that contain
-        "Platinum" in the 'cpu' column or 32 or 128 in the 'param_size' column.
+        the given values for each columns, the name is can be a substring of
+        the column and is not case sensitive.
+        e.g: {'CPU': ["Platinum"], "Size":[32,128]} will delete all rows that
+        contain "Platinum" in the 'cpu' column or 32 or 128 in the
+        'param_size' column.
 
     params_dict : dict
         dict of the form {param_name: value}
@@ -240,26 +243,36 @@ def column_filtering(df, filters):
     df : Dataframe
         filtered dataframe
     """
-    columns = list(df.columns)
-    tmp_filters = {}
+    if filters:
+        columns = list(df.columns)
+        tmp_filters = {}
 
-    # create dict with correct keys from substring
-    for col in columns:
-        for f_key, f_item in filters.items():
-            if f_key.lower() in col.lower():
-                tmp_filters[col] = f_item
+        # create dict with correct keys from substring
+        for col in columns:
+            for f_key, f_item in filters.items():
+                if f_key.lower() in col.lower():
+                    tmp_filters[col] = f_item
 
-    #Filter data
-    for tmp_key, tmp_item in tmp_filters.items():
-        for item in tmp_item:
-            if df[tmp_key].dtype == 'object':
-                df = df[~df[tmp_key].str.contains(item)]
-            else:
-                df = df[~(df[tmp_key] == item)]
+        if tmp_filters:
+            # Filter data
+            for tmp_key, tmp_item in tmp_filters.items():
+                for item in tmp_item:
+                    if df[tmp_key].dtype == 'object':
+                        df = df[~df[tmp_key].str.contains(item)]
+                    else:
+                        df = df[~(df[tmp_key] == item)]
+        else:
+            warning = "filter doesn correspond to any column for"
+            warning += key
+            warning += ", plotting anyway"
+            warnings.warn(warning)
+
     return df
 
 
-def sort_params(df, line_sep=None, filters=None, col_filters=None, exclude=None):
+def sort_params(
+     df, line_sep=None, filters=None,
+     col_filters=None, exclude=None):
     """Filters the input dataframe by parameters used
     to separate each plot
 
@@ -281,6 +294,18 @@ def sort_params(df, line_sep=None, filters=None, col_filters=None, exclude=None)
         e.g: {param_size: [16,128]; param_density: [sparse]} will filter by
         size and density for operations but only by size for solvers,
         as solver benchmarks do not have a density parameter.
+
+    col_filters : dict
+        dict of the form {column_name: [deleted_values]}, filters the data by
+        the given values for each columns, the name is can be a substring of
+        the column and is not case sensitive.
+        e.g: {'CPU': ["Platinum"], "Size":[32,128]} will delete all rows that
+        contain "Platinum" in the 'cpu' column or 32 or 128 in the
+        'param_size' column.
+
+    exclude : list
+        List of params not to be used as plot separators, by default will use
+        all, of them except those specified in line_sep.
 
     Returns
     -------
@@ -339,20 +364,23 @@ def sort_params(df, line_sep=None, filters=None, col_filters=None, exclude=None)
                 key = [op] + list(dict_params.values())
                 key = "-".join([str(item) for item in key])
 
-                # add data to outpu only if param value exists
+                # add data to output only if param value exists
                 #  in the filter
                 if param_filtering(filters, dict_params, key):
-                    plot_df = column_filtering(plot_df, col_filters)
+                    plot_df = column_filtering(plot_df, col_filters, key)
                     data[key] = {
                         "data": plot_df,
                         "line_sep": separator
                     }
         else:
-            # TODO Filtering when no params are left after
-            # exclude and/or line_sep
             key = [op]
             key = "-".join([str(item) for item in key])
-            plot_df = column_filtering(df[op], col_filters)
+            if filters:
+                warning = "no parameter to apply filters to"
+                warning += key
+                warning += ", plotting anyway"
+                warnings.warn(warning)
+            plot_df = column_filtering(df[op], col_filters, key)
             data[key] = {
                 "data": plot_df,
                 "line_sep": separator
