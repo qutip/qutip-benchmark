@@ -95,7 +95,8 @@ def main():
         data = view_funcs.sort_ops(data, args.operations)
         data = view_funcs.sort_params(
             data, line_sep,
-            param_filters
+            filters=param_filters,
+            col_filters={'cpu': ["E5"]}
             )
         view_funcs.plot_data(data, "datetime", "stats_mean", False, True, args.plotpath)
     else:
@@ -105,10 +106,11 @@ def main():
         data = view_funcs.json_to_dataframe(path)
         data = view_funcs.sort_ops(data, args.operations)
         data = view_funcs.sort_params(
-        data, line_sep,
-        param_filters, ["size"]
+            data, line_sep,
+            filters=param_filters,
+            exclude=["size"]
         )
-        view_funcs.plot_data(data, 'size', 'stats_mean', True, True, args.plotpath)
+        view_funcs.plot_data(data, 'size', 'stats_mean', False, True, args.plotpath)
 
 
 if __name__ == '__main__':

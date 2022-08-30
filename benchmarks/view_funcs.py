@@ -220,8 +220,46 @@ def param_filtering(filters, dict_params, key):
                     return False
     return True
 
+def column_filtering(df, filters):
+    """deletes rows that contain specified values of a column columns
 
-def sort_params(df, line_sep=None, filters=None, exclude=None):
+    Parameters
+    ----------
+    filters : dict
+        dict of the form {column_name: [deleted_values]}, filters the data by
+        the given values for each columns, the name is can be a substring of the
+        column and is not case sensitive.
+        e.g: {'CPU': ["Platinum"], "Size":[32,128]} will delete all rows that contain
+        "Platinum" in the 'cpu' column or 32 or 128 in the 'param_size' column.
+
+    params_dict : dict
+        dict of the form {param_name: value}
+
+    Returns
+    -------
+    df : Dataframe
+        filtered dataframe
+    """
+    columns = list(df.columns)
+    tmp_filters = {}
+
+    # create dict with correct keys from substring
+    for col in columns:
+        for f_key, f_item in filters.items():
+            if f_key.lower() in col.lower():
+                tmp_filters[col] = f_item
+
+    #Filter data
+    for tmp_key, tmp_item in tmp_filters.items():
+        for item in tmp_item:
+            if df[tmp_key].dtype == 'object':
+                df = df[~df[tmp_key].str.contains(item)]
+            else:
+                df = df[~(df[tmp_key] == item)]
+    return df
+
+
+def sort_params(df, line_sep=None, filters=None, col_filters=None, exclude=None):
     """Filters the input dataframe by parameters used
     to separate each plot
 
@@ -304,6 +342,7 @@ def sort_params(df, line_sep=None, filters=None, exclude=None):
                 # add data to outpu only if param value exists
                 #  in the filter
                 if param_filtering(filters, dict_params, key):
+                    plot_df = column_filtering(plot_df, col_filters)
                     data[key] = {
                         "data": plot_df,
                         "line_sep": separator
@@ -313,10 +352,12 @@ def sort_params(df, line_sep=None, filters=None, exclude=None):
             # exclude and/or line_sep
             key = [op]
             key = "-".join([str(item) for item in key])
+            plot_df = column_filtering(df[op], col_filters)
             data[key] = {
-                "data": df[op],
+                "data": plot_df,
                 "line_sep": separator
             }
+
     return data
 
 
