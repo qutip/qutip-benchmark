@@ -52,32 +52,6 @@ def json_to_dataframe(filepath):
         return data
 
 
-def get_latest_benchmark_path(folder):
-    """Returns a list of paths to all benchmark runs
-
-    Parameters
-    ----------
-    folder : str
-        path to the benchmarks folder
-
-    Returns
-    -------
-    Paths : Path
-        Path to the latest bencchmark
-    """
-
-    benchmark_paths = glob.glob(f"{folder}/*/*.json")
-    dates = [''.join(_b.split("/")[-1].split('_')[2:4])
-             for _b in benchmark_paths]
-    benchmarks = {date: value for date, value in zip(dates, benchmark_paths)}
-
-    dates.sort()
-    latest = dates[-1]
-    benchmark_latest = benchmarks[latest]
-
-    return benchmark_latest
-
-
 def get_paths(folder):
     """Returns a list of paths to all benchmark runs
 
@@ -555,7 +529,7 @@ def default_scaling_plots(plot_path, bench_path):
     bench_path = Path(bench_path)
     line_sep = ["type", "model"]
 
-    path = get_latest_benchmark_path(bench_path)
+    path = get_paths(bench_path)[-1]
     data = json_to_dataframe(path)
     data = sort_ops(data)
     data = sort_params(

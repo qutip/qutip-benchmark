@@ -1,6 +1,6 @@
 from pathlib import Path
 import argparse
-from view_funcs import default_nightly_plots, default_scaling_plots
+from view_utilities import default_nightly_plots, default_scaling_plots
 
 
 def main():
