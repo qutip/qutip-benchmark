@@ -92,17 +92,10 @@ jobs:
       
       - name: create plots
         run: |
-          python benchmarks/view_benchmarks.py --line_sep --size --plotpath images/plots/nihgtly
-          python benchmarks/view_benchmarks.py --scaling --line_sep --plotpath images/plots/scaling
-      
-      - name: import website and replace images
-        run: |
-          git clone --depth 1 -b gh-pages https://github.com/qutip/qutip-benchmark
-          rm -rf qutip-benchmark/.git
-          rm -rf qutip-benchmark/images/plots
-          cp -rf images qutip-benchmark/
+          python benchmarks/view_benchmarks.py --nightly --plotpath website/images/plots/nightly
+          python benchmarks/view_benchmarks.py --scaling --plotpath website/images/plots/scaling
 
       - name: publish website
         run: | 
           python -m pip install ghp-import
-          ghp-import -m "Automatic push by ghp-import" -f -p -o -r origin -b gh-pages qutip-benchmark
+          ghp-import -m "Automatic push by ghp-import" -f -p -o -r origin -b gh-pages website
