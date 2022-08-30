@@ -525,3 +525,43 @@ def plot_data(data, x_axis, y_axis, x_log, y_log, path):
             plt.gcf().autofmt_xdate()
         plt.savefig(f"{folder}/{plot}.png", bbox_inches='tight')
         plt.close()
+
+
+def default_nightly_plots(plot_path, bench_path):
+    """Function to plot nightly benchmarks for all operation with
+    default settings"""
+    plot_path = Path(plot_path)
+    bench_path = Path(bench_path)
+    line_sep = ["type", "model"]
+    param_sep = {"size" : [32,128,512]}
+
+    paths = get_paths(bench_path)
+    data = create_dataframe(paths)
+    data = sort_ops(data)
+    data = sort_params(
+        data, line_sep,
+        param_sep,
+        col_filters={'cpu': ["E5"]}
+        )
+    plot_data(
+        data, "datetime", "stats_mean",
+        False, True, plot_path)
+
+
+def default_scaling_plots(plot_path, bench_path):
+    """Function to plot scaling benchmarks for all operation with
+    default settings"""
+    plot_path = Path(plot_path)
+    bench_path = Path(bench_path)
+    line_sep = ["type", "model"]
+
+    path = get_latest_benchmark_path(bench_path)
+    data = json_to_dataframe(path)
+    data = sort_ops(data)
+    data = sort_params(
+        data, line_sep,
+        exclude=["size"]
+    )
+    plot_data(
+        data, 'size', 'stats_mean',
+        True, True, plot_path)
