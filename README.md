@@ -67,7 +67,7 @@ This scipts accepts 4 flags:
 | `--nightly`   | Plot the performance over time using results from all the benchmark files   | 
 
 If you wish to have more control on what to plot you can import view_utilities.py to a python script and use the available functions. 
-These functions all contain an extensive description of the accepted parameters and outputs can be used for which you can find in `benchmarks/view_utilities.py` so only a brief description will be given here, you can also view a use case example in this [tutorial](tutorial.ipynb).
+These functions all contain an extensive description of the accepted parameters and outputs can be used for which you can find in `benchmarks/view_utilities.py` so only a brief description will be given here, you can also view a use case example in this [tutorial](tutorial.md).
 
 | Function      | Description |
 | ----------- | ----------- |
