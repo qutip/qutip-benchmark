@@ -197,13 +197,13 @@ def param_filtering(filters, dict_params, key):
 
 
 def column_filtering(df, filters, key):
-    """deletes rows that contain specified values of a column columns
+    """deletes rows that contain specified values of a column
 
     Parameters
     ----------
     filters : dict
         dict of the form {column_name: [deleted_values]}, filters the data by
-        the given values for each columns, the name is can be a substring of
+        the given values for each column, the name can be a substring of
         the column and is not case sensitive.
         e.g: {'CPU': ["Platinum"], "Size":[32,128]} will delete all rows that
         contain "Platinum" in the 'cpu' column or 32 or 128 in the
@@ -211,6 +211,9 @@ def column_filtering(df, filters, key):
 
     params_dict : dict
         dict of the form {param_name: value}
+
+    key: str
+    Id of the plot on which the filtering is being done
 
     Returns
     -------
@@ -415,6 +418,20 @@ def plot_data(data, x_axis, y_axis, x_log, y_log, path):
         Nested Dictionnary of the form {"operation-param_1-param_2-...":
         {data: dataframe; line_sep: str/None}}.
 
+    x_axis : str
+        substring contained in the column name to be used as the
+        x axis
+
+    y_axis : str
+        substring contained in the column name to be used as the
+        y axis
+
+    x_log : bool
+        Apply logarithmic scaling to the x axis
+
+    y_log : bool
+        Apply logarithmic scaling to the y axis
+
     path : str
         location to store the plot folders.
 
@@ -507,7 +524,7 @@ def default_nightly_plots(plot_path, bench_path):
     plot_path = Path(plot_path)
     bench_path = Path(bench_path)
     line_sep = ["type", "model"]
-    param_sep = {"size" : [32,128,512]}
+    param_sep = {"size": [32, 128, 512]}
 
     paths = get_paths(bench_path)
     data = create_dataframe(paths)
