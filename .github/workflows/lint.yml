@@ -13,6 +13,19 @@ jobs:
           options: "--line-length 79"
           src: "./benchmarks"
 
+  Run:
+    name: "Flake8"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 
+        uses: "actions/checkout@v2"
+
+      - name: Setup Python 
+        uses: "actions/setup-python@v2"
+        with:
+          python-version: "3.10"
+
       - name: Install dependencies 
         run: |
           python -VV
@@ -22,4 +35,4 @@ jobs:
           python -m pip install flake8-github-actions
 
       - name: "Run Flake8"
-        run: "flake8 benchmarks --format github"
+        run: "flake8 --format github"
