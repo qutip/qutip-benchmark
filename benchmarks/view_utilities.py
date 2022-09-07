@@ -94,7 +94,7 @@ def get_paths(folder):
 
 
 def create_dataframe(paths):
-    """ fetch all required data
+    """Fetch all required data
 
     Parameters
     ----------
