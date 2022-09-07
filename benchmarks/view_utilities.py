@@ -23,30 +23,45 @@ def json_to_dataframe(filepath):
 
     """
 
-    with open(filepath, encoding='utf-8') as f:
+    with open(filepath, encoding="utf-8") as f:
         data_json = json.load(f)
 
         # Create dataframe
         data = pd.json_normalize(data_json["benchmarks"], sep="_")
 
         # Set operation from group name
-        data["params_operation"] = data.group.str.split('-')
+        data["params_operation"] = data.group.str.split("-")
         data.params_operation = [d[0] for d in data.params_operation]
 
         # Add time and cpu to dataframe
-        data['cpu'] = data_json['machine_info']["cpu"]["brand_raw"]
-        data['datetime'] = data_json['datetime']
-        data['datetime'] = pd.to_datetime(data['datetime'])
+        data["cpu"] = data_json["machine_info"]["cpu"]["brand_raw"]
+        data["datetime"] = data_json["datetime"]
+        data["datetime"] = pd.to_datetime(data["datetime"])
 
         # drop unused columns
         unused = [
-            'options_disable_gc', 'options_timer', 'options_min_rounds',
-            'options_max_time', 'options_min_time', 'options_warmup',
-            'stats_min', 'stats_max', 'stats_median', 'stats_iqr', 'stats_q1',
-            'stats_q3', 'stats_iqr_outliers', 'stats_stddev_outliers',
-            'stats_outliers', 'stats_ld15iqr', 'stats_hd15iqr', 'stats_ops',
-            'stats_total', 'stats_iterations', 'stats_rounds'
-            ]
+            "options_disable_gc",
+            "options_timer",
+            "options_min_rounds",
+            "options_max_time",
+            "options_min_time",
+            "options_warmup",
+            "stats_min",
+            "stats_max",
+            "stats_median",
+            "stats_iqr",
+            "stats_q1",
+            "stats_q3",
+            "stats_iqr_outliers",
+            "stats_stddev_outliers",
+            "stats_outliers",
+            "stats_ld15iqr",
+            "stats_hd15iqr",
+            "stats_ops",
+            "stats_total",
+            "stats_iterations",
+            "stats_rounds",
+        ]
         data = data.drop(unused, axis="columns")
 
         return data
@@ -68,8 +83,9 @@ def get_paths(folder):
     """
 
     benchmark_paths = glob.glob(f"{folder}/*/*.json")
-    dates = [''.join(_b.split("/")[-1].split('_')[2:4])
-             for _b in benchmark_paths]
+    dates = [
+        "".join(_b.split("/")[-1].split("_")[2:4]) for _b in benchmark_paths
+    ]
     zipped = zip(dates, benchmark_paths)
     tmp = sorted(zipped, key=lambda x: x[0])
     paths = list(zip(*tmp))
@@ -126,21 +142,21 @@ def sort_ops(df, filters=None):
     """
 
     if filters:
-        old_ops = list(df['params_operation'].unique())
+        old_ops = list(df["params_operation"].unique())
         ops = []
         for param in filters:
             for op in old_ops:
                 if param.lower() in op.lower():
                     ops.append(op)
     else:
-        ops = list(df['params_operation'].unique())
+        ops = list(df["params_operation"].unique())
 
     data = {}
     for op in ops:
         data[op] = df[df["params_operation"] == op]
 
         # drop columns that only exist for other operations
-        data[op] = data[op].dropna(axis=1, how='all')
+        data[op] = data[op].dropna(axis=1, how="all")
     return data
 
 
@@ -231,7 +247,7 @@ def column_filtering(df, filters, key):
             # Filter data
             for tmp_key, tmp_item in tmp_filters.items():
                 for item in tmp_item:
-                    if df[tmp_key].dtype == 'object':
+                    if df[tmp_key].dtype == "object":
                         df = df[~df[tmp_key].str.contains(item)]
                     else:
                         df = df[~(df[tmp_key] == item)]
@@ -245,8 +261,8 @@ def column_filtering(df, filters, key):
 
 
 def sort_params(
-     df, line_sep=None, filters=None,
-     col_filters=None, exclude=None):
+    df, line_sep=None, filters=None, col_filters=None, exclude=None
+):
     """Filters the input dataframe by parameters used
     to separate each plot
 
@@ -296,9 +312,10 @@ def sort_params(
     for op in df:
         # get names of parameter columns and drop the one containing operations
         params = [
-            param for param in list(df[op].columns)
+            param
+            for param in list(df[op].columns)
             if "params_" in param and "operation" not in param
-            ]
+        ]
 
         separator = None
 
@@ -342,10 +359,7 @@ def sort_params(
                 #  in the filter
                 if param_filtering(filters, dict_params, key):
                     plot_df = column_filtering(plot_df, col_filters, key)
-                    data[key] = {
-                        "data": plot_df,
-                        "line_sep": separator
-                    }
+                    data[key] = {"data": plot_df, "line_sep": separator}
         else:
             key = [op]
             key = "-".join([str(item) for item in key])
@@ -355,10 +369,7 @@ def sort_params(
                 warning += ", plotting anyway"
                 warnings.warn(warning)
             plot_df = column_filtering(df[op], col_filters, key)
-            data[key] = {
-                "data": plot_df,
-                "line_sep": separator
-            }
+            data[key] = {"data": plot_df, "line_sep": separator}
 
     return data
 
@@ -425,10 +436,17 @@ def plot_data(data, x_axis, y_axis, x_log, y_log, path):
 
     # Set colors and markers for legend
     colors = [
-        "blue", "orange", "green",
-        "red", "black", "gray",
-        "pink", "purple", "cyan"]
-    markers = ['o--', 'x-', 'v:', "1-.", "*:"]
+        "blue",
+        "orange",
+        "green",
+        "red",
+        "black",
+        "gray",
+        "pink",
+        "purple",
+        "cyan",
+    ]
+    markers = ["o--", "x-", "v:", "1-.", "*:"]
     i = 0
     for plot in data:
 
@@ -451,19 +469,22 @@ def plot_data(data, x_axis, y_axis, x_log, y_log, path):
                 count = 0
                 cpus = []
                 # Separate by CPU
-                for cpu, gr in g.groupby('cpu'):
+                for cpu, gr in g.groupby("cpu"):
                     cpus.append(cpu)
                     for i, label in enumerate(labels):
                         if sep == label:
                             ax.plot(
-                                gr[x_axis], gr[y_axis],
-                                markers[count], color=colors[i]
-                                )
-                    count = count+1
+                                gr[x_axis],
+                                gr[y_axis],
+                                markers[count],
+                                color=colors[i],
+                            )
+                    count = count + 1
 
             # Generate legend
             def f(m, c):
                 return plt.plot([], [], m, color=c)[0]
+
             handles = [f("s", colors[i]) for i in range(len(labels))]
             handles += [f(markers[i], "k") for i in range(len(cpus))]
             labels += cpus
@@ -473,31 +494,29 @@ def plot_data(data, x_axis, y_axis, x_log, y_log, path):
         else:
             labels = list(df["cpu"].unique())
             # Separate by CPU
-            for cpu, gr in df.groupby('cpu'):
+            for cpu, gr in df.groupby("cpu"):
                 for i, label in enumerate(labels):
                     if cpu == label:
-                        ax.plot(
-                            gr[x_axis], gr[y_axis],
-                            'o--', color=colors[i]
-                            )
+                        ax.plot(gr[x_axis], gr[y_axis], "o--", color=colors[i])
 
             # Generate legend
             def f(m, c):
                 return plt.plot([], [], m, color=c)[0]
+
             handles = [f("s", colors[i]) for i in range(len(labels))]
             ax.legend(handles, labels)
 
         ax.set_xlabel(x_axis)
         ax.set_ylabel("time (s)")
         if y_log:
-            ax.set_yscale('log')
+            ax.set_yscale("log")
         if x_log:
-            ax.set_xscale('log')
+            ax.set_xscale("log")
 
         fig.tight_layout()
         if x_axis == "datetime":
             plt.gcf().autofmt_xdate()
-        plt.savefig(f"{folder}/{plot}.png", bbox_inches='tight')
+        plt.savefig(f"{folder}/{plot}.png", bbox_inches="tight")
         plt.close()
 
 
@@ -507,19 +526,13 @@ def default_nightly_plots(plot_path, bench_path):
     plot_path = Path(plot_path)
     bench_path = Path(bench_path)
     line_sep = ["type", "model"]
-    param_sep = {"size" : [32,128,512]}
+    param_sep = {"size": [32, 128, 512]}
 
     paths = get_paths(bench_path)
     data = create_dataframe(paths)
     data = sort_ops(data)
-    data = sort_params(
-        data, line_sep,
-        param_sep,
-        col_filters={'cpu': ["E5"]}
-        )
-    plot_data(
-        data, "datetime", "stats_mean",
-        False, True, plot_path)
+    data = sort_params(data, line_sep, param_sep, col_filters={"cpu": ["E5"]})
+    plot_data(data, "datetime", "stats_mean", False, True, plot_path)
 
 
 def default_scaling_plots(plot_path, bench_path):
@@ -532,10 +545,5 @@ def default_scaling_plots(plot_path, bench_path):
     path = get_paths(bench_path)[-1]
     data = json_to_dataframe(path)
     data = sort_ops(data)
-    data = sort_params(
-        data, line_sep,
-        exclude=["size"]
-    )
-    plot_data(
-        data, 'size', 'stats_mean',
-        True, True, plot_path)
+    data = sort_params(data, line_sep, exclude=["size"])
+    plot_data(data, "size", "stats_mean", True, True, plot_path)

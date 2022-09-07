@@ -7,15 +7,18 @@ from qutip.solve.steadystate import steadystate
 
 
 @pytest.fixture(params=np.logspace(2, 7, 6, base=2, dtype=int).tolist())
-def size(request): return request.param
+def size(request):
+    return request.param
 
 
 @pytest.fixture(params=["Jaynes-Cummings", "Cavity", "Qubit Spin Chain"])
-def model_solve(request): return request.param
+def model_solve(request):
+    return request.param
 
 
 @pytest.fixture(params=["Jaynes-Cummings", "Cavity"])
-def model_steady(request): return request.param
+def model_steady(request):
+    return request.param
 
 
 # times
@@ -23,18 +26,19 @@ tlist = np.linspace(0, 20, 80)
 
 
 def jc_setup(size):
-    size = int(size/2)
+    size = int(size / 2)
 
     # initial state
-    psi0 = qutip.fock(size, 0) & ((qutip.basis(2, 0) +
-                                   qutip.basis(2, 1)).unit())
+    psi0 = qutip.fock(size, 0) & (
+        (qutip.basis(2, 0) + qutip.basis(2, 1)).unit()
+    )
 
-    wc = 1.0 * 2 * np.pi   # cavity frequency
-    wa = 1.0 * 2 * np.pi   # atom frequency
+    wc = 1.0 * 2 * np.pi  # cavity frequency
+    wa = 1.0 * 2 * np.pi  # atom frequency
     g = 0.25 * 2 * np.pi  # coupling strength
 
-    kappa = 0.015       # cavity dissipation rate
-    gamma = 0.15        # atom dissipation rate
+    kappa = 0.015  # cavity dissipation rate
+    gamma = 0.15  # atom dissipation rate
 
     # Hamiltonian
     Ia = qutip.qeye(2)
@@ -48,9 +52,9 @@ def jc_setup(size):
     sp = qutip.sigmap()
     sz = qutip.sigmaz()
 
-    H = (wc * (n & Ia))
-    H += (Ic & (wa / 2. * sz))
-    H += (g * ((a_dag & sm) + (a & sp)))
+    H = wc * (n & Ia)
+    H += Ic & (wa / 2.0 * sz)
+    H += g * ((a_dag & sm) + (a & sp))
 
     # Collapse operators
     c_ops = []
@@ -58,8 +62,8 @@ def jc_setup(size):
     n_th = 0.0  # zero temperature
 
     c_ops = [
-        (np.sqrt(kappa*(1+n_th)) * a) & Ia,
-        (np.sqrt(kappa*n_th) * a_dag) & Ia,
+        (np.sqrt(kappa * (1 + n_th)) * a) & Ia,
+        (np.sqrt(kappa * n_th) * a_dag) & Ia,
         Ic & (np.sqrt(gamma) * sm),
     ]
 
@@ -67,10 +71,10 @@ def jc_setup(size):
 
 
 def cavity_setup(size):
-    kappa = 1.
+    kappa = 1.0
     eta = 1.5
     wc = 1.8
-    wl = 2.
+    wl = 2.0
     delta_c = wl - wc
     alpha0 = 0.3 - 0.5j
 
@@ -138,11 +142,11 @@ def test_mesolve(benchmark, model_solve, size, request):
     group = "mesolve-" + group
     benchmark.group = group
 
-    if model_solve == 'Cavity':
+    if model_solve == "Cavity":
         H, psi0, c_ops, e_ops = cavity_setup(size)
-    elif model_solve == 'Jaynes-Cummings':
+    elif model_solve == "Jaynes-Cummings":
         H, psi0, c_ops, e_ops = jc_setup(size)
-    elif model_solve == 'Qubit Spin Chain':
+    elif model_solve == "Qubit Spin Chain":
         H, psi0, c_ops, e_ops = qubit_setup(size)
 
     result = benchmark(mesolve, H, psi0, tlist, c_ops, e_ops)
@@ -155,11 +159,11 @@ def test_mcsolve(benchmark, model_solve, size, request):
     group = "mcsolve-" + group
     benchmark.group = group
 
-    if model_solve == 'Cavity':
+    if model_solve == "Cavity":
         H, psi0, c_ops, e_ops = cavity_setup(size)
-    elif model_solve == 'Jaynes-Cummings':
+    elif model_solve == "Jaynes-Cummings":
         H, psi0, c_ops, e_ops = jc_setup(size)
-    elif model_solve == 'Qubit Spin Chain':
+    elif model_solve == "Qubit Spin Chain":
         H, psi0, c_ops, e_ops = qubit_setup(size)
 
     result = benchmark(mcsolve, H, psi0, tlist, c_ops, e_ops)
@@ -173,10 +177,10 @@ def test_steadystate(benchmark, model_steady, size, request):
     group = "steadystate-" + group
     benchmark.group = group
 
-    if model_steady == 'Cavity':
+    if model_steady == "Cavity":
         H, _, c_ops, _ = cavity_setup(size)
 
-    elif model_steady == 'Jaynes-Cummings':
+    elif model_steady == "Jaynes-Cummings":
         H, _, c_ops, _ = jc_setup(size)
 
     result = benchmark(steadystate, H, c_ops)

@@ -5,19 +5,24 @@ import numpy as np
 
 
 @pytest.fixture(params=np.logspace(1, 9, 9, base=2, dtype=int).tolist())
-def size(request): return request.param
+def size(request):
+    return request.param
 
 
 @pytest.fixture(params=["dense", "sparse"])
-def density(request): return request.param
+def density(request):
+    return request.param
 
 
-coeftype = ['function', 'array', 'string']
+coeftype = ["function", "array", "string"]
+
+
 @pytest.fixture(params=coeftype)
-def coeftype(request): return request.param
+def coeftype(request):
+    return request.param
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def left_QobjEvo(size, density, coeftype):
     """Return a random QobjEvo of size `sizexsize'. Density is either 'dense'
     or 'sparse' and returns a fully dense or a reandomly sparse matrix
@@ -25,20 +30,22 @@ def left_QobjEvo(size, density, coeftype):
 
     # Creating static Qobj
     if density == "sparse":
-        q_obj = qutip.rand_herm(size, density=1/size)
+        q_obj = qutip.rand_herm(size, density=1 / size)
 
     elif density == "dense":
         q_obj = qutip.rand_herm(size, density=1)
 
     # Creating coefficients
     tlist = None
-    if coeftype == 'function':
+    if coeftype == "function":
+
         def cos_t(t):
             return np.cos(t)
+
         coeff = cos_t
 
-    elif coeftype == 'string':
-        coeff = 'cos(t)'
+    elif coeftype == "string":
+        coeff = "cos(t)"
 
     elif coeftype == "array":
         tlist = np.linspace(0, 10, 101)
@@ -49,7 +56,7 @@ def left_QobjEvo(size, density, coeftype):
     return qutip.QobjEvo([q_obj, coeff], tlist=tlist)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def right_ket(size):
     return qutip.rand_ket(size, density=1)
 
