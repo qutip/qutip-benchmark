@@ -18,7 +18,7 @@ jobs:
         uses: psf/black@stable
         with:
           options: "--line-length 79 --check --diff"
-          src: "./benchmarks"
+          src: "./qutip_benchmark"
 
       - name: Install dependencies 
         run: |
@@ -29,4 +29,4 @@ jobs:
           python -m pip install flake8-github-actions
 
       - name: "Run Flake8"
-        run: "flake8 benchmarks --format github"
+        run: "flake8 qutip_benchmark --format github"
