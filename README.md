@@ -43,18 +43,18 @@ and [Pytest-Benchmark documetation](https://pytest-benchmark.readthedocs.io/en/s
 for all command line flags.
 Examples:
 
--`python benchmarks/benchmarks.py -k"test_linear_algebra" --collect-only`:
+-`python -m qutip_benchmarks.cli.run_benchmarks -k "test_linear_algebra" --collect-only`:
 Shows all the available benchmarks. Useful to filter them with the `-k`
 argument. 
 
--`python benchmarks/benchmarks.py -k"matmul"`: Runs only the benchmarks for
+-`python -m qutip_benchmarks.cli.run_benchmarks -k "matmul"`: Runs only the benchmarks for
 `matmul`.
 
 Viewing the benchmarks
 -------
 The default method to view the benchmarks is by using:
 ```
-python benchmarks/view_benchmarks.py
+python -m qutip_benchmarks.cli.view_benchmarks
 ```
 This will plot the benchmarks in an identical manner to what is found on the Qutip's benchmark [website](https://qutip.org/qutip-benchmark).
 

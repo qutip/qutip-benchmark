@@ -9,7 +9,7 @@ Getting the paths to the bench folders
 
 
 ```python
-from benchmarks.view_utilities import *
+from qutip_benchmark.view_utilities import *
 from pathlib import Path
 
 #Set the folder containing all the bench files
