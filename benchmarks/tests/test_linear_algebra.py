@@ -7,16 +7,19 @@ import numpy as np
 
 # Available datatypes (using qutip_dense and qutip_csr to avoid confusion
 # with density parameters)
-@pytest.fixture(params=['numpy', 'scipy_csr', 'qutip_dense', 'qutip_csr'])
-def dtype(request): return request.param
+@pytest.fixture(params=["numpy", "scipy_csr", "qutip_dense", "qutip_csr"])
+def dtype(request):
+    return request.param
 
 
 @pytest.fixture(params=np.logspace(1, 9, 9, base=2, dtype=int).tolist())
-def size(request): return request.param
+def size(request):
+    return request.param
 
 
 @pytest.fixture(params=["dense", "sparse"])
-def density(request): return request.param
+def density(request):
+    return request.param
 
 
 @pytest.fixture()
@@ -26,17 +29,17 @@ def left_oper(size, density, dtype):
     The matrices are Hermitian."""
 
     if density == "sparse":
-        res = qutip.rand_herm(size, density=1/size)
+        res = qutip.rand_herm(size, density=1 / size)
     elif density == "dense":
         res = qutip.rand_herm(size, density=1)
 
-    if dtype == 'numpy':
+    if dtype == "numpy":
         return res.full()
-    elif dtype == 'scipy_csr':
+    elif dtype == "scipy_csr":
         return scipy.sparse.csr_matrix(res.full())
-    if dtype == 'qutip_dense':
+    if dtype == "qutip_dense":
         return res.to("dense")
-    if dtype == 'qutip_csr':
+    if dtype == "qutip_csr":
         return res.to("csr")
     raise Exception("The specified dtype is invalid")
 
@@ -48,17 +51,17 @@ def right_oper(size, density, dtype):
     The matrices are Hermitian."""
 
     if density == "sparse":
-        res = qutip.rand_herm(size, density=1/size)
+        res = qutip.rand_herm(size, density=1 / size)
     elif density == "dense":
         res = qutip.rand_herm(size, density=1)
 
-    if dtype == 'numpy':
+    if dtype == "numpy":
         return res.full()
-    elif dtype == 'scipy_csr':
+    elif dtype == "scipy_csr":
         return scipy.sparse.csr_matrix(res.full())
-    if dtype == 'qutip_dense':
+    if dtype == "qutip_dense":
         return res.to("dense")
-    if dtype == 'qutip_csr':
+    if dtype == "qutip_csr":
         return res.to("csr")
     raise Exception("The specified dtype is invalid")
 
@@ -70,19 +73,19 @@ def right_ket(size, density, dtype):
     else:
         res = qutip.rand_ket(size, density=1)
 
-    if dtype == 'numpy':
+    if dtype == "numpy":
         return res.full()
-    if dtype == 'scipy_csr':
+    if dtype == "scipy_csr":
         return scipy.sparse.csr_matrix(res.full())
-    if dtype == 'qutip_dense':
+    if dtype == "qutip_dense":
         return res.to("dense")
-    if dtype == 'qutip_csr':
+    if dtype == "qutip_csr":
         return res.to("csr")
     raise Exception("The specified dtype is invalid")
 
 
 def matmul(left, right):
-    return left@right
+    return left @ right
 
 
 @pytest.mark.nightly
@@ -94,7 +97,7 @@ def test_add(benchmark, left_oper, right_oper, request):
 
     # Operation to be benchmarked
     def add(left, right):
-        return left+right
+        return left + right
 
     # Run benchmark
     result = benchmark(add, left_oper, right_oper)
