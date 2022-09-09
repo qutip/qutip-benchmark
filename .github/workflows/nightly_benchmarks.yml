@@ -74,7 +74,7 @@ jobs:
 
       - name: run benchmarks
         run: |
-          python benchmarks/benchmarks.py -m "nightly" -v 
+          python -m qutip_benchmark.cli.run_benchmarks -m nightly -v 
         
       - name: Create artefact containing benchmarks
         uses: actions/upload-artifact@v2
@@ -92,8 +92,8 @@ jobs:
       
       - name: create plots
         run: |
-          python benchmarks/view_benchmarks.py --nightly --plotpath website/images/plots/nightly
-          python benchmarks/view_benchmarks.py --scaling --plotpath website/images/plots/scaling
+          python -m qutip_benchmark.cli.view_benchmarks --nightly --plotpath website/images/plots/nightly
+          python qutip_benchmark.cli.view_benchmarks --scaling --plotpath website/images/plots/scaling
 
       - name: publish website
         run: | 

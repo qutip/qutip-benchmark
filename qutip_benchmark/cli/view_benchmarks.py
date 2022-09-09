@@ -1,5 +1,5 @@
 import argparse
-from view_utilities import default_nightly_plots, default_scaling_plots
+from qutip_benchmark.view_utilities import default_nightly_plots, default_scaling_plots
 
 
 def main():

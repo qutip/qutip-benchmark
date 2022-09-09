@@ -47,7 +47,7 @@ def run_benchmarks(args):
     "Run pytest benchmark with sensible defaults."
     pytest.main(
         [
-            "benchmarks/tests",
+            "qutip_benchmark/benchmarks",
             "--benchmark-only",
             "--benchmark-columns=Mean,StdDev,rounds,Iterations",
             "--benchmark-sort=name",
