@@ -17,7 +17,9 @@ def get_latest_benchmark():
     """Returns the path to the latest benchmark run from `./.benchmarks/`"""
 
     benchmark_paths = glob.glob("./.benchmarks/*/*.json")
-    dates = ["".join(_b.split("/")[-1].split("_")[2:4]) for _b in benchmark_paths]
+    dates = [
+        "".join(_b.split("/")[-1].split("_")[2:4]) for _b in benchmark_paths
+    ]
     benchmarks = {date: value for date, value in zip(dates, benchmark_paths)}
 
     dates.sort()
@@ -72,6 +74,7 @@ def main(args=[]):
     benchmark_latest = get_latest_benchmark()
     add_packages_to_json(benchmark_latest)
     return exit_code
+
 
 if __name__ == "__main__":
     sys.exit(main())
