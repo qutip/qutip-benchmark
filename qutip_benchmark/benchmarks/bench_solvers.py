@@ -6,7 +6,7 @@ from qutip.solver.mcsolve import mcsolve
 from qutip.solve.steadystate import steadystate
 
 
-@pytest.fixture(params=np.logspace(2, 8, 7, base=2, dtype=int).tolist())
+@pytest.fixture(params=np.logspace(2, 7, 6, base=2, dtype=int).tolist())
 def size(request):
     return request.param
 
