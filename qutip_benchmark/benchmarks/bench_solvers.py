@@ -153,7 +153,6 @@ def bench_mesolve(benchmark, model_solve, size):
 def bench_mcsolve(benchmark, model_solve, size):
     benchmark.group = "solvers:monte-carlo"
 
-
     if model_solve == "Cavity":
         H, psi0, c_ops, e_ops = cavity_setup(size)
     elif model_solve == "Jaynes-Cummings":
@@ -168,7 +167,6 @@ def bench_mcsolve(benchmark, model_solve, size):
 @pytest.mark.nightly
 def bench_steadystate(benchmark, model_steady, size):
     benchmark.group = "solvers:steadystate"
-
 
     if model_steady == "Cavity":
         H, _, c_ops, _ = cavity_setup(size)
