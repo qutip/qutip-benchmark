@@ -218,7 +218,7 @@ def column_filtering(df, filters, key):
     ----------
     df : Dataframe
         dataframe to be filtered.
-    
+
     filters : dict
         dict of the form {column_name: [deleted_values]}, filters the data by
         the given values for each column, the name can be a substring of
