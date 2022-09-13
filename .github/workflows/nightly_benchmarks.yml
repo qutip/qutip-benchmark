@@ -73,17 +73,7 @@ jobs:
 
       - name: Run benchmarks
         run: |
-          mapfile -t output < <( python benchmarks/benchmarks.py -v -m nightly )
-          echo "::set-output name=result::${output[-1]}"
-          printf "%s\n" "${output[@]}"
-        id: bench_results
-
-      - name: Check for failed benchmarks
-        if: contains(steps.bench_results.outputs.result, 'failed')
-        uses: actions/github-script@v3
-        with:
-          script: |
-              core.setFailed('One or more benchmarks failed')
+          python benchmarks/benchmarks.py -v -m nightly
         
       - name: Create artefact containing benchmarks
         uses: actions/upload-artifact@v2
