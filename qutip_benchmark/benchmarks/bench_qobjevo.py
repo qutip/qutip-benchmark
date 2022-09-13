@@ -66,12 +66,8 @@ def matmul(left, right):
 
 
 @pytest.mark.nightly
-def bench_matmul_QobjEvo_ket(benchmark, left_QobjEvo, right_ket, request):
-    # Group benchmark by operation, density and size.
-    group = request.node.callspec.id
-    group = "Matmul_QobjEvo_op@ket-" + group
-    benchmark.group = group
-    # Benchmark operations and skip those that are not implemented.
+def bench_matmul_QobjEvo_ket(benchmark, left_QobjEvo, right_ket):
+    benchmark.group = "math:matmul:qobjevo-op-times-ket"
 
     result = benchmark(matmul, left_QobjEvo, right_ket)
 

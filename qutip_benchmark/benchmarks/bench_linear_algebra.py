@@ -89,11 +89,8 @@ def matmul(left, right):
 
 
 @pytest.mark.nightly
-def bench_add(benchmark, left_oper, right_oper, request):
-    # Group benchmark by operation, density and size.
-    group = request.node.callspec.id
-    group = "Add-" + group
-    benchmark.group = group
+def bench_add(benchmark, left_oper, right_oper):
+    benchmark.group = "math:add:op-plus-ket"
 
     # Operation to be benchmarked
     def add(left, right):
@@ -106,11 +103,8 @@ def bench_add(benchmark, left_oper, right_oper, request):
 
 
 @pytest.mark.nightly
-def bench_matmul_oper_oper(benchmark, left_oper, right_oper, request):
-    # Group benchmark by operation, density and size.
-    group = request.node.callspec.id
-    group = "Matmul_op@op-" + group
-    benchmark.group = group
+def bench_matmul_oper_oper(benchmark, left_oper, right_oper):
+    benchmark.group = "math:matmul:op-times-op"
 
     # Benchmark operations
     result = benchmark(matmul, left_oper, right_oper)
@@ -119,11 +113,8 @@ def bench_matmul_oper_oper(benchmark, left_oper, right_oper, request):
 
 
 @pytest.mark.nightly
-def bench_matmul_oper_ket(benchmark, left_oper, right_ket, request):
-    # Group benchmark by operation, density and size.
-    group = request.node.callspec.id
-    group = "Matmul_op@ket-" + group
-    benchmark.group = group
+def bench_matmul_oper_ket(benchmark, left_oper, right_ket):
+    benchmark.group = "math:matmul:op-times-ket"
 
     # Run benchmark
     result = benchmark(matmul, left_oper, right_ket)

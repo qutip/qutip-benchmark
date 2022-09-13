@@ -30,8 +30,7 @@ def json_to_dataframe(filepath):
         data = pd.json_normalize(data_json["benchmarks"], sep="_")
 
         # Set operation from group name
-        data["params_operation"] = data.group.str.split("-")
-        data.params_operation = [d[0] for d in data.params_operation]
+        data["params_operation"] = data.group
 
         # Add time and cpu to dataframe
         data["cpu"] = data_json["machine_info"]["cpu"]["brand_raw"]
