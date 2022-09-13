@@ -136,11 +136,8 @@ def qubit_setup(size):
 
 
 @pytest.mark.nightly
-def bench_mesolve(benchmark, model_solve, size, request):
-    # Group benchmark by operation, density and size.
-    group = request.node.callspec.id
-    group = "mesolve-" + group
-    benchmark.group = group
+def bench_mesolve(benchmark, model_solve, size):
+    benchmark.group = "solvers:master-equation"
 
     if model_solve == "Cavity":
         H, psi0, c_ops, e_ops = cavity_setup(size)
@@ -153,11 +150,8 @@ def bench_mesolve(benchmark, model_solve, size, request):
     return result
 
 
-def bench_mcsolve(benchmark, model_solve, size, request):
-    # Group benchmark by operation, density and size.
-    group = request.node.callspec.id
-    group = "mcsolve-" + group
-    benchmark.group = group
+def bench_mcsolve(benchmark, model_solve, size):
+    benchmark.group = "solvers:monte-carlo"
 
     if model_solve == "Cavity":
         H, psi0, c_ops, e_ops = cavity_setup(size)
@@ -171,11 +165,8 @@ def bench_mcsolve(benchmark, model_solve, size, request):
 
 
 @pytest.mark.nightly
-def bench_steadystate(benchmark, model_steady, size, request):
-    # Group benchmark by operation, density and size.
-    group = request.node.callspec.id
-    group = "steadystate-" + group
-    benchmark.group = group
+def bench_steadystate(benchmark, model_steady, size):
+    benchmark.group = "solvers:steadystate"
 
     if model_steady == "Cavity":
         H, _, c_ops, _ = cavity_setup(size)
