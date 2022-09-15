@@ -216,6 +216,9 @@ def column_filtering(df, filters, key):
 
     Parameters
     ----------
+    df : Dataframe
+        dataframe to be filtered.
+
     filters : dict
         dict of the form {column_name: [deleted_values]}, filters the data by
         the given values for each column, the name can be a substring of
@@ -224,11 +227,8 @@ def column_filtering(df, filters, key):
         contain "Platinum" in the 'cpu' column or 32 or 128 in the
         'param_size' column.
 
-    params_dict : dict
-        dict of the form {param_name: value}
-
     key: str
-    Id of the plot on which the filtering is being done
+        Id of the plot on which the filtering is being done
 
     Returns
     -------
