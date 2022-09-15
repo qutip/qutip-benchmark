@@ -73,7 +73,7 @@ jobs:
 
       - name: Run benchmarks
         run: |
-          python benchmarks/benchmarks.py -v -m nightly
+          -m qutip_benchmark.cli.run_benchmarks -m nightly -v
         
       - name: Create artefact containing benchmarks
         uses: actions/upload-artifact@v2
