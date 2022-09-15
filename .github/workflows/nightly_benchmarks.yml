@@ -92,7 +92,7 @@ jobs:
       - name: create plots
         run: |
           python -m qutip_benchmark.cli.view_benchmarks --nightly --plotpath website/images/plots/nightly
-          python qutip_benchmark.cli.view_benchmarks --scaling --plotpath website/images/plots/scaling
+          python -m qutip_benchmark.cli.view_benchmarks --scaling --plotpath website/images/plots/scaling
 
       - name: publish website
         run: | 
