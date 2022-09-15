@@ -2,6 +2,7 @@ import json
 import pytest
 import argparse
 import glob
+import sys
 from importlib.metadata import version, PackageNotFoundError
 
 
@@ -45,7 +46,7 @@ def add_packages_to_json(filepath):
 
 def run_benchmarks(args):
     "Run pytest benchmark with sensible defaults."
-    pytest.main(
+    return pytest.main(
         [
             "qutip_benchmark/benchmarks",
             "--benchmark-only",
@@ -69,10 +70,11 @@ def main(args=[]):
 
     args, other_args = parser.parse_known_args()
 
-    run_benchmarks(other_args)
+    exit_code = run_benchmarks(other_args)
     benchmark_latest = get_latest_benchmark()
     add_packages_to_json(benchmark_latest)
+    return exit_code
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

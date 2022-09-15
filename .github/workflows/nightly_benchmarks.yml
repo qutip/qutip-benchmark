@@ -6,7 +6,6 @@ on:
     # Run every day at midnight
     - cron: "0 0 * * *"
 
-
 defaults:
   run:
     # The slightly odd shell call is to force bash to read .bashrc, which is
@@ -72,9 +71,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.QUTIP_BENCHMARK_S3_SECRET }}
           AWS_EC2_METADATA_DISABLED: true
 
-      - name: run benchmarks
+      - name: Run benchmarks
         run: |
-          python -m qutip_benchmark.cli.run_benchmarks -m nightly -v 
+          python -m qutip_benchmark.cli.run_benchmarks -m nightly -v
         
       - name: Create artefact containing benchmarks
         uses: actions/upload-artifact@v2
@@ -93,7 +92,7 @@ jobs:
       - name: create plots
         run: |
           python -m qutip_benchmark.cli.view_benchmarks --nightly --plotpath website/images/plots/nightly
-          python qutip_benchmark.cli.view_benchmarks --scaling --plotpath website/images/plots/scaling
+          python -m qutip_benchmark.cli.view_benchmarks --scaling --plotpath website/images/plots/scaling
 
       - name: publish website
         run: | 
