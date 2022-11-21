@@ -113,6 +113,9 @@ jobs:
           svn export https://github.com/qutip/qutip.github.io/trunk/header_source
           svn export https://github.com/qutip/qutip.github.io/trunk/images
 
+          # Add additional includes
+          cp -r _includes_extra/* _includes
+
           # build the website
           python create_index.py
           bundle install
