@@ -84,7 +84,7 @@ jobs:
   publish:
     needs: benchmarks
     runs-on: ubuntu-latest
-    if: ${{ github.repository == 'qutip/qutip-benchmark' && github.ref == 'refs/heads/master' }}
+    # if: ${{ github.repository == 'qutip/qutip-benchmark' && github.ref == 'refs/heads/master' }}
     steps:
       - uses: actions/checkout@v3
 
