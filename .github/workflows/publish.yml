@@ -35,7 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-           conda install pandas matplotlib
+           mamba install pandas matplotlib
 
       - name: Download benchmark data from S3
         run: |
@@ -47,8 +47,8 @@ jobs:
 
       - name: Generate benchmark plots
         run: |
-          python -m qutip_benchmark.cli.view_benchmarks --nightly --plotpath website/images/plots/nightly
-          python -m qutip_benchmark.cli.view_benchmarks --scaling --plotpath website/images/plots/scaling
+          python -m qutip_benchmark.cli.view_benchmarks --nightly --plotpath website/plots/nightly
+          python -m qutip_benchmark.cli.view_benchmarks --scaling --plotpath website/plots/scaling
 
       - name: Build website with Jekyll
         run: |
