@@ -53,7 +53,7 @@ jobs:
       - name: Build website with Jekyll
         run: |
           sudo gem install bundler jekyll
-          sudo apt-get install wget subversion
+          sudo apt-get install subversion
           cd website
 
           # Download resources from qutip.github.io repository
