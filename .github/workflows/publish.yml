@@ -23,6 +23,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: actions-bench
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          use-mamba: true
+
+      - name: Install dependencies
+        run: |
+           conda install pandas matplotlib
+
       - name: Download benchmark data from S3
         run: |
           aws s3 cp s3://qutip-benchmark-data/nightly ./.benchmarks --recursive
