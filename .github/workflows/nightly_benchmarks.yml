@@ -14,9 +14,8 @@ defaults:
     # things much simpler.
     shell: bash -l {0}
 
-
 jobs:
-  cases:
+  benchmarks:
     name: ${{ matrix.os }}, python${{ matrix.python-version }}, ${{ matrix.case-name }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -44,16 +43,16 @@ jobs:
            conda install pytest pytest-benchmark
            conda install pandas matplotlib
            python -m pip install pygal pygaljs
-           
+
       - name: Install Qutip
         run: |
            python -m pip install git+https://github.com/qutip/qutip@dev.major
-    
+
       - name: Package information
         run: |
           conda list
           python -c "import qutip; qutip.about()"
-     
+
       - name: Environment information
         run: |
           uname -a
@@ -63,21 +62,13 @@ jobs:
               free -h
           fi
 
-      - name: download from s3
-        run: |
-          aws s3 cp s3://qutip-benchmark-data/nightly ./.benchmarks --recursive
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.QUTIP_BENCHMARK_S3_KEYID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.QUTIP_BENCHMARK_S3_SECRET }}
-          AWS_EC2_METADATA_DISABLED: true
-
       - name: Run benchmarks
         run: |
           python -m qutip_benchmark.cli.run_benchmarks -m nightly -v
-        
+
       - name: Create artefact containing benchmarks
-        uses: actions/upload-artifact@v2
-        with: 
+        uses: actions/upload-artifact@v3
+        with:
           name: nightly_benchmarks
           path: .benchmarks
 
@@ -88,13 +79,3 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.QUTIP_BENCHMARK_S3_KEYID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.QUTIP_BENCHMARK_S3_SECRET }}
           AWS_EC2_METADATA_DISABLED: true
-      
-      - name: create plots
-        run: |
-          python -m qutip_benchmark.cli.view_benchmarks --nightly --plotpath website/images/plots/nightly
-          python -m qutip_benchmark.cli.view_benchmarks --scaling --plotpath website/images/plots/scaling
-
-      - name: publish website
-        run: | 
-          python -m pip install ghp-import
-          ghp-import -m "Automatic push by ghp-import" -f -p -o -r origin -b gh-pages website
