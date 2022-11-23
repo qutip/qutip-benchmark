@@ -1,19 +1,81 @@
 ---
-title: Quantum Toolbox in Python
+title: QuTiP Benchmarks
 ---
 {% include header.html %}
 {% include navbar.html %}
-{% include navbar_benchmark.html %}
 
 <div class="row">
 <div class="col-md-9">
 
+<h2>QuTiP benchmarks</h2>
 
-<div class="row">
-    <div class="col-md-12">
-        <p>Welcome to QuTiP benchmarks: Please choose an operation from the menu above.</p>
-    </div>
-    </div>
+<p>QuTiP benchmarks are run nightly on GitHub Actions. Two different kinds of
+  plots are produced -- historical and scaling.
+</p>
+
+<p><em>Historical</em> plots show the changes in benchmark performance
+  over the last month.
+</p>
+
+<p><em>Scaling</em> plots show the lastest benchmark performance as a
+  function of the size of the data. The data might be a Qobj, QobjEvo or
+  a system Hamiltonian.
+</p>
+
+<p>Where possible, we compare QuTiP performance to the equivalent raw numpy
+  and SciPy operations.
+</p>
+
+<p>You can view the plots by clicking on the links below or using the
+  navigation bar above.
+</p>
+
+<h3>Historical plots</h3>
+
+<ul>
+  <li><a href="/qutip-benchmark/ops/add.html">Qobj Add</a></li>
+  <li><a href="/qutip-benchmark/ops/matmul.html">Qobj Matmul</a></li>
+  <li><a href="/qutip-benchmark/ops/qobjevo.html">QobjEvo @ Ket</a></li>
+  <li><a href="/qutip-benchmark/ops/solve.html">Solvers</a></li>
+</ul>
+
+<h3>Scaling plots</h3>
+
+<ul>
+  <li><a href="/qutip-benchmark/ops/s_add_qobjevo.html">Qobj Add and QobjEvo Matmul</a></li>
+  <li><a href="/qutip-benchmark/ops/s_matmul.html">Qobj Matmul</a></li>
+  <li><a href="/qutip-benchmark/ops/s_solve.html">Solvers</a></li>
+</ul>
+
+<h3>Benchmarking process</h3>
+
+<p>Benchmarking on GitHub Actions comes with some challenges. GitHub Action
+  runners are randomly assigned and the underlying hardware is not consistent.
+  We account for this by showing separate lines on each plot for the most
+  commonly provided CPUs.
+</p>
+
+<p>The downside is that the plots are more cluttered, but the upside is that
+  they give a clearer picture of performance across a range of typical
+  CPUs used in cloud data centres.
+</p>
+
+
+<h3>Contributing</h3>
+
+<p>The benchmarks are maintained in the
+  <a href="https://www.github.com/qutip/qutip-benchmark">qutip-benchmark</a>
+  repository. Suggestions for new benchmarks or bug reports are welcome (please
+  open an issue or pull reuqest).
+</p>
+
+<p>If you or your company would like to support the benchmarking effort QuTiP
+  would welcome contributions towards running benchmarks, either by offering to
+  pay for running benchmarks on additional cloud instances (e.g. machines with
+  better CPUs, more RAM, GPUs) or by offering to run benchmarks on dedicated
+  hardware you have available. If this interests you, please email the
+  <a href="mailto:qutip-admin@googlegroups.com ">qutip-admin</a> mailing list.
+</p>
 
 </div> <!-- col-md-9 main content div -->
 </div> <!-- main row div -->
