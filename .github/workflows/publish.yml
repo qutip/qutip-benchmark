@@ -52,7 +52,7 @@ jobs:
 
       - name: Build website with Jekyll
         run: |
-          sudo gem install bundler jekyll
+          gem install --user-install bundler jekyll
           sudo apt-get install subversion
           cd website
 
