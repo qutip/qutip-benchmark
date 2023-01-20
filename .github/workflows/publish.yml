@@ -52,7 +52,7 @@ jobs:
 
       - name: Build website with Jekyll
         run: |
-          gem install --user-install bundler jekyll
+          sudo gem install jekyll
           sudo apt-get install subversion
           cd website
 
@@ -66,8 +66,7 @@ jobs:
           cp -r _includes_extra/* _includes
 
           # build the website
-          bundle install
-          bundle exec jekyll build
+          jekyll build
 
       - name: Publish benchmarks
         run: |
