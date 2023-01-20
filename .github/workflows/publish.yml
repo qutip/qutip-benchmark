@@ -67,8 +67,8 @@ jobs:
 
           # build the website
           bundle config path .gems
-          bundler install
-          bundler exec jekyll build
+          bundle install
+          bundle exec jekyll build
 
       - name: Publish benchmarks
         run: |
