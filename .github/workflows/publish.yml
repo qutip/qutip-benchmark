@@ -66,6 +66,7 @@ jobs:
           cp -r _includes_extra/* _includes
 
           # build the website
+          bundle config path .gems
           bundler install
           bundler exec jekyll build
 
