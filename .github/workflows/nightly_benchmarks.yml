@@ -16,8 +16,10 @@ defaults:
 
 jobs:
   benchmarks:
+    # if: github.repository == 'qutip/qutip-benchmark'
     name: ${{ matrix.os }}, python${{ matrix.python-version }}, ${{ matrix.case-name }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -26,7 +28,7 @@ jobs:
         case-name: [defaults]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: actions-bench

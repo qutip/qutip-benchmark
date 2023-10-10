@@ -6,21 +6,21 @@ jobs:
   lint-black:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 
-        uses: "actions/checkout@v2"
+      - name: Checkout
+        uses: "actions/checkout@v4"
 
-      - name: Setup Python 
+      - name: Setup Python
         uses: "actions/setup-python@v2"
         with:
           python-version: "3.10"
-     
+
       - name: Black
         uses: psf/black@stable
         with:
           options: "--line-length 79 --check --diff"
           src: "./qutip_benchmark"
 
-      - name: Install dependencies 
+      - name: Install dependencies
         run: |
           python -VV
           python -m site
