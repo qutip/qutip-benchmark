@@ -465,7 +465,6 @@ def plot_data(data, x_axis, y_axis, x_log, y_log, path):
     markers = ["o--", "x-", "v:", "1-.", "*:"]
     i = 0
     for plot in data:
-
         line_sep = data[plot]["line_sep"]
         df = data[plot]["data"]
         cols = list(df.columns)

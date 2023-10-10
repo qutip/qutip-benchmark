@@ -53,6 +53,8 @@ def run_benchmarks(args):
             "--benchmark-columns=Mean,StdDev,rounds,Iterations",
             "--benchmark-sort=name",
             "--benchmark-autosave",
+            "--durations=0",
+            "--durations-min=1.0",
             "-Wdefault",
         ]
         + args

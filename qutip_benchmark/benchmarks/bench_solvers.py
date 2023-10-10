@@ -160,7 +160,7 @@ def bench_mcsolve(benchmark, model_solve, size):
     elif model_solve == "Qubit Spin Chain":
         H, psi0, c_ops, e_ops = qubit_setup(size)
 
-    result = benchmark(mcsolve, H, psi0, tlist, c_ops, e_ops)
+    result = benchmark(mcsolve, H, psi0, tlist, c_ops, e_ops, ntraj=1)
     return result
 
 
@@ -169,6 +169,8 @@ def bench_steadystate(benchmark, model_steady, size):
     benchmark.group = "solvers:steadystate"
 
     if model_steady == "Cavity":
+        if size >= 128:
+            pytest.skip("Slow test")
         H, _, c_ops, _ = cavity_setup(size)
 
     elif model_steady == "Jaynes-Cummings":

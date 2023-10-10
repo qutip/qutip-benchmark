@@ -19,9 +19,9 @@ defaults:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # if: ${{ github.repository == 'qutip/qutip-benchmark' && github.ref == 'refs/heads/master' }}
+    if: ${{ github.repository == 'qutip/qutip-benchmark' && github.ref == 'refs/heads/master' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
