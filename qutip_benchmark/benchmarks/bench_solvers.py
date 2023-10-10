@@ -169,7 +169,8 @@ def bench_steadystate(benchmark, model_steady, size):
     benchmark.group = "solvers:steadystate"
 
     if model_steady == "Cavity":
-        pytest.skipif(size >= 128, "Too slow")
+        if size >= 128:
+            pytest.skip("Slow test")
         H, _, c_ops, _ = cavity_setup(size)
 
     elif model_steady == "Jaynes-Cummings":
