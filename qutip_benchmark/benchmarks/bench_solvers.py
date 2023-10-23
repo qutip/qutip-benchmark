@@ -42,10 +42,10 @@ def jc_setup(size):
 
     # Hamiltonian
     Ia = qutip.qeye(2)
-    Ic = qutip.qeye(size)
+    Ic = qutip.qeye(size, dtype="csr")
 
-    a = qutip.destroy(size)
-    a_dag = qutip.create(size)
+    a = qutip.destroy(size, dtype="csr")
+    a_dag = qutip.create(size, dtype="csr")
     n = a_dag * a
 
     sm = qutip.sigmam()
@@ -169,9 +169,10 @@ def bench_steadystate(benchmark, model_steady, size):
     benchmark.group = "solvers:steadystate"
 
     if model_steady == "Cavity":
-        if size >= 128:
-            pytest.skip("Slow test")
         H, _, c_ops, _ = cavity_setup(size)
+        # Steadystate is bad with Dia.
+        H = H.to("csr")
+        c_ops = [c_ops[0].to("csr")]
 
     elif model_steady == "Jaynes-Cummings":
         H, _, c_ops, _ = jc_setup(size)
