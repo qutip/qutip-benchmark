@@ -70,5 +70,3 @@ def bench_matmul_QobjEvo_ket(benchmark, left_QobjEvo, right_ket):
     benchmark.group = "math:matmul:qobjevo-op-times-ket"
 
     result = benchmark(matmul, left_QobjEvo, right_ket)
-
-    return result

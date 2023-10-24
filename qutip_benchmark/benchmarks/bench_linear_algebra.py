@@ -107,8 +107,6 @@ def bench_add(benchmark, left_oper, right_oper):
     # Run benchmark
     result = benchmark(add, left_oper, right_oper)
 
-    return result
-
 
 @pytest.mark.nightly
 def bench_matmul_oper_oper(benchmark, left_oper, right_oper):
@@ -117,8 +115,6 @@ def bench_matmul_oper_oper(benchmark, left_oper, right_oper):
     # Benchmark operations
     result = benchmark(matmul, left_oper, right_oper)
 
-    return result
-
 
 @pytest.mark.nightly
 def bench_matmul_oper_ket(benchmark, left_oper, right_ket):
@@ -126,5 +122,3 @@ def bench_matmul_oper_ket(benchmark, left_oper, right_ket):
 
     # Run benchmark
     result = benchmark(matmul, left_oper, right_ket)
-
-    return result
