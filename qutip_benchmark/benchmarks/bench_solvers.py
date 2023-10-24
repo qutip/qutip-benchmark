@@ -146,7 +146,7 @@ def bench_mesolve(benchmark, model_solve, size):
     elif model_solve == "Qubit Spin Chain":
         H, psi0, c_ops, e_ops = qubit_setup(size)
 
-    result = benchmark(mesolve, H, psi0, tlist, c_ops, e_ops)
+    benchmark(mesolve, H, psi0, tlist, c_ops, e_ops)
 
 
 def bench_mcsolve(benchmark, model_solve, size):
@@ -159,7 +159,7 @@ def bench_mcsolve(benchmark, model_solve, size):
     elif model_solve == "Qubit Spin Chain":
         H, psi0, c_ops, e_ops = qubit_setup(size)
 
-    result = benchmark(mcsolve, H, psi0, tlist, c_ops, e_ops, ntraj=1)
+    benchmark(mcsolve, H, psi0, tlist, c_ops, e_ops, ntraj=1)
 
 
 @pytest.mark.nightly
@@ -175,4 +175,4 @@ def bench_steadystate(benchmark, model_steady, size):
     elif model_steady == "Jaynes-Cummings":
         H, _, c_ops, _ = jc_setup(size)
 
-    result = benchmark(steadystate, H, c_ops)
+    benchmark(steadystate, H, c_ops)
