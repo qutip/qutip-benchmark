@@ -42,10 +42,10 @@ def jc_setup(size):
 
     # Hamiltonian
     Ia = qutip.qeye(2)
-    Ic = qutip.qeye(size, dtype="csr")
+    Ic = qutip.qeye(size)
 
-    a = qutip.destroy(size, dtype="csr")
-    a_dag = qutip.create(size, dtype="csr")
+    a = qutip.destroy(size)
+    a_dag = qutip.create(size)
     n = a_dag * a
 
     sm = qutip.sigmam()
@@ -146,7 +146,8 @@ def bench_mesolve(benchmark, model_solve, size):
     elif model_solve == "Qubit Spin Chain":
         H, psi0, c_ops, e_ops = qubit_setup(size)
 
-    benchmark(mesolve, H, psi0, tlist, c_ops, e_ops)
+    result = benchmark(mesolve, H, psi0, tlist, c_ops, e_ops)
+    return result
 
 
 def bench_mcsolve(benchmark, model_solve, size):
@@ -159,7 +160,8 @@ def bench_mcsolve(benchmark, model_solve, size):
     elif model_solve == "Qubit Spin Chain":
         H, psi0, c_ops, e_ops = qubit_setup(size)
 
-    benchmark(mcsolve, H, psi0, tlist, c_ops, e_ops, ntraj=1)
+    result = benchmark(mcsolve, H, psi0, tlist, c_ops, e_ops, ntraj=1)
+    return result
 
 
 @pytest.mark.nightly
@@ -167,12 +169,12 @@ def bench_steadystate(benchmark, model_steady, size):
     benchmark.group = "solvers:steadystate"
 
     if model_steady == "Cavity":
+        if size >= 128:
+            pytest.skip("Slow test")
         H, _, c_ops, _ = cavity_setup(size)
-        # Steadystate is bad with Dia.
-        H = H.to("csr")
-        c_ops = [c_ops[0].to("csr")]
 
     elif model_steady == "Jaynes-Cummings":
         H, _, c_ops, _ = jc_setup(size)
 
-    benchmark(steadystate, H, c_ops)
+    result = benchmark(steadystate, H, c_ops)
+    return result
