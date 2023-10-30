@@ -7,7 +7,9 @@ import numpy as np
 
 # Available datatypes (using qutip_dense and qutip_csr to avoid confusion
 # with density parameters)
-@pytest.fixture(params=["numpy", "scipy_csr", "qutip_dense", "qutip_csr"])
+@pytest.fixture(
+    params=["numpy", "scipy_csr", "qutip_dense", "qutip_csr", "qutip_dia"]
+)
 def dtype(request):
     return request.param
 
@@ -41,6 +43,8 @@ def left_oper(size, density, dtype):
         return res.to("dense")
     if dtype == "qutip_csr":
         return res.to("csr")
+    if dtype == "qutip_dia":
+        return res.to("dia")
     raise Exception("The specified dtype is invalid")
 
 
@@ -63,6 +67,8 @@ def right_oper(size, density, dtype):
         return res.to("dense")
     if dtype == "qutip_csr":
         return res.to("csr")
+    if dtype == "qutip_dia":
+        return res.to("dia")
     raise Exception("The specified dtype is invalid")
 
 
@@ -81,6 +87,8 @@ def right_ket(size, density, dtype):
         return res.to("dense")
     if dtype == "qutip_csr":
         return res.to("csr")
+    if dtype == "qutip_dia":
+        return res.to("dia")
     raise Exception("The specified dtype is invalid")
 
 
@@ -97,9 +105,7 @@ def bench_add(benchmark, left_oper, right_oper):
         return left + right
 
     # Run benchmark
-    result = benchmark(add, left_oper, right_oper)
-
-    return result
+    benchmark(add, left_oper, right_oper)
 
 
 @pytest.mark.nightly
@@ -107,9 +113,7 @@ def bench_matmul_oper_oper(benchmark, left_oper, right_oper):
     benchmark.group = "math:matmul:op-times-op"
 
     # Benchmark operations
-    result = benchmark(matmul, left_oper, right_oper)
-
-    return result
+    benchmark(matmul, left_oper, right_oper)
 
 
 @pytest.mark.nightly
@@ -117,6 +121,4 @@ def bench_matmul_oper_ket(benchmark, left_oper, right_ket):
     benchmark.group = "math:matmul:op-times-ket"
 
     # Run benchmark
-    result = benchmark(matmul, left_oper, right_ket)
-
-    return result
+    benchmark(matmul, left_oper, right_ket)
