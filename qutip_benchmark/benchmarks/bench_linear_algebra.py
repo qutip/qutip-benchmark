@@ -19,7 +19,7 @@ def size(request):
     return request.param
 
 
-@pytest.fixture(params=["dense", "sparse"])
+@pytest.fixture(params=["dense", "sparse", "tridiag"])
 def density(request):
     return request.param
 
@@ -34,6 +34,9 @@ def left_oper(size, density, dtype):
         res = qutip.rand_herm(size, density=1 / size)
     elif density == "dense":
         res = qutip.rand_herm(size, density=1)
+    elif density == "tridiag":
+        a = qutip.destroy(size)
+        res = a + a.dag() + a*a.dag()
 
     if dtype == "numpy":
         return res.full()
