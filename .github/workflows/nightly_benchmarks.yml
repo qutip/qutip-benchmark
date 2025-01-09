@@ -79,3 +79,19 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.QUTIP_BENCHMARK_S3_KEYID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.QUTIP_BENCHMARK_S3_SECRET }}
           AWS_EC2_METADATA_DISABLED: true
+
+  finalise:
+    needs: publish
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open Issue on Failure
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [[ -z "${{ inputs.open_issue }}" ]] || [[ "${{ inputs.open_issue }}" != "False" ]];
+          then
+            pip install requests
+            python tools/report_failing_tests.py $GITHUB_TOKEN
+          fi
