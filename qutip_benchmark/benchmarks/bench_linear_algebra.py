@@ -1,4 +1,5 @@
 """This file contains the benchmarks that are run the benchmark.py script."""
+
 import pytest
 import qutip
 import scipy
@@ -19,13 +20,18 @@ def size(request):
     return request.param
 
 
+@pytest.fixture(params=["dense", "sparse", "tridiag"])
+def density_oper(request):
+    return request.param
+
+
 @pytest.fixture(params=["dense", "sparse"])
-def density(request):
+def density_ket(request):
     return request.param
 
 
 @pytest.fixture()
-def left_oper(size, density, dtype):
+def left_oper(size, density_oper, dtype):
     """Return a random matrix of size `sizexsize'. Density is either 'dense'
     or 'sparse' and returns a fully dense or a sparse matrix respectively.
     The matrices are Hermitian."""
@@ -34,6 +40,9 @@ def left_oper(size, density, dtype):
         res = qutip.rand_herm(size, density=1 / size)
     elif density == "dense":
         res = qutip.rand_herm(size, density=1)
+    elif density == "tridiag":
+        a = qutip.destroy(size)
+        res = a + a.dag() + a * a.dag()
 
     if dtype == "numpy":
         return res.full()
@@ -49,7 +58,7 @@ def left_oper(size, density, dtype):
 
 
 @pytest.fixture()
-def right_oper(size, density, dtype):
+def right_oper(size, density_oper, dtype):
     """Return a random matrix of size `sizexsize'. Density is either 'dense'
     or 'sparse' and returns a fully dense or a sparse matrix respectively.
     The matrices are Hermitian."""
@@ -58,6 +67,9 @@ def right_oper(size, density, dtype):
         res = qutip.rand_herm(size, density=1 / size)
     elif density == "dense":
         res = qutip.rand_herm(size, density=1)
+    elif density == "tridiag":
+        a = qutip.destroy(size)
+        res = a + a.dag() + a * a.dag()
 
     if dtype == "numpy":
         return res.full()
@@ -73,7 +85,7 @@ def right_oper(size, density, dtype):
 
 
 @pytest.fixture()
-def right_ket(size, density, dtype):
+def right_ket(size, density_ket, dtype):
     if density == "sparse":
         res = qutip.rand_ket(size, density=0.3)
     else:
