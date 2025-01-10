@@ -1,4 +1,5 @@
 """This file contains the benchmarks that are run the benchmark.py script."""
+
 import pytest
 import qutip
 import scipy
@@ -36,7 +37,7 @@ def left_oper(size, density, dtype):
         res = qutip.rand_herm(size, density=1)
     elif density == "tridiag":
         a = qutip.destroy(size)
-        res = a + a.dag() + a*a.dag()
+        res = a + a.dag() + a * a.dag()
 
     if dtype == "numpy":
         return res.full()

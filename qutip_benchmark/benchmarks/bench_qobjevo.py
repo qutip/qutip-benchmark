@@ -1,4 +1,5 @@
 """This file contains the benchmarks that are run the benchmark.py script."""
+
 import pytest
 import qutip
 import numpy as np
@@ -37,7 +38,7 @@ def left_QobjEvo(size, density, coeftype):
 
     elif density == "tridiag":
         a = qutip.destroy(size)
-        res = a + a.dag() + a*a.dag()
+        res = a + a.dag() + a * a.dag()
 
     # Creating coefficients
     tlist = None
