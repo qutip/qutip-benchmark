@@ -38,7 +38,7 @@ def left_QobjEvo(size, density, coeftype):
 
     elif density == "tridiag":
         a = qutip.destroy(size)
-        res = a + a.dag() + a * a.dag()
+        q_obj = a + a.dag() + a * a.dag()
 
     # Creating coefficients
     tlist = None
