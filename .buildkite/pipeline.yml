@@ -1,6 +1,6 @@
 # see: https://github.com/staticfloat/forerunner-buildkite-plugin
 steps:
-  - label: ":runner: Dynamically launch pipelines"
+  - label: ":runner: Dynamically launch benchmark pipeline"
     if: | 
         // Don't run Buildkite if the commit message includes the text [skip ci], [ci skip], or [no ci]
         // Don't run Buildkite for PR draft
@@ -19,4 +19,3 @@ steps:
             - ".buildkite/*"
             - "benchmark/*"
           target: ".buildkite/benchmark.yml" # trigger this pipeline
-    
