@@ -3,9 +3,10 @@ steps:
   - label: ":runner: Dynamically launch pipelines"
     plugins:
       - staticfloat/forerunner:
+          # only trigger the benchmark pipeline if the following folders are updated
           watch:
             - ".buildkite/*"
-            - "code_files..."
+            - "benchmark/*"
           target: ".buildkite/benchmark.yml"
     agents:
       queue: "juliagpu"
