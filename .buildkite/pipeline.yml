@@ -16,6 +16,6 @@ steps:
       - staticfloat/forerunner:
           # only trigger the benchmark pipeline if the following folders are updated
           watch:
-            - ".buildkite/*"
-            - "benchmark/*"
+            - ".buildkite/**"
+            - "benchmark/**"
           target: ".buildkite/benchmark.yml" # trigger this pipeline
