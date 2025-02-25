@@ -2,7 +2,7 @@
 steps:
   - label: ":runner: Dynamically launch pipelines"
     plugins:
-      - staticfloat/forerunner: # CUDA.jl tests
+      - staticfloat/forerunner:
           watch:
             - ".buildkite/*"
             - "code_files..."
