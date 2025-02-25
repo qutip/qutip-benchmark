@@ -1,0 +1,11 @@
+# see: https://github.com/staticfloat/forerunner-buildkite-plugin
+steps:
+  - label: ":runner: Dynamically launch pipelines"
+    plugins:
+      - staticfloat/forerunner: # CUDA.jl tests
+          watch:
+            - ".buildkite/*"
+            - "code_files..."
+          target: ".buildkite/benchmark.yml"
+    agents:
+      queue: "juliagpu"
