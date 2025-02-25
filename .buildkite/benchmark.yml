@@ -1,0 +1,31 @@
+steps:
+  - label: "Run QuantumToolbox.jl benchmarks with CUDA"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "1"
+    command: |
+      julia --project=benchmarks/QuantumToolbox.jl -e 'println("--- Instantiating project ---")
+          using Pkg
+          Pkg.develop(PackageSpec(path=pwd()))
+          Pkg.instantiate()'
+
+      julia --project=benchmarks/QuantumToolbox.jl -e 'println("--- Run Benchmarks ---")
+          include("benchmarks/QuantumToolbox.jl/runbenchmarks.jl")'
+    artifact_paths:
+      - "benchmarks/results/*"
+    agents:
+      queue: "juliagpu"
+      cuda: "*"
+    env:
+      BENCHMARK_GROUP: "CUDA"
+    timeout_in_minutes: 60
+
+  #- label: "Run qutip benchmarks with CUDA"
+  #  ...
+  #  env:
+  #    BENCHMARK_GROUP: "CUDA"
+
+  #- label: "Run dynamiqs benchmarks with CUDA"
+  #  ...
+  #  env:
+  #    BENCHMARK_GROUP: "CUDA"
