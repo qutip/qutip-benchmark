@@ -1,0 +1,21 @@
+# see: https://github.com/staticfloat/forerunner-buildkite-plugin
+steps:
+  - label: ":runner: Dynamically launch benchmark pipeline"
+    if: | 
+        // Don't run Buildkite if the commit message includes the text [skip ci], [ci skip], or [no ci]
+        // Don't run Buildkite for PR draft
+        // Only run Buildkite when new commits and PR are made to main branch
+        build.message !~ /\[skip ci\]/ &&
+        build.message !~ /\[ci skip\]/ &&
+        build.message !~ /\[no ci\]/   &&
+        !build.pull_request.draft      &&
+        (build.branch =~ /main/ || build.pull_request.base_branch =~ /main/)
+    agents:
+      queue: "juliagpu"
+    plugins:
+      - staticfloat/forerunner:
+          # only trigger the benchmark pipeline if the following folders are updated
+          watch:
+            - ".buildkite/**"
+            - "benchmark/**"
+          target: ".buildkite/benchmark.yml" # trigger this pipeline

@@ -1,0 +1,11 @@
+.DS_Store
+
+*.jl.*.cov
+*.jl.cov
+*.jl.mem
+Manifest.toml
+
+.vscode
+
+.ipynb_checkpoints
+*.ipynb

@@ -2,7 +2,23 @@ name: Test Benchmarks
 
 
 on:
-  [push, pull_request]
+  push:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '.buildkite/**'
+      - 'benchmark/**'
+  pull_request:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '.buildkite/**'
+      - 'benchmark/**'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 
 defaults:

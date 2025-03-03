@@ -1,6 +1,23 @@
 name: Lint
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '.buildkite/**'
+      - 'benchmark/**'
+  pull_request:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '.buildkite/**'
+      - 'benchmark/**'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
 
 jobs:
   lint-black:
