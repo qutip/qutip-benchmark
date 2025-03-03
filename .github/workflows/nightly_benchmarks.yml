@@ -81,7 +81,7 @@ jobs:
           AWS_EC2_METADATA_DISABLED: true
 
   finalise:
-    needs: publish
+    needs: benchmarks
     if: failure()
     runs-on: ubuntu-latest
     steps:
