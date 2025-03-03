@@ -14,8 +14,7 @@ steps:
       queue: "juliagpu"
     plugins:
       - staticfloat/forerunner:
-          # only trigger the benchmark pipeline if the following folders are updated
-          watch:
+          watch: # only trigger the benchmark pipeline if the following folders are updated
             - ".buildkite/**"
             - "benchmark/**"
           target: ".buildkite/benchmark.yml" # trigger this pipeline
