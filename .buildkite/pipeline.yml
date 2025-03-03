@@ -9,7 +9,7 @@ steps:
         build.message !~ /\[ci skip\]/ &&
         build.message !~ /\[no ci\]/   &&
         !build.pull_request.draft      &&
-        (build.branch =~ /main/ || build.pull_request.base_branch =~ /main/)
+        (build.branch =~ /master/ || build.pull_request.base_branch =~ /master/)
     agents:
       queue: "juliagpu"
     plugins:
