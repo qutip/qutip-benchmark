@@ -1,7 +1,7 @@
 using BenchmarkTools
 using QuantumToolbox
 
-QuantumToolbox.versioninfo()
+QuantumToolbox.about()
 
 const GROUP = get(ENV, "GROUP", "CPU")
 

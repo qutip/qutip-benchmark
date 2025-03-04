@@ -9,13 +9,12 @@ steps:
         build.message !~ /\[ci skip\]/ &&
         build.message !~ /\[no ci\]/   &&
         !build.pull_request.draft      &&
-        (build.branch =~ /main/ || build.pull_request.base_branch =~ /main/)
+        (build.branch =~ /master/ || build.pull_request.base_branch =~ /master/)
     agents:
       queue: "juliagpu"
     plugins:
       - staticfloat/forerunner:
-          # only trigger the benchmark pipeline if the following folders are updated
-          watch:
+          watch: # only trigger the benchmark pipeline if the following folders are updated
             - ".buildkite/**"
             - "benchmark/**"
           target: ".buildkite/benchmark.yml" # trigger this pipeline
