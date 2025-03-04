@@ -16,15 +16,15 @@ steps:
       queue: "juliagpu"
       cuda: "*"
     env:
-      BENCHMARK_GROUP: "CUDA"
+      GROUP: "CUDA"
     timeout_in_minutes: 60
 
   #- label: "Run qutip benchmarks with CUDA"
   #  ...
   #  env:
-  #    BENCHMARK_GROUP: "CUDA"
+  #    GROUP: "CUDA"
 
   #- label: "Run dynamiqs benchmarks with CUDA"
   #  ...
   #  env:
-  #    BENCHMARK_GROUP: "CUDA"
+  #    GROUP: "CUDA"
