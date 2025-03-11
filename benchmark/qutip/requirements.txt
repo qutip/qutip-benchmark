@@ -1,0 +1,3 @@
+numpy>=1.21
+qutip>=5.1
+pytest-benchmark==5.1.0
