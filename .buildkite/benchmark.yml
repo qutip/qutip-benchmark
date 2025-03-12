@@ -25,7 +25,7 @@ steps:
     key: "pip"
     plugins:
       - docker#5:
-        image "python:3"
+        image: "python:3"
     command: "pip install -r benchmark/qutip/requirements.txt"
 
   - label: "python: Run benchmark"
