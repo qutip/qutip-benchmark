@@ -24,14 +24,14 @@ steps:
   - label: "pip: Install requirements"
     key: "pip"
     plugins:
-      - docker#v5:
+      - docker#v5.12.0:
         image: "python:3"
     command: "pip install -r benchmark/qutip/requirements.txt"
 
   - label: "python: Run benchmark"
     depends_on: ["pip"]
     plugins:
-      - docker#v5:
+      - docker#v5.12.0:
         image: "python:3"
     command: "python -m benchmark.qutip.benchmark -v -s"
     artifact_paths:
