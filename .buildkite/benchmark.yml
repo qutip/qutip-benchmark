@@ -32,7 +32,7 @@ steps:
     depends_on: ["pip"]
     plugins:
       - docker#5:
-        image "python:3"
+        image: "python:3"
     command: "python -m benchmark.qutip.benchmark -v -s"
     artifact_paths:
       - ".benchmarks/*"
