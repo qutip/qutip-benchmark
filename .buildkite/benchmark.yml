@@ -27,6 +27,9 @@ steps:
       - docker#v5.12.0:
           image: "python:3"
     command: "pip install -r benchmark/qutip/requirements.txt"
+    agents:
+      queue: "juliagpu"
+      cuda: "*"
 
   - label: "qutip: run benchmark"
     depends_on: ["pip"]
