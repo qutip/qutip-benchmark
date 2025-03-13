@@ -22,25 +22,24 @@ steps:
 
   ### Python ###
   - label: "qutip: pip install requirements"
-    key: "pip"
     plugins:
       - docker#v5.12.0:
           image: "python:3"
-    command: pip install -r benchmark/qutip/requirements.txt
+    command: "pip install -r benchmark/qutip/requirements.txt"
 
   - label: "qutip: run benchmark"
-    depends_on: ["pip"]
     plugins:
       - docker#v5.12.0:
           image: "python:3"
-    command: python -m benchmark.qutip.benchmark -v -s
+    command: "python -m benchmark.qutip.benchmark -v -s"
     artifact_paths:
-      - ".benchmarks/*"
+      - "benchmarks/results/*"
     agents:
       queue: "juliagpu"
       cuda: "*"
     env:
       GROUP: "CUDA"
+    timeout_in_minutes: 60
 
   #- label: "Run dynamiqs benchmarks with CUDA"
   #  ...
