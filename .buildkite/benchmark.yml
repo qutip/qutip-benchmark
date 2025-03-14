@@ -24,9 +24,14 @@ steps:
   - label: "qutip: pip install requirements"
     key: "pip"
     plugins:
-      - docker#v5.12.0:
-          image: "python:3"
-    command: "pip install -r benchmark/qutip/requirements.txt"
+      - JuliaCI/julia#v1:
+          version: "1"
+    command: |
+      which python
+
+      which pip
+
+      pip install -r benchmark/qutip/requirements.txt
     agents:
       queue: "juliagpu"
       cuda: "*"
@@ -34,8 +39,8 @@ steps:
   - label: "qutip: run benchmark"
     depends_on: ["pip"]
     plugins:
-      - docker#v5.12.0:
-          image: "python:3"
+      - JuliaCI/julia#v1:
+          version: "1"
     command: "python -m benchmark.qutip.benchmark -v -s"
     artifact_paths:
       - "benchmarks/results/*"
