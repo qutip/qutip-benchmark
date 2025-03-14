@@ -26,7 +26,7 @@ steps:
     plugins:
       - JuliaCI/julia#v1:
           version: "1"
-    command: "python3 --version"
+    command: "python3 -m pip install -r benchmark/qutip/requirements.txt"
     agents:
       queue: "juliagpu"
       cuda: "*"
@@ -36,7 +36,7 @@ steps:
     plugins:
       - JuliaCI/julia#v1:
           version: "1"
-    command: "python -m benchmark.qutip.benchmark -v -s"
+    command: "python3 -m benchmark.qutip.benchmark -v -s"
     artifact_paths:
       - "benchmarks/results/*"
     agents:
