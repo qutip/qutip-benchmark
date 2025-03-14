@@ -26,12 +26,7 @@ steps:
     plugins:
       - JuliaCI/julia#v1:
           version: "1"
-    command: |
-      which python
-
-      which pip
-
-      pip install -r benchmark/qutip/requirements.txt
+    command: "pip install -r benchmark/qutip/requirements.txt"
     agents:
       queue: "juliagpu"
       cuda: "*"
