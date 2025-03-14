@@ -1,4 +1,5 @@
 steps:
+  ### Julia ###
   - label: "Run QuantumToolbox.jl benchmarks with CUDA"
     plugins:
       - JuliaCI/julia#v1:
@@ -19,10 +20,34 @@ steps:
       GROUP: "CUDA"
     timeout_in_minutes: 60
 
-  #- label: "Run qutip benchmarks with CUDA"
-  #  ...
-  #  env:
-  #    GROUP: "CUDA"
+  ### Python ###
+  - label: "qutip: pip install requirements"
+    key: "pip"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "1"
+    command: |
+      python3 -m ensurepip --upgrade
+
+      python3 -m pip install -r benchmark/qutip/requirements.txt
+    agents:
+      queue: "juliagpu"
+      cuda: "*"
+
+  - label: "qutip: run benchmark"
+    depends_on: ["pip"]
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "1"
+    command: "python3 -m benchmark.qutip.benchmark -v -s"
+    artifact_paths:
+      - "benchmarks/results/*"
+    agents:
+      queue: "juliagpu"
+      cuda: "*"
+    env:
+      GROUP: "CUDA"
+    timeout_in_minutes: 60
 
   #- label: "Run dynamiqs benchmarks with CUDA"
   #  ...
