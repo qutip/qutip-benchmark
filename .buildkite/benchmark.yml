@@ -25,7 +25,8 @@ steps:
     #         image: "python"
     command: |
       echo $PATH
-      apt-get install -y python3-pip
+      apt-get install -y python3-venv
+      python3 -m ensurepip --upgrade -y
       python3 -v
       python3 -m pip install qutip
       
