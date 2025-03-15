@@ -27,8 +27,8 @@ steps:
         python -v
         which pip
     agents:
-        queue: "juliagpu"
-        cuda: "*"
+      queue: "juliagpu"
+      cuda: "*"
     env:
       GROUP: "CUDA"
     timeout_in_minutes: 60
