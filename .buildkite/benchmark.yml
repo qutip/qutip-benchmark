@@ -24,8 +24,10 @@ steps:
     #     - docker#v5.9.0:
     #         image: "python"
     command: |
-      echo PATH
-      python3 -m ensurepip
+      echo $PATH
+      apt-get install python3-venv
+      python3 -m ensurepip --upgrade
+      python3 -m pip install qutip
     agents:
       queue: "juliagpu"
       cuda: "*"
