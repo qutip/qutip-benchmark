@@ -20,11 +20,12 @@ steps:
   #   timeout_in_minutes: 60
 
   - label: "Setup Python"
-    plugins:
-        - docker#v5.9.0:
-            image: "python"
+    # plugins:
+    #     - docker#v5.9.0:
+    #         image: "python"
     command: |
-      which docker
+      which python3
+      python3 -m pip install qutip
     agents:
       queue: "juliagpu"
       cuda: "*"
