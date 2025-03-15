@@ -20,18 +20,18 @@ steps:
   #   timeout_in_minutes: 60
 
   - label: "Setup Python"
-  plugins:
-      - docker#v5.9.0:
-          image: "python"
-    command: |
-      python -v
-      which pip
-  agents:
-      queue: "juliagpu"
-      cuda: "*"
-  env:
-    GROUP: "CUDA"
-  timeout_in_minutes: 60
+    plugins:
+        - docker#v5.9.0:
+            image: "python"
+      command: |
+        python -v
+        which pip
+    agents:
+        queue: "juliagpu"
+        cuda: "*"
+    env:
+      GROUP: "CUDA"
+    timeout_in_minutes: 60
   #- label: "Run qutip benchmarks with CUDA"
   #  ...
   #  env:
