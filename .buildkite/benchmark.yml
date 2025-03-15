@@ -23,9 +23,9 @@ steps:
     plugins:
         - docker#v5.9.0:
             image: "python"
-      command: |
-        python -v
-        which pip
+    command: |
+      python -v
+      which pip
     agents:
       queue: "juliagpu"
       cuda: "*"
