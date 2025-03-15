@@ -1,24 +1,37 @@
 steps:
-  - label: "Run QuantumToolbox.jl benchmarks with CUDA"
-    plugins:
-      - JuliaCI/julia#v1:
-          version: "1"
-    command: |
-      julia --project=benchmark/QuantumToolbox.jl -e 'println("--- Instantiating project ---")
-          using Pkg
-          Pkg.instantiate()'
+  # - label: "Run QuantumToolbox.jl benchmarks with CUDA"
+  #   plugins:
+  #     - JuliaCI/julia#v1:
+  #         version: "1"
+  #   command: |
+  #     julia --project=benchmark/QuantumToolbox.jl -e 'println("--- Instantiating project ---")
+  #         using Pkg
+  #         Pkg.instantiate()'
 
-      julia --project=benchmark/QuantumToolbox.jl -e 'println("--- Run Benchmarks ---")
-          include("benchmark/QuantumToolbox.jl/runbenchmarks.jl")'
-    artifact_paths:
-      - "benchmark/results/*"
-    agents:
+  #     julia --project=benchmark/QuantumToolbox.jl -e 'println("--- Run Benchmarks ---")
+  #         include("benchmark/QuantumToolbox.jl/runbenchmarks.jl")'
+  #   artifact_paths:
+  #     - "benchmark/results/*"
+  #   agents:
+  #     queue: "juliagpu"
+  #     cuda: "*"
+  #   env:
+  #     GROUP: "CUDA"
+  #   timeout_in_minutes: 60
+
+  - label: "Setup Python"
+  plugins:
+      - docker#v5.9.0:
+          image: "python"
+    command: |
+      python -v
+      which pip
+  agents:
       queue: "juliagpu"
       cuda: "*"
-    env:
-      GROUP: "CUDA"
-    timeout_in_minutes: 60
-
+  env:
+    GROUP: "CUDA"
+  timeout_in_minutes: 60
   #- label: "Run qutip benchmarks with CUDA"
   #  ...
   #  env:
