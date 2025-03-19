@@ -1,20 +1,15 @@
 import pytest
-from qutip import mesolve, basis, sigmax, sigmaz, CoreOptions
+import jax
 import jax.numpy as jnp
 import qutip_jax as qj
-import jax
+from qutip import mesolve, basis, sigmax, sigmaz, CoreOptions
 
 @pytest.mark.jax
 def bench_jax_mesolve(benchmark):
     benchmark.group = "jax:mesolve"
     qj.set_as_default()
 
-    try:
-        jax.default_device(jax.devices("gpu")[0])
-    except:
-        # jax.default_device(jax.devices("cpu")[0])
-        raise BaseException("Only available devices are: " + str(jax.devices()))
-    finally:
+    with jax.default_device(jax.devices("gpu")[0]):
         opt = { "method": "diffrax", "normalize_output": False }
 
         with CoreOptions(default_dtype="jax"):

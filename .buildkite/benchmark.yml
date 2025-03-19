@@ -36,8 +36,6 @@ steps:
     agents:
       queue: "juliagpu"
       cuda: "*"
-    env:
-      GROUP: "CUDA"
     timeout_in_minutes: 60
 
   #- label: "Run dynamiqs benchmarks with CUDA"

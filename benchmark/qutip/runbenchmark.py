@@ -9,6 +9,7 @@ def run_benchmarks():
             "--benchmark-columns=Mean,StdDev,rounds,Iterations",
             "--benchmark-sort=name",
             "--benchmark-autosave",
+            "--benchmark-storage=./benchmark/results/"
         ]
     )
 
