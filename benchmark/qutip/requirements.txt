@@ -1,5 +1,5 @@
 numpy>=1.21
 qutip>=5.1
-jax<0.5
+jax[cuda12]<0.5
 qutip-jax>=0.1
 pytest-benchmark==5.1.0
