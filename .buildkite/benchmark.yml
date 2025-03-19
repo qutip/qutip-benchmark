@@ -21,20 +21,31 @@ steps:
     timeout_in_minutes: 60
 
   ### Python ###
-  - label: "Run QuTiP benchmarks"
+  - label: "Install Python"
+    key: "python"
     command: |
       apt-get update -y
       apt-get install -y python3-pip
 
-      pip3 install -r benchmark/qutip/requirements.txt
-
       python3 --version
       pip3 --version
-
-      python3 -m benchmark.qutip.runbenchmark -v -s
     agents:
       queue: "juliagpu"
       cuda: "*"
+    timeout_in_minutes: 60
+
+  - label: "Run QuTiP benchmarks"
+    depends_on: ["python"]
+    command: |
+      pip3 install -r benchmark/qutip/requirements.txt
+      python3 -m benchmark.qutip.runbenchmark -v -s
+    artifact_paths:
+      - "benchmark/results/*"
+    agents:
+      queue: "juliagpu"
+      cuda: "*"
+    env:
+      GROUP: "CUDA"
     timeout_in_minutes: 60
 
   #- label: "Run dynamiqs benchmarks with CUDA"
