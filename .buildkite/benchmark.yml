@@ -22,8 +22,11 @@ steps:
 
   - label: "Run QuTiP benchmarks"
     command: |
-      apt-get update -y
-      apt-get install -y python3-pip
+      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+      bash Miniconda3-latest-Linux-x86_64.sh
+
+      conda create -n qutip-benchmark python
+      conda activate qutip-benchmark
 
       python3 --version
       pip3 --version
