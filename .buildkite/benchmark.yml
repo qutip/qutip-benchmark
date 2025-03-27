@@ -24,6 +24,7 @@ steps:
     command: |
       wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
       bash Miniconda3-latest-Linux-x86_64.sh -b
+      source ~/.bashrc
 
       conda create -n qutip-benchmark python
       conda activate qutip-benchmark
