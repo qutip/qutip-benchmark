@@ -23,7 +23,7 @@ steps:
   - label: "Run QuTiP benchmarks"
     command: |
       wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-      bash Miniconda3-latest-Linux-x86_64.sh
+      bash Miniconda3-latest-Linux-x86_64.sh -b
 
       conda create -n qutip-benchmark python
       conda activate qutip-benchmark
