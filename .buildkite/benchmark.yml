@@ -38,7 +38,7 @@ steps:
 
       python3 -m benchmark.qutip.runbenchmark -v -s
     artifact_paths:
-      - "benchmark/results/*"
+      - "benchmark/results/qutip/*"
     agents:
       queue: "juliagpu"
       cuda: "*"
