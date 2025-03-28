@@ -7,6 +7,8 @@ def pkg_version(package):
         return None
 
 def pytest_benchmark_update_json(config, benchmarks, output_json):
+    """Adds the version of selected packages to the benchmarks' output JSON."""
+
     output_json["package_versions"] = {}
     output_json["package_versions"]["scipy"] = pkg_version("scipy")
     output_json["package_versions"]["numpy"] = pkg_version("numpy")
