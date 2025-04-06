@@ -26,7 +26,7 @@ Running the benchmarks
 
 to run the benchmarks use the following command from the root of the repository:
 ```
-python benchmarks/benchmarks.py
+python benchmark/qutip/runbenchmark.py
 ```
 
 This will store the resulting data and figures in the folder `.benchmarks/`.
