@@ -23,7 +23,7 @@ def run_benchmarks(args):
 def main():
     pars = argparse.ArgumentParser(
         description="""
-            Run the benchmarks for QuTiP. The script als accepts the same
+            Run the benchmarks for QuTiP. The script also accepts the same
             arguments as pytest/pytest-benchmark. Run the script from the
             root directory of the repository.
         """
