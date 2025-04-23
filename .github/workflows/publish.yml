@@ -68,6 +68,7 @@ jobs:
           # wget https://raw.githubusercontent.com/qutip/qutip.github.io/master/_includes/header.html
           # wget https://raw.githubusercontent.com/qutip/qutip.github.io/master/_includes/navbar.html
           wget https://raw.githubusercontent.com/langhaarzombie/langhaarzombie.github.io/develop/_includes/head.html
+          wget https://raw.githubusercontent.com/langhaarzombie/langhaarzombie.github.io/develop/_includes/navbar.html
           wget https://raw.githubusercontent.com/langhaarzombie/langhaarzombie.github.io/develop/_includes/footer.html
           wget https://raw.githubusercontent.com/langhaarzombie/langhaarzombie.github.io/develop/_includes/scripts.html
           cd ..
