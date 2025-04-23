@@ -22,8 +22,14 @@ steps:
 
   - label: "Run QuTiP benchmarks"
     command: |
-      apt-get update -y
-      apt-get install -y python3-pip
+      mkdir -p ~/miniconda3
+      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+      bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+      source ~/miniconda3/bin/activate
+      conda init --all
+
+      conda create -y -n qutip-benchmark python
+      conda activate qutip-benchmark
 
       python3 --version
       pip3 --version
@@ -32,7 +38,7 @@ steps:
 
       python3 -m benchmark.qutip.runbenchmark -v -s
     artifact_paths:
-      - "benchmark/results/*"
+      - "benchmark/results/qutip/*"
     agents:
       queue: "juliagpu"
       cuda: "*"
