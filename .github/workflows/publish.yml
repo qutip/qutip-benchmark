@@ -79,9 +79,6 @@ jobs:
           wget https://raw.githubusercontent.com/langhaarzombie/langhaarzombie.github.io/develop/images/logo_small.png
           cd ..
 
-          # Add additional includes
-          cp -r _includes_extra/* _includes
-
           # build the website
           bundle config path .gems
           bundle install
