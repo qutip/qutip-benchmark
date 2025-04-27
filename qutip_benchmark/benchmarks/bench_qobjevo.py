@@ -1,4 +1,5 @@
 """This file contains the benchmarks that are run the benchmark.py script."""
+
 import pytest
 import qutip
 import numpy as np
@@ -9,7 +10,7 @@ def size(request):
     return request.param
 
 
-@pytest.fixture(params=["dense", "sparse"])
+@pytest.fixture(params=["dense", "sparse", "tridiag"])
 def density(request):
     return request.param
 
@@ -34,6 +35,10 @@ def left_QobjEvo(size, density, coeftype):
 
     elif density == "dense":
         q_obj = qutip.rand_herm(size, density=1)
+
+    elif density == "tridiag":
+        a = qutip.destroy(size)
+        q_obj = a + a.dag() + a * a.dag()
 
     # Creating coefficients
     tlist = None
