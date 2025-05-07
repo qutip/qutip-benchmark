@@ -1,4 +1,5 @@
 """This file contains the benchmarks that are run the benchmark.py script."""
+
 import pytest
 import qutip
 import scipy
