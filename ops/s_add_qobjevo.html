@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="google-site-verification" content="_8nZ7KJx54y7NEnE3tvEmjGutx6mtTMsanWXgnXxjaE" />
+    <title>qutip-benchmark</title>
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="P.D. Nation & J.R. Johansson">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"/>
+    <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'/>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/site.css"/>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7GD9QRNR6E"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-7GD9QRNR6E');
+    </script>
+</head> 
+
+<body>
+<header>  <div class="container-xxl">
+    <nav class="navbar navbar-expand-md sticky-top side-padding">
+        <div class="navbar-brand m-0">
+        
+        <a href="/" style="margin: 0">
+            <img src="/images/logo_small.png" alt="QuTiP" width="64" height="32">
+        </a>
+        
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_markup" aria-controls="navbar_markup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse" id="navbar_markup">
+            <ul class="navbar-nav ms-auto align-items-md-baseline align-items-center">
+                <li class="nav-item dropdown-center">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Get Started
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="https://nbviewer.org/urls/qutip.org/qutip-tutorials/tutorials-v5/python-introduction/004_link_to_lecture_0.ipynb">Introduction</a></li>
+                        <li><a class="dropdown-item" href="/try-qutip.html">Try QuTiP!</a></li>
+                        <li><a class="dropdown-item" href="https://qutip.org/qutip-virtual-lab/">QuTiP Virtual Lab</a></li>
+                        <li><a class="dropdown-item" href="/features">Features</a></li>
+                        <li class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Other QuTiP Packages</h6></li>
+                        <li><a class="dropdown-item" href="https://qutip-qip.readthedocs.io/en/stable/">Quantum Information Processing</a></li>
+                        <li><a class="dropdown-item" href="https://github.com/qutip/qutip-qoc/">Quantum Optimal Control</a></li>
+                        <li><a class="dropdown-item" href="https://qutip.org/QuantumToolbox.jl/stable/">Quantum Toolbox in Julia</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown-center">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Tutorials
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/qutip-tutorials">All Tutorials</a></li>
+                        <li class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">By Category</h6></li>
+                        <li><a class="dropdown-item" href="/qutip-tutorials/#visualizations">Visualizations</a></li>
+                        <li><a class="dropdown-item" href="/qutip-tutorials/#time-evolution">Time Evolutions</a></li>
+                        <li><a class="dropdown-item" href="/qutip-tutorials/#quantum-information-processing">Quantum Information Processing</a></li>
+                        <li><a class="dropdown-item" href="/qutip-tutorials/#optimal-control">Optimal Control</a></li>
+                        <li><a class="dropdown-item" href="/qutip-tutorials/#tomography">Tomography</a></li>
+                        <li><a class="dropdown-item" href="/qutip-tutorials/#piqs">Permutational Invariant Lindblad Dynamics</a></li>
+                        <li><a class="dropdown-item" href="/qutip-tutorials/#heom">Hierachical Equations of Motion</a></li>
+                        <li><a class="dropdown-item" href="/qutip-tutorials/#lectures">Lecture Series</a></li>
+                        <li class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="https://qutip.org/qutip-julia-tutorials/">Quantum Toolbox in Julia</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown-center">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Resources
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="https://qutip.readthedocs.io/en/stable/">User Guide</a></li>
+                        <li><a class="dropdown-item" href="https://qutip.readthedocs.io/en/stable/apidoc/apidoc.html">API</a></li>
+                        <li><a class="dropdown-item" href="https://github.com/qutip/qutip/wiki">Wiki</a></li>
+                        <li><a class="dropdown-item" href="/qutip-benchmark">Benchmarks</a></li>
+                        <li><a class="dropdown-item" href="https://qutip.readthedocs.io/en/latest/changelog.html">Changelog</a></li>
+                        <li class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Previous Versions</h6></li>
+                        <li><a class="dropdown-item" href="https://qutip.readthedocs.io/en/qutip-4.7.x/">QuTiP 4.7.x</a></li>
+                        <li><a class="dropdown-item" href="https://colab.research.google.com/drive/18TcuHNQifYSHdGey7otK8IPDB1YbDZpW?usp=sharing">Migrate to QuTiP v5</a></li>
+                        <li><a class="dropdown-item" href="/documentation">All Versions</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown-center">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Community
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="https://github.com/qutip">GitHub</a></li>
+                        <li><a class="dropdown-item" href="/education">For Educators</a></li>
+                        <li><a class="dropdown-item" href="/research">For Researchers</a></li>
+                        <li><a class="dropdown-item" href="https://groups.google.com/g/qutip">Google Groups</a></li>
+                        <li><a class="dropdown-item" href="/jobs">Jobs</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown-center">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        About
+                    </a>
+                    <ul class="dropdown-menu" style="margin-bottom: 1rem;">
+                        <li><a class="dropdown-item" href="/news">News</a></li>
+                        <li><a class="dropdown-item" href="/devs">Devs</a></li>
+                        <li><a class="dropdown-item" href="/citing">Citing</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-primary" href="https://github.com/qutip">
+                        See on GitHub
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>  </header>
+
+<main class="my-content">
+<div class="container">
+ <div class="row">
+    <div>
+        <h3 class="text-center">Scaling Benchmarks: Qobj Add and QobjEvo Matmul</h3>
+      </div>
+  </div>
+  <div class="row">
+    <div>
+        <h4 class="text-center">Qobj Add</h4>
+      </div>
+  </div>
+  <div class="row justify-content-md-center">
+  <div class="col-md-6 pull-left">
+
+
+    <div>
+        <img src="../plots/scaling/math:add:op-plus-ket-dense.png">
+    </div>
+
+  </div> <!-- col-md-6 right content div -->
+  <div class="col-md-6 pull right">
+
+
+      <div>
+          <img src="../plots/scaling/math:add:op-plus-ket-sparse.png">
+      </div>
+
+      </div> <!-- col-md-6 left content div -->
+ </div><!-- main row div -->
+
+
+<div class="row">
+    <div>
+        <h4 class="text-center">QobjEvo Matmul</h4>
+      </div>
+  </div>
+  <div class="row justify-content-md-center">
+  <div class="col-md-6 pull-left">
+
+
+    <div>
+        <img src="../plots/scaling/math:matmul:qobjevo-op-times-ket-dense.png">
+    </div>
+
+  </div> <!-- col-md-6 right content div -->
+  <div class="col-md-6 pull right">
+
+
+      <div>
+          <img src="../plots/scaling/math:matmul:qobjevo-op-times-ket-sparse.png">
+      </div>
+
+      </div> <!-- col-md-6 left content div -->
+ </div><!-- main row div -->
+</div>
+</main>
+
+<footer><div class="container-xxl">
+    <div class="row footer">
+        <ul class="col-lg-3 col-md-4 col-6 footer-list">
+            <li><a href="/">QuTiP</a></li>
+            <li><a href="https://nbviewer.org/urls/qutip.org/qutip-tutorials/tutorials-v5/python-introduction/004_link_to_lecture_0.ipynb">
+                Get Started
+            </a></li>
+            <li><a href="/try-qutip.html">Try QuTiP!</a></li>
+            <li><a href="https://qutip.org/qutip-virtual-lab/">QuTiP Virtual Lab</a></li>
+            <li><a href="/features">Features</a></li>
+            <li><a href="https://qutip-qip.readthedocs.io/en/stable/">QuTiP QIP</a></li>
+            <li><a href="https://github.com/qutip/qutip-qoc/">QuTiP QOC</a></li>
+            <li><a href="https://qutip.org/QuantumToolbox.jl/stable/">Quantum Toolbox in Julia</a></li>
+        </ul>
+        <ul class="col-lg-3 col-md-4 col-6 footer-list">
+            <li><p>Documentation</p></li>
+            <li><a href="https://qutip.readthedocs.io/en/stable/">User Guide</a></li>
+            <li><a href="/qutip-tutorials">Tutorials</a></li>
+            <li><a href="https://qutip.readthedocs.io/en/stable/apidoc/apidoc.html">API</a></li>
+            <li><a href="https://github.com/qutip/qutip/wiki">Wiki</a></li>
+            <li><a href="https://qutip.readthedocs.io/en/latest/">QuTiP v5 (Latest Release)</a></li>
+            <li><a href="https://qutip.readthedocs.io/en/qutip-4.7.x/">QuTiP v4.7.x</a></li>
+            <li><a href="https://colab.research.google.com/drive/18TcuHNQifYSHdGey7otK8IPDB1YbDZpW?usp=sharing">Migrate to QuTiP v5</a></li>
+            <li><a href="https://qutip.readthedocs.io/en/latest/changelog.html">Changelog</a></li>
+            <li><a href="/qutip-benchmark">Benchmarks</a></li>
+        </ul>
+        <ul class="col-lg-2 col-md-4 col-6 footer-list">
+            <li><p>Community</p></li>
+            <li><a href="https://github.com/qutip">GitHub</a></li>
+            <li><a href="/research">For Researchers</a></li>
+            <li><a href="/education">For Educators</a></li>
+            <li><a href="https://groups.google.com/g/qutip">Google Groups</a></li>
+            <li><a href="/jobs">Jobs</a></li>
+            <li><a href="/news">News</a></li>
+            <li><a href="/devs">Devs</a></li>
+            <li><a href="/citing">Citing</a></li>
+        </ul>
+        <p class="col-lg-4 col-md-12">
+            &copy; 2011 to 2025 inclusive, QuTiP developers and contributors.
+        </p>
+    </div>
+</div></footer>
+    <script src='//cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js'></script>
+    <script src='//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js' integrity='sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz' crossorigin='anonymous'></script>
+    <script src='//cdn.jsdelivr.net/npm/d3@3.5.3/d3.min.js'></script>
+    <script src='//cdn.jsdelivr.net/npm/topojson@1.6.9/topojson.min.js'></script>
+    <script src='//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js'></script>
+    <script src='/js/datamaps.world.min.js'></script>
+    <script src='/js/map.js'></script>
+    <script src='/js/carousel.js'></script>
+    <script src='/js/show_more.js'></script>
+
+</body>
+</html>
