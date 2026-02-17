@@ -1,4 +1,6 @@
 import pytest
+pytest.importorskip("jax")
+pytest.importorskip("jaxlib")
 import jax
 import jax.numpy as jnp
 import qutip_jax as qj

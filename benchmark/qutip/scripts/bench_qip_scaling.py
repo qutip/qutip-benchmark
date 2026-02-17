@@ -1,4 +1,5 @@
 import pytest
+pytest.importorskip("qutip_qip")
 from qutip import basis, tensor
 from qutip_qip.circuit import QubitCircuit
 
