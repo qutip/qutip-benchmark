@@ -1,5 +1,4 @@
 import pytest
-pytest.importorskip("qutip_qip")
 from qutip import basis, tensor
 from qutip_qip.circuit import QubitCircuit
 
@@ -25,4 +24,3 @@ def bench_qip_ghz_scaling(benchmark, n_qubits):
     state = zero_state(n_qubits)
 
     benchmark(qc.run, state)
-
