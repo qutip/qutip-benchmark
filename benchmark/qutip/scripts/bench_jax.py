@@ -1,5 +1,8 @@
 import pytest
-import jax
+
+jax = pytest.importorskip("jax")
+pytest.importorskip("jaxlib")
+
 import jax.numpy as jnp
 import qutip_jax as qj
 from qutip import mesolve, basis, sigmax, sigmaz, CoreOptions
@@ -10,7 +13,11 @@ def bench_jax_mesolve(benchmark):
     benchmark.group = "jax:mesolve"
     qj.set_as_default()
 
-    with jax.default_device(jax.devices("gpu")[0]):
+    # Use GPU if available, otherwise fallback to CPU
+    devices = jax.devices("gpu")
+    dev = devices[0] if devices else jax.devices("cpu")[0]
+
+    with jax.default_device(dev):
         opt = {"method": "diffrax", "normalize_output": False}
 
         with CoreOptions(default_dtype="jax"):
