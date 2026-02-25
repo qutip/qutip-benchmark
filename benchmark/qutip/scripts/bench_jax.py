@@ -1,11 +1,12 @@
 import pytest
 
-jax = pytest.importorskip("jax")
-pytest.importorskip("jaxlib")
-
-import jax.numpy as jnp
-import qutip_jax as qj
-from qutip import mesolve, basis, sigmax, sigmaz, CoreOptions
+try:
+    import jax
+    import jax.numpy as jnp
+    import qutip_jax as qj
+    from qutip import mesolve, basis, sigmax, sigmaz, CoreOptions
+except Exception:
+    pytest.skip("JAX not properly available in this environment", allow_module_level=True)
 
 
 @pytest.mark.jax
@@ -13,11 +14,11 @@ def bench_jax_mesolve(benchmark):
     benchmark.group = "jax:mesolve"
     qj.set_as_default()
 
-    # Use GPU if available, otherwise fallback to CPU
-    devices = jax.devices("gpu")
-    dev = devices[0] if devices else jax.devices("cpu")[0]
+    # Safe device selection
+    gpu_devices = jax.devices("gpu")
+    device = gpu_devices[0] if gpu_devices else jax.devices("cpu")[0]
 
-    with jax.default_device(dev):
+    with jax.default_device(device):
         opt = {"method": "diffrax", "normalize_output": False}
 
         with CoreOptions(default_dtype="jax"):
@@ -29,4 +30,12 @@ def bench_jax_mesolve(benchmark):
             psi0 = basis(2, 0)
             tlist = jnp.linspace(0, 10, 100)
 
-            benchmark(mesolve, H, psi0, tlist, c_ops, e_ops=e_ops, options=opt)
+            benchmark(
+                mesolve,
+                H,
+                psi0,
+                tlist,
+                c_ops,
+                e_ops=e_ops,
+                options=opt,
+            )
