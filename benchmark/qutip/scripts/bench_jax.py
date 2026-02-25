@@ -14,11 +14,8 @@ def bench_jax_mesolve(benchmark):
     benchmark.group = "jax:mesolve"
     qj.set_as_default()
 
-    # Safe device selection
-    gpu_devices = jax.devices("gpu")
-    device = gpu_devices[0] if gpu_devices else jax.devices("cpu")[0]
-
-    with jax.default_device(device):
+    # DO NOT request GPU explicitly
+    with jax.default_device(jax.devices()[0]):
         opt = {"method": "diffrax", "normalize_output": False}
 
         with CoreOptions(default_dtype="jax"):
