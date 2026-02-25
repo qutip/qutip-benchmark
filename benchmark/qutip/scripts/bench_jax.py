@@ -1,12 +1,9 @@
 import pytest
 
-try:
-    import jax
-    import jax.numpy as jnp
-    import qutip_jax as qj
-    from qutip import mesolve, basis, sigmax, sigmaz, CoreOptions
-except Exception:
-    pytest.skip("JAX not properly available in this environment", allow_module_level=True)
+import jax
+import jax.numpy as jnp
+import qutip_jax as qj
+from qutip import mesolve, basis, sigmax, sigmaz, CoreOptions
 
 
 @pytest.mark.jax
