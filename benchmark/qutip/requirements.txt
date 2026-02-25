@@ -1,5 +1,5 @@
 numpy>=1.21
 qutip>=5.1
 qutip-jax>=0.1
-qutip-qip
+qutip-qip==0.4.1
 pytest-benchmark==5.1.0
