@@ -61,7 +61,7 @@ jobs:
         run: |
            python -m pip install git+https://github.com/qutip/qutip@master
 
-       - name: Install Qutip QIP
+      - name: Install Qutip QIP
         run: |
            python -m pip install qutip-qip
       - name: Package information
