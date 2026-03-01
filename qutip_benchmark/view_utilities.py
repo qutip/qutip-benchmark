@@ -82,9 +82,7 @@ def get_paths(folder):
     """
 
     benchmark_paths = glob.glob(f"{folder}/*/*.json")
-    dates = [
-        "".join(_b.split("/")[-1].split("_")[2:4]) for _b in benchmark_paths
-    ]
+    dates = ["".join(_b.split("/")[-1].split("_")[2:4]) for _b in benchmark_paths]
     zipped = zip(dates, benchmark_paths)
     tmp = sorted(zipped, key=lambda x: x[0])
     paths = list(zip(*tmp))
@@ -262,9 +260,7 @@ def column_filtering(df, filters, key):
     return df
 
 
-def sort_params(
-    df, line_sep=None, filters=None, col_filters=None, exclude=None
-):
+def sort_params(df, line_sep=None, filters=None, col_filters=None, exclude=None):
     """Filters the input dataframe by parameters used
     to separate each plot
 

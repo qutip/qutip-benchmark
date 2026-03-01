@@ -8,9 +8,7 @@ import numpy as np
 
 # Available datatypes (using qutip_dense and qutip_csr to avoid confusion
 # with density parameters)
-@pytest.fixture(
-    params=["numpy", "scipy_csr", "qutip_dense", "qutip_csr", "qutip_dia"]
-)
+@pytest.fixture(params=["numpy", "scipy_csr", "qutip_dense", "qutip_csr", "qutip_dia"])
 def dtype(request):
     return request.param
 

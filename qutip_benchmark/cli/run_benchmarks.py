@@ -17,9 +17,7 @@ def get_latest_benchmark():
     """Returns the path to the latest benchmark run from `./.benchmarks/`"""
 
     benchmark_paths = glob.glob("./.benchmarks/*/*.json")
-    dates = [
-        "".join(_b.split("/")[-1].split("_")[2:4]) for _b in benchmark_paths
-    ]
+    dates = ["".join(_b.split("/")[-1].split("_")[2:4]) for _b in benchmark_paths]
     benchmarks = {date: value for date, value in zip(dates, benchmark_paths)}
 
     dates.sort()
@@ -62,13 +60,11 @@ def run_benchmarks(args):
 
 
 def main(args=[]):
-    parser = argparse.ArgumentParser(
-        description="""Run and plot the
+    parser = argparse.ArgumentParser(description="""Run and plot the
                                      benchmarks. The script also accepts the
                                      same arguments as pytest/pytest-benchmark.
                                      The script must be run from the root of
-                                     the repository."""
-    )
+                                     the repository.""")
 
     args, other_args = parser.parse_known_args()
 

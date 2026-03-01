@@ -7,11 +7,9 @@ from qutip_benchmark.view_utilities import (
 
 def main():
     """View historical performance of nightly benchmarks"""
-    parser = argparse.ArgumentParser(
-        description="""Choose what to plot and
+    parser = argparse.ArgumentParser(description="""Choose what to plot and
                     where to store it, by default all benchmarks will be
-                    plotted using default size and dimensions"""
-    )
+                    plotted using default size and dimensions""")
     parser.add_argument(
         "--plotpath",
         default=None,
