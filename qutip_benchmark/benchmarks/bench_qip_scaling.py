@@ -15,7 +15,6 @@ def ghz_circuit(n_qubits):
     return qc
 
 
- 
 @pytest.mark.parametrize("n_qubits", [3, 4, 5, 6, 7])
 def bench_qip_ghz_scaling(benchmark, n_qubits):
     benchmark.group = "qip:ghz_scaling"
