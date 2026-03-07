@@ -2,14 +2,15 @@ from qutip import *
 from numpy import *
 from time import time
 
+
 def test_14(runs=1):
     """
     mcsolve evolution of 8-spin chain
     """
-    test_name='8-spin MC [256]'
-    N = 6# number of spins
+    test_name = "8-spin MC [256]"
+    N = 6  # number of spins
     # uniform parameters
-    h  = 1.0 * 2 * pi * ones(N) 
+    h = 1.0 * 2 * pi * ones(N)
     Jz = 0.1 * 2 * pi * ones(N)
     Jx = 0.1 * 2 * pi * ones(N)
     Jy = 0.1 * 2 * pi * ones(N)
@@ -17,9 +18,9 @@ def test_14(runs=1):
     gamma = 0.01 * ones(N)
     # intial state, first spin in state |1>, the rest in state |0>
     psi_list = []
-    psi_list.append(basis(2,1))
-    for n in range(N-1):
-        psi_list.append(basis(2,0))
+    psi_list.append(basis(2, 1))
+    for n in range(N - 1):
+        psi_list.append(basis(2, 0))
     psi0 = tensor(psi_list)
     tlist = linspace(0, 10, 200)
     # Hamiltonian
@@ -43,32 +44,32 @@ def test_14(runs=1):
         op_list[n] = sz
         sz_list.append(tensor(op_list))
     # construct the hamiltonian
-    H = 0    
+    H = 0
     # energy splitting terms
     for n in range(N):
-        H += - 0.5 * h[n] * sz_list[n]
+        H += -0.5 * h[n] * sz_list[n]
     # interaction terms
-    for n in range(N-1):
-        H += - 0.5 * Jx[n] * sx_list[n] * sx_list[n+1]
-        H += - 0.5 * Jy[n] * sy_list[n] * sy_list[n+1]
-        H += - 0.5 * Jz[n] * sz_list[n] * sz_list[n+1]
+    for n in range(N - 1):
+        H += -0.5 * Jx[n] * sx_list[n] * sx_list[n + 1]
+        H += -0.5 * Jy[n] * sy_list[n] * sy_list[n + 1]
+        H += -0.5 * Jz[n] * sz_list[n] * sz_list[n + 1]
     # collapse operators
     c_op_list = []
     # spin dephasing
     for n in range(N):
         c_op_list.append(sqrt(gamma[n]) * sz_list[n])
     # evolve and calculate expectation values
-    opts=Odeoptions(gui=False)
+    opts = Odeoptions(gui=False)
 
     tot_elapsed = 0
     for n in range(runs):
-        tic=time()
-        mcsolve(H, psi0, tlist, c_op_list, sz_list,options=opts)
-        toc=time()
+        tic = time()
+        mcsolve(H, psi0, tlist, c_op_list, sz_list, options=opts)
+        toc = time()
         tot_elapsed += toc - tic
 
     return [test_name], [tot_elapsed / runs]
- 
 
-if __name__=='__main__':
+
+if __name__ == "__main__":
     test_14()

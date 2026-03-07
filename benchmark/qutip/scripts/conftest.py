@@ -1,10 +1,12 @@
 from importlib.metadata import version, PackageNotFoundError
 
+
 def pkg_version(package):
     try:
         return version(package)
     except PackageNotFoundError:
         return None
+
 
 def pytest_benchmark_update_json(config, benchmarks, output_json):
     """Adds the version of selected packages to the benchmarks' output JSON."""

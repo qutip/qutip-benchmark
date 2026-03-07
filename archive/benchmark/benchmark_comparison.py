@@ -27,23 +27,37 @@ from qutip import *
 # command-line parsing
 #
 import argparse
+
 parser = argparse.ArgumentParser()
-parser.add_argument("-i", "--benchmark-input",
-                    help="file name for benchmark input",
-                    default="qutip-benchmarks.json", type=str)
-parser.add_argument("-r", "--benchmark-reference",
-                    help="file name for benchmark refernce",
-                    default="matlab-benchmarks.json", type=str)
-parser.add_argument("-o", "--output-file",
-                    help="file name for benchmark comparison output",
-                    default="benchmark_data.json", type=str)
+parser.add_argument(
+    "-i",
+    "--benchmark-input",
+    help="file name for benchmark input",
+    default="qutip-benchmarks.json",
+    type=str,
+)
+parser.add_argument(
+    "-r",
+    "--benchmark-reference",
+    help="file name for benchmark refernce",
+    default="matlab-benchmarks.json",
+    type=str,
+)
+parser.add_argument(
+    "-o",
+    "--output-file",
+    help="file name for benchmark comparison output",
+    default="benchmark_data.json",
+    type=str,
+)
 args = parser.parse_args()
 
 #
 # get hardware info
 #
-platform = [{'label': label, 'value': value}
-            for label, value in hardware_info().items()]
+platform = [
+    {"label": label, "value": value} for label, value in hardware_info().items()
+]
 
 #
 # read in benchmark files
@@ -64,11 +78,11 @@ for n in range(len(mb1_data["data"])):
     dt2 = mb2_data["data"][n]["time"]
     if dt2 > 0.0 and dt1 > 0.0:
         factor = dt2 / dt1
-        data.append({'name': str(name), 'factor': factor})
+        data.append({"name": str(name), "factor": factor})
 
 f = open(args.output_file, "w")
-f.write('data = ' + str(data) + ';\n')
-f.write('platform = ' + str(platform).replace("u'", "'") + ';\n')
-f.write('bm1_info = ' + str(mb1_data["info"]).replace("u'", "'") + ';\n')
-f.write('bm2_info= ' + str(mb2_data["info"]).replace("u'", "'") + ';\n')
+f.write("data = " + str(data) + ";\n")
+f.write("platform = " + str(platform).replace("u'", "'") + ";\n")
+f.write("bm1_info = " + str(mb1_data["info"]).replace("u'", "'") + ";\n")
+f.write("bm2_info= " + str(mb2_data["info"]).replace("u'", "'") + ";\n")
 f.close()

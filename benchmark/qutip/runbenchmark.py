@@ -2,6 +2,7 @@ import sys
 import argparse
 import pytest
 
+
 def run_benchmarks(args):
     """Run pytest benchmarks with defaults and optional additional args."""
 
@@ -20,16 +21,16 @@ def run_benchmarks(args):
         + args
     )
 
+
 def main():
-    pars = argparse.ArgumentParser(
-        description="""
+    pars = argparse.ArgumentParser(description="""
             Run the benchmarks for QuTiP. The script also accepts the same
             arguments as pytest/pytest-benchmark. Run the script from the
             root directory of the repository.
-        """
-    )
+        """)
     _, other_args = pars.parse_known_args()
     return run_benchmarks(other_args)
+
 
 if __name__ == "__main__":
     sys.exit(main())

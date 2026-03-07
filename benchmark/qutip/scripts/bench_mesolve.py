@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 from qutip import mesolve, basis, sigmax, sigmaz
 
+
 @pytest.mark.solvers
 def bench_mesolve(benchmark):
     benchmark.group = "solvers:mesolve"
@@ -9,7 +10,7 @@ def bench_mesolve(benchmark):
     delta = np.pi
     g = 0.2
 
-    H = delta/2.0 * sigmax()
+    H = delta / 2.0 * sigmax()
     c_ops = [np.sqrt(g) * sigmaz()]
 
     psi0 = basis(2, 0)

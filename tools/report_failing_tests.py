@@ -4,17 +4,20 @@ import sys
 import argparse
 from datetime import date
 
+
 def open_issue(token):
     url = "https://api.github.com/repos/qutip/qutip-benchmark/issues"
-    data = json.dumps({
-        "title": f"Automated tests failed on {date.today()}",
-        "labels": ["bug"],
-        "body": "Scheduled test failed!"
-    })
+    data = json.dumps(
+        {
+            "title": f"Automated tests failed on {date.today()}",
+            "labels": ["bug"],
+            "body": "Scheduled test failed!",
+        }
+    )
 
     headers = {
         "Accept": "application/vnd.github.v3+json",
-        "Authorization" : f"token {token}",
+        "Authorization": f"token {token}",
     }
 
     post_request = requests.post(url=url, data=data, headers=headers)
@@ -24,17 +27,12 @@ def open_issue(token):
 
     else:
         print(
-            "Fail:",
-            post_request.status_code,
-            post_request.reason,
-            post_request.content
+            "Fail:", post_request.status_code, post_request.reason, post_request.content
         )
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="""Open an issue on failed tests."""
-    )
+    parser = argparse.ArgumentParser(description="""Open an issue on failed tests.""")
     parser.add_argument("token")
     args = parser.parse_args()
     print(args.token)
