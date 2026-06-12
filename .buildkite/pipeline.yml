@@ -11,7 +11,7 @@ steps:
         !build.pull_request.draft      &&
         (build.branch =~ /master/ || build.pull_request.base_branch =~ /master/)
     agents:
-      queue: "juliagpu"
+      queue: "cuda"
     plugins:
       - staticfloat/forerunner:
           watch: # only trigger the benchmark pipeline if the following folders are updated
