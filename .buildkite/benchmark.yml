@@ -14,8 +14,7 @@ steps:
     artifact_paths:
       - "benchmark/results/*"
     agents:
-      queue: "juliagpu"
-      cuda: "*"
+      queue: "cuda"
     env:
       GROUP: "CUDA"
     timeout_in_minutes: 60
@@ -40,8 +39,7 @@ steps:
     artifact_paths:
       - "benchmark/results/qutip/*"
     agents:
-      queue: "juliagpu"
-      cuda: "*"
+      queue: "cuda"
     timeout_in_minutes: 60
 
   #- label: "Run dynamiqs benchmarks with CUDA"
