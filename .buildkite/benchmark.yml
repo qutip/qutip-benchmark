@@ -27,7 +27,7 @@ steps:
       source ~/miniconda3/bin/activate
       conda init --all
 
-      conda create -y -n qutip-benchmark python
+      conda create -y -n qutip-benchmark python=3.13
       conda activate qutip-benchmark
 
       python3 --version
