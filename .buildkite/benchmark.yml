@@ -14,8 +14,7 @@ steps:
     artifact_paths:
       - "benchmark/results/*"
     agents:
-      queue: "juliagpu"
-      cuda: "*"
+      queue: "cuda"
     env:
       GROUP: "CUDA"
     timeout_in_minutes: 60
@@ -28,7 +27,7 @@ steps:
       source ~/miniconda3/bin/activate
       conda init --all
 
-      conda create -y -n qutip-benchmark python
+      conda create -y -n qutip-benchmark python=3.13
       conda activate qutip-benchmark
 
       python3 --version
@@ -40,8 +39,7 @@ steps:
     artifact_paths:
       - "benchmark/results/qutip/*"
     agents:
-      queue: "juliagpu"
-      cuda: "*"
+      queue: "cuda"
     timeout_in_minutes: 60
 
   #- label: "Run dynamiqs benchmarks with CUDA"
