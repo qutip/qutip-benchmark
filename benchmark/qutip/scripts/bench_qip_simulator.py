@@ -25,15 +25,14 @@ def backend(request):
 
 def _build_circuit(n_qubits, depth):
     from qutip_qip.circuit import QubitCircuit
-    import qutip_qip.operations.gates as gates
 
     rng = np.random.default_rng(seed=42)
     qc = QubitCircuit(n_qubits)
     for _ in range(depth):
         for q in range(n_qubits):
-            qc.add_gate(gates.RX(rng.uniform(0, 2 * np.pi)), targets=q)
+            qc.add_gate("RX", targets=q, arg_value=rng.uniform(0, 2 * np.pi))
         for q in range(n_qubits - 1):
-            qc.add_gate(gates.CX, targets=q + 1, controls=q)
+            qc.add_gate("CNOT", controls=q, targets=q + 1)
     return qc
 
 
