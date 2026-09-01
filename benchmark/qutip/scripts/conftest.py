@@ -16,4 +16,6 @@ def pytest_benchmark_update_json(config, benchmarks, output_json):
     output_json["package_versions"]["qutip"] = pkg_version("qutip")
     output_json["package_versions"]["qutip-jax"] = pkg_version("qutip-jax")
     output_json["package_versions"]["jax"] = pkg_version("jax")
+    output_json["package_versions"]["qutip-qip"] = pkg_version("qutip-qip")
+    output_json["package_versions"]["qutip-cuquantum"] = pkg_version("qutip-cuquantum")
     output_json["package_versions"]["pytest"] = pkg_version("pytest")
